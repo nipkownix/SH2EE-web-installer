@@ -1,0 +1,3 @@
+Inno Download Plugin 1.5.1
+
+https://bitbucket.org/mitrich_k/inno-download-plugin/downloads/idpsetup-1.5.1.exe
