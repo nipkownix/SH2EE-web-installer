@@ -1,6 +1,9 @@
 ; -- Prototype SH2EE Online Installer --
 
-#define DEBUG "false"
+#define INSTALLER_VER  "1.0"
+#define DEBUG          "false"
+#define SH2EE_CSV_URL  "http://etc.townofsilenthill.com/sandbox/ee_itmp/sh2ee.csv"
+
 #include "includes\innosetup-download-plugin\idp.iss"
 
 [Setup]
@@ -8,19 +11,19 @@ AppName=Silent Hill 2: Enhanced Edition
 AppVersion=1.0
 WizardStyle=modern
 DefaultDirName={autopf}\Konami\Silent Hill 2\
-DefaultGroupName=Silent Hill 2 Enhanced Edition
 UninstallDisplayIcon={app}\sh2.ico
 OutputDir=build
 DirExistsWarning=no
 DisableWelcomePage=False
 RestartIfNeededByRun=False
 AppendDefaultDirName=False
-DisableProgramGroupPage=no
+DisableProgramGroupPage=Yes
 RestartApplications=False
 UninstallDisplayName=Silent Hill 2: Enhanced Edition
 DisableDirPage=no
 ShowLanguageDialog=no
 WizardResizable=True
+LicenseFile=license.rtf
 
 [Types]
 Name: full; Description: Full installation (Recommended)
@@ -28,78 +31,47 @@ Name: custom; Description: Custom installation; Flags: iscustom
 
 [Components]
 Name: sh2emodule; Description: SH2 Enhancements Module; ExtraDiskSpaceRequired: 4174272; Types: full custom; Flags: fixed
+Name: ee_exe; Description: Enhanced Executable; ExtraDiskSpaceRequired: 5459968; Types: full custom; Flags: fixed
 Name: ee_essentials; Description: Enhanced Edition Essential Files; ExtraDiskSpaceRequired: 288792943; Types: full
 Name: img_pack; Description: Image Enhancement Pack; ExtraDiskSpaceRequired: 1229057424; Types: full
+Name: fmv_pack; Description: FMV Enhancement Pack; ExtraDiskSpaceRequired: 3427749254; Types: full
 Name: audio_pack; Description: Audio Enhancement Pack; ExtraDiskSpaceRequired: 2487799726; Types: full
 Name: dsoal; Description: DSOAL; ExtraDiskSpaceRequired: 2217690; Types: full
-Name: fmv_pack; Description: FMV Enhancement Pack; ExtraDiskSpaceRequired: 3427749254; Types: full
 Name: xinput_plus; Description: XInput Plus; ExtraDiskSpaceRequired: 941770; Types: full
-Name: ee_exe; Description: Enhanced Executable; ExtraDiskSpaceRequired: 5459968; Types: full
 
 [Files]
 ; Extraction tools bellow
 Source: "includes\7zip\7za.exe"; Flags: dontcopy
-Source: "includes\unshield\unshield.exe"; Flags: dontcopy
-Source: "includes\cmdlinerunner\cmdlinerunner.dll"; DestDir: "{tmp}"; Flags: dontcopy
-; Files bellow will be downloaded
-Source: "{tmp}\sh2emodule\*"; DestDir: "{app}"; Flags: external recursesubdirs createallsubdirs; ExternalSize: 4174272; Components: sh2emodule
-Source: "{tmp}\ee_essentials\SILENT HILL 2\*"; DestDir: "{app}"; Flags: external recursesubdirs createallsubdirs; ExternalSize: 288792943; Components: ee_essentials
-Source: "{tmp}\img_pack\SILENT HILL 2\*"; DestDir: "{app}"; Flags: external recursesubdirs createallsubdirs; ExternalSize: 1229057424; Components: img_pack
-Source: "{tmp}\audio_pack\SILENT HILL 2\*"; DestDir: "{app}"; Flags: external recursesubdirs createallsubdirs; ExternalSize: 2487799726; Components: audio_pack
-Source: "{tmp}\dsoal\SILENT HILL 2\*"; DestDir: "{app}"; Flags: external recursesubdirs createallsubdirs; ExternalSize: 2217690; Components: dsoal
-Source: "{tmp}\fmv_pack\SILENT HILL 2\*"; DestDir: "{app}"; Flags: external recursesubdirs createallsubdirs; ExternalSize: 3427749254; Components: fmv_pack
-Source: "{tmp}\xinput_plus\SILENT HILL 2\*"; DestDir: "{app}"; Flags: external recursesubdirs createallsubdirs; ExternalSize: 941770; Components: xinput_plus
-Source: "{tmp}\ee_exe\*"; DestDir: "{app}"; Flags: external recursesubdirs createallsubdirs; ExternalSize: 5459968; Components: ee_exe
+Source: "includes\cmdlinerunner\cmdlinerunner.dll"; Flags: dontcopy
+//Source: "includes\unshield\unshield.exe"; Flags: dontcopy
 
 [Icons]
-Name: "{group}\Silent Hill 2 Enhanced Edition"; Filename: "{app}\sh2pc.exe"; Tasks: add_startmenu
-Name: "{group}\Silent Hill 2 Enhanced Edition"; Filename: "{app}\sh2pc.exe"; Tasks: add_desktopicon
-Name: "{group}\Silent Hill 2 Enhanced Edition"; Filename: "{app}\sh2pc.exe"; Tasks: add_quicklaunchicon
+//Name: "{commondesktop}\Silent Hill 2 Enhanced Edition"; Filename: "{app}\sh2pc.exe"; Tasks: add_desktopicon
 
 [Tasks]
-Name: portablemode; Description: "todo?"; Flags: unchecked
-Name: add_startmenu; Description: Create Startmenu entries; Components: sh2emodule
-Name: add_quicklaunchicon; Description: Create a &Quick Launch shortcut for the game; GroupDescription: Additional Icons:; Components: sh2emodule
-Name: add_desktopicon; Description: Create a &Desktop for the game; GroupDescription: Additional Icons:; Components: sh2emodule
+//Name: add_desktopicon; Description: Create a &Desktop shortcut for the game; GroupDescription: Additional Icons:; Components: sh2emodule
 
 [CustomMessages]
 HelpButton=Help
 
 [Messages]
 StatusExtractFiles=Placing files...
+WelcomeLabel1=Silent Hill 2: Enhanced Edition Installation Wizard
+WelcomeLabel2=This wizard will guide you through installing Silent Hill 2: Enhanced Edition for use with Silent Hill 2 PC.%n%nNote: This wizard does not include a copy of Silent Hill 2 PC.%n%nYou must install your own copy of Silent Hill 2 PC in order to use Silent Hill 2: Enhanced Edition.%n%nYou should install Silent Hill 2 PC before running this wizard.
 
 [Code]
 #include "includes/Extractore.iss"
-
-const  
-  // Define download URLs for the packages
-  URL_sh2emodule        = 'https://github.com/elishacloud/Silent-Hill-2-Enhancements/releases/latest/download/d3d8.zip';   
-  URL_ee_essentials     = 'http://enhanced.townofsilenthill.com/SH2/files/Enhanced_Edition_Essential_Files_1.2.1.zip'; 
-  URL_img_pack          = 'http://enhanced.townofsilenthill.com/SH2/files/SH2PC_Image_Enhancement_Pack_1.1.0.zip'; 
-  URL_audio_pack        = 'http://enhanced.townofsilenthill.com/SH2/files/SH2PC_Audio_Enhancement_Pack_2.0.3.zip'; 
-  URL_dsoal             = 'http://enhanced.townofsilenthill.com/SH2/files/DSOAL_1.31a.02.zip'; 
-  URL_fmv_pack          = 'http://enhanced.townofsilenthill.com/SH2/files/SH2PC_Enhanced_FMV_Pack_1.5.2.zip'; 
-  URL_xinput_plus       = 'http://enhanced.townofsilenthill.com/SH2/files/XInputPlus_4.15.2.zip'; 
-  URL_ee_exe            = 'http://enhanced.townofsilenthill.com/SH2/files/SH2PC_Enhanced_EXE_NA_v1.0.zip';
-
-  // Define file names for the downloads
-  Filename_sh2emodule           = 'd3d8.zip';
-  Filename_ee_essentials        = 'Enhanced_Edition_Essential_Files_1.2.1.zip';
-  Filename_img_pack             = 'SH2PC_Image_Enhancement_Pack_1.1.0.zip';
-  Filename_audio_pack           = 'SH2PC_Audio_Enhancement_Pack_2.0.3.zip';
-  Filename_dsoal                = 'DSOAL_1.31a.02.zip';
-  Filename_fmv_pack             = 'SH2PC_Enhanced_FMV_Pack_1.5.2.zip';
-  Filename_xinput_plus          = 'XInputPlus_4.15.2.zip';
-  Filename_ee_exe               = 'SH2PC_Enhanced_EXE_NA_v1.0.zip';
+#include "includes/Util.iss"
 
 var
-  targetPath                    : String;
-  appDir                        : String;
   wpExtractPage                 : TWizardPage;
   intTotalComponents            : Integer;
   intInstalledComponentsCounter : Integer;
   ExtractoreListBox             : TNewListBox;
   CurrentComponentProgressBar   : TNewProgressBar;
+
+  CSVFilePath                   : String;
+  ComponentsInfoArray           : array of TComponentsInfo;
 
 procedure create_wpExtract;
 var
@@ -213,16 +185,6 @@ begin
   end;
 end;
 
-procedure OnDirEditChange(Sender: TObject);
-var
-  S: string;
-begin
-  S := WizardDirValue;
-
-  // string must not be empty
-  if (Length(S) = 0) then MsgBox('Please enter a target folder for the installation.', mbError, MB_OK);
-end;
-
 procedure HelpButtonClick(Sender: TObject);
 var
   ErrorCode: Integer;
@@ -251,6 +213,52 @@ begin
   create_wpExtract();
 
   idpClearFiles();
+  
+  SetTimer(0, 0, 50, CreateCallback(@HoverTimerProc));
+
+  ExtractoreListBox := TNewListBox.Create(wpExtractPage);
+  with ExtractoreListBox do
+  begin
+      Parent := wpExtractPage.Surface;
+      Left := CurrentComponentProgressBar.Left;
+      Top := CurrentComponentProgressBar.Top + ScaleY(40);
+      Width := CurrentComponentProgressBar.Width;
+      Height := wpExtractPage.SurfaceHeight - ExtractoreListBox.Top - ScaleY(10);
+      Anchors := [akLeft, akTop, akRight, akBottom];
+      Items.Clear();
+  end;
+
+  CompTitle := TLabel.Create(WizardForm);
+  with CompTitle do
+  begin
+      Caption := '';
+      Font.Style := [fsBold];
+      Parent := WizardForm.SelectComponentsPage;
+      Left := WizardForm.ComponentsList.Left;
+      Width := WizardForm.ComponentsList.Width;
+      Height := ScaleY(35);
+      Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(25);
+      Anchors := [akLeft, akBottom];
+      AutoSize := False;
+      WordWrap := True;
+  end;
+
+  CompDescription := TLabel.Create(WizardForm);
+  with CompDescription do
+  begin
+      Caption := '';
+      Parent := WizardForm.SelectComponentsPage;
+      Left := WizardForm.ComponentsList.Left;
+      Width := WizardForm.ComponentsList.Width;
+      Height := ScaleY(60);
+      Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
+      Anchors := [akLeft, akBottom];
+      AutoSize := False;
+      WordWrap := True;
+  end;
+
+  WizardForm.ComponentsList.Height := WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(30);
+
 
   CancelBtn                := WizardForm.CancelButton;
   HelpButton               := TButton.Create(WizardForm);
@@ -274,9 +282,39 @@ begin
     DebugLabel.Font.Style := [fsBold];
     DebugLabel.Parent     := WizardForm;
   end;
+end;
 
-  // OnChange event handling function for the "Select Destination Location" dialog
-  WizardForm.DirEdit.OnChange := @OnDirEditChange;
+function InitializeSetup(): Boolean;
+var
+  version : String;
+begin
+  Result := True;
+  // Store the path sh2ee.csv in a global variable
+  CSVFilePath := tmp(GetURLFilePart('{#SH2EE_CSV_URL}'));
+
+  // Download sh2ee.csv; show an error message and exit the installer if downloading fails
+  if not idpDownloadFile('{#SH2EE_CSV_URL}', CSVFilePath) then begin
+    MsgBox('Error:' + chr(10) + chr(13) + 'Downloading {#SH2EE_CSV_URL} failed.' + chr(10) + chr(13) + 'Setup cannot continue.', mbInformation, MB_OK);
+    Result := False;
+    exit;
+  end;
+
+  // Create an array of TComponentsInfo records from sh2ee.csv and store them in a global variable
+  ComponentsInfoArray := CSVToInfoArray(CSVFilePath);
+  // Check if above didn't work
+  if GetArrayLength(ComponentsInfoArray) = 0 then begin
+    MsgBox('Error:' + chr(10) + chr(13) + 'Parsing {#SH2EE_CSV_URL} failed.' + chr(10) + chr(13) + 'Setup cannot continue.', mbInformation, MB_OK);
+    Result := False;
+    exit;
+  end;
+
+  // Check if the installer should work correctly with with the current server-side files
+  if not SameText(ComponentsInfoArray[0].ReqInstallerVersion, ExpandConstant('{#INSTALLER_VER}')) then
+  begin
+    MsgBox('Error:' + chr(10) + chr(13) + 'This installer is outdated.' + chr(10) + chr(13) + 'Please visit the official website and download an updated version', mbInformation, MB_OK);
+    Result := False;
+    exit;
+  end;
 end;
 
 procedure CancelButtonClick(CurPageID: Integer; var Cancel, Confirm: Boolean);
@@ -297,20 +335,27 @@ function NextButtonClick(CurPage: Integer): Boolean;
 begin
   if CurPage = wpSelectComponents then
   begin
-    // Define "targetPath" for downloads or extractions is the temporary path.
-    targetPath := ExpandConstant('{tmp}\');
-
     // Add files to idp
-    if WizardIsComponentSelected('sh2emodule')       then idpAddFile(URL_sh2emodule,    ExpandConstant(targetPath + Filename_sh2emodule));   
-    if WizardIsComponentSelected('ee_essentials')    then idpAddFile(URL_ee_essentials, ExpandConstant(targetPath + Filename_ee_essentials));
-    if WizardIsComponentSelected('img_pack')         then idpAddFile(URL_img_pack,      ExpandConstant(targetPath + Filename_img_pack));     
-    if WizardIsComponentSelected('audio_pack')       then idpAddFile(URL_audio_pack,    ExpandConstant(targetPath + Filename_audio_pack));   
-    if WizardIsComponentSelected('dsoal')            then idpAddFile(URL_dsoal,         ExpandConstant(targetPath + Filename_dsoal));        
-    if WizardIsComponentSelected('fmv_pack')         then idpAddFile(URL_fmv_pack,      ExpandConstant(targetPath + Filename_fmv_pack));     
-    if WizardIsComponentSelected('xinput_plus')      then idpAddFile(URL_xinput_plus,   ExpandConstant(targetPath + Filename_xinput_plus));  
-    if WizardIsComponentSelected('ee_exe')           then idpAddFile(URL_ee_exe,        ExpandConstant(targetPath + Filename_ee_exe));       
+    if WizardIsComponentSelected('sh2emodule')     then idpAddFile(ComponentsInfoArray[0].URL, tmp(GetURLFilePart(ComponentsInfoArray[0].URL))); 
+    if WizardIsComponentSelected('ee_exe')         then idpAddFile(ComponentsInfoArray[1].URL, tmp(GetURLFilePart(ComponentsInfoArray[1].URL)));
+    if WizardIsComponentSelected('ee_essentials')  then idpAddFile(ComponentsInfoArray[2].URL, tmp(GetURLFilePart(ComponentsInfoArray[2].URL)));
+    if WizardIsComponentSelected('img_pack')       then idpAddFile(ComponentsInfoArray[3].URL, tmp(GetURLFilePart(ComponentsInfoArray[3].URL)));
+    if WizardIsComponentSelected('fmv_pack')       then idpAddFile(ComponentsInfoArray[4].URL, tmp(GetURLFilePart(ComponentsInfoArray[4].URL)));
+    if WizardIsComponentSelected('audio_pack')     then idpAddFile(ComponentsInfoArray[5].URL, tmp(GetURLFilePart(ComponentsInfoArray[5].URL)));
+    if WizardIsComponentSelected('dsoal')          then idpAddFile(ComponentsInfoArray[6].URL, tmp(GetURLFilePart(ComponentsInfoArray[6].URL)));
+    if WizardIsComponentSelected('xinput_plus')    then idpAddFile(ComponentsInfoArray[7].URL, tmp(GetURLFilePart(ComponentsInfoArray[7].URL)));    
   end;
   Result := True;
+
+  // Check for file presence in WizardDirValue
+  if CurPage = wpSelectDir then
+  begin
+    if not FileExists(AddBackslash(WizardDirValue) + 'sh2pc.exe') then 
+    begin 
+      if MsgBox('Could not find sh2pc.exe in folder!' + chr(10) + chr(13) + 'The selected folder may not be where Silent Hill 2 PC is located.' + chr(10) + chr(13) + 'Proceed anyway?', mbConfirmation, MB_YESNO) = IDNO then
+        Result := False;
+    end;
+  end;
 end;
 
 // determine the total number of components by counting the selected components.
@@ -321,7 +366,6 @@ begin
   for i := 0 to WizardForm.ComponentsList.Items.Count - 1 do
     if WizardForm.ComponentsList.Checked[i] = true then
        intTotalComponents := intTotalComponents + 1;
-
   Log('# The following [' + IntToStr(intTotalComponents) + '] components are selected: ' + selectedComponents);
 end;
 
@@ -333,8 +377,6 @@ var
     TotalProgressLabel : TLabel;
 begin
     TotalProgressBar := TNewProgressBar(wpExtractPage.FindComponent('TotalProgressBar'));
-
-
     // Initalize the ProgessBar
     if(TotalProgressBar.Position = -1) then
     begin
@@ -353,7 +395,6 @@ begin
 
     // Update ProgressBar
     TotalProgressBar.Position := (intInstalledComponentsCounter * 100);
-
     Log('# Processed Components '+IntToStr(intInstalledComponentsCounter) +'/'+IntToStr(intTotalComponents)+'.');
 end;
 
@@ -369,15 +410,6 @@ begin
 end;
 
 // Called by doExtract()
-procedure PrepareExtraction();
-begin
-  ExtractTemporaryFile('7za.exe');
-  //ExtractTemporaryFile('unshield.exe');
-  appDir := ExpandConstant('{app}');
-  targetPath := ExpandConstant('{tmp}\');
-end;
-
-// Called by doExtract()
 procedure ExtractFiles();
 var
   selectedComponents : String;
@@ -386,72 +418,66 @@ var
 begin
   selectedComponents := WizardSelectedComponents(false);
 
+  ExtractTemporaryFile('7za.exe');
+  //ExtractTemporaryFile('unshield.exe');
+
   GetNumberOfSelectedComponents(selectedComponents);
 
   // Extract the main module
   UpdateCurrentComponentName('SH2 Enhancements Module');
-    Extractore(targetPath + Filename_sh2emodule, targetPath + 'sh2emodule', '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+    Extractore(tmp(GetURLFilePart(ComponentsInfoArray[0].URL)), ExpandConstant('{app}'), '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
   UpdateTotalProgressBar();
 
+  // Extract EE .exe
+  UpdateCurrentComponentName('Enhanced Executable');
+    Extractore(tmp(GetURLFilePart(ComponentsInfoArray[1].URL)), ExpandConstant('{app}'), '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+  UpdateTotalProgressBar(); 
+  
   // Extracte selected components
   if Pos('ee_essentials', selectedComponents) > 0 then
   begin
     UpdateCurrentComponentName('Enhanced Edition Essential Files');
-      Extractore(targetPath + Filename_ee_essentials, targetPath + 'ee_essentials', '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+      Extractore(tmp(GetURLFilePart(ComponentsInfoArray[2].URL)), ExpandConstant('{app}'), '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
     UpdateTotalProgressBar();
   end;
 
   if Pos('img_pack', selectedComponents) > 0 then
   begin
     UpdateCurrentComponentName('Image Enhancement Pack');
-      Extractore(targetPath + Filename_img_pack, targetPath + 'img_pack', '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
-    UpdateTotalProgressBar();
-  end;
-
-  if Pos('audio_pack', selectedComponents) > 0 then
-  begin
-    UpdateCurrentComponentName('Audio Enhancement Pack');
-      Extractore(targetPath + Filename_audio_pack, targetPath + 'audio_pack', '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
-    UpdateTotalProgressBar();
-  end;
-
-  if Pos('dsoal', selectedComponents) > 0 then
-  begin
-    UpdateCurrentComponentName('DSOAL');
-      Extractore(targetPath + Filename_dsoal, targetPath + 'dsoal', '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+      Extractore(tmp(GetURLFilePart(ComponentsInfoArray[3].URL)), ExpandConstant('{app}'), '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
     UpdateTotalProgressBar();
   end;
 
   if Pos('fmv_pack', selectedComponents) > 0 then
   begin
     UpdateCurrentComponentName('FMV Enhancement Pack');
-      Extractore(targetPath + Filename_fmv_pack, targetPath + 'fmv_pack', '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+      Extractore(tmp(GetURLFilePart(ComponentsInfoArray[4].URL)), ExpandConstant('{app}'), '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+    UpdateTotalProgressBar();
+  end;
+
+  if Pos('audio_pack', selectedComponents) > 0 then
+  begin
+    UpdateCurrentComponentName('Audio Enhancement Pack');
+      Extractore(tmp(GetURLFilePart(ComponentsInfoArray[5].URL)), ExpandConstant('{app}'), '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+    UpdateTotalProgressBar();
+  end;
+
+  if Pos('dsoal', selectedComponents) > 0 then
+  begin
+    UpdateCurrentComponentName('DSOAL');
+      Extractore(tmp(GetURLFilePart(ComponentsInfoArray[6].URL)), ExpandConstant('{app}'), '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
     UpdateTotalProgressBar();
   end;
 
   if Pos('xinput_plus', selectedComponents) > 0 then
   begin
     UpdateCurrentComponentName('XInput Plus');
-      Extractore(targetPath + Filename_xinput_plus, targetPath + 'xinput_plus', '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
-    UpdateTotalProgressBar();
-  end;
-
-  if Pos('ee_exe', selectedComponents) > 0 then
-  begin
-    UpdateCurrentComponentName('Enhanced Executable');
-      Extractore(targetPath + Filename_ee_exe, targetPath + 'ee_exe', '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+      Extractore(tmp(GetURLFilePart(ComponentsInfoArray[7].URL)), ExpandConstant('{app}'), '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
     UpdateTotalProgressBar();
   end;
 
   if not ExtractionCancel then WizardForm.NextButton.OnClick(WizardForm.NextButton);
 
-end;
-
-// Called when we reach wpExtractPage
-procedure doExtract();
-begin
-  PrepareExtraction();
-  ExtractFiles();
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -466,6 +492,6 @@ begin
   begin
     Wizardform.NextButton.Enabled := false;
     WizardForm.BackButton.Visible := false;
-    doExtract();
+    ExtractFiles();
   end;
 end;

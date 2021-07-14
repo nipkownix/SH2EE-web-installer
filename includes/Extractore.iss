@@ -60,7 +60,7 @@ begin
  
   if S <> '' then
   begin
-    Log(S);
+    // Log(S);
     P := Pos('Extracted', S);
     if P > 0 then
     begin

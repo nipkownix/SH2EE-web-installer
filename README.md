@@ -10,12 +10,14 @@ References used when coding this installer:
 
 [Embedded CMD in Inno Setup installer (show command output on a custom page)](https://stackoverflow.com/a/56912589/16421617)
 
-[WPN-XM/installers/](https://github.com/WPN-XM/WPN-XM/tree/master/installers) 
+[WPN-XM/installers/](https://github.com/WPN-XM/WPN-XM/tree/master/installers)
+
+[elixir-windows-setup](https://github.com/elixir-lang/elixir-windows-setup)
 
 [dwranging/cmdlinerunner.c](https://github.com/Techtesh/dwranging/blob/main/tools/windows/tool_setup/cmdlinerunner/cmdlinerunner.c)
 
 #
 
-[7zip](https://www.7-zip.org/) by Igor Pavlov. 
+[7-zip](https://www.7-zip.org/) by Igor Pavlov. 
 
 [Inno Download Plugin](https://mitrichsoftware.wordpress.com/inno-setup-tools/inno-download-plugin/) by Mitrich Software.
