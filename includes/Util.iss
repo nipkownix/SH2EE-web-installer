@@ -5,7 +5,8 @@
 [Code]
 
 type
-  TComponentsInfo = record
+  TWebComponentsInfo    = record
+    ID                  : String;
     Name                : String;
     Version             : String;
     URL                 : String;
@@ -13,10 +14,62 @@ type
     SHA512              : String;
   end;
 
+  TLocalComponentsInfo    = record
+    ID                    : String;
+    isInstalled           : Boolean;
+    Version               : String;
+  end;
+
+
+// Given a filename, replace a string with another
+function FileReplaceString(const FileName, SearchString, ReplaceString: string): Boolean;
+var
+  MyFile : TStrings;
+  MyText : string;
+begin
+  MyFile := TStringList.Create;
+
+  try
+    result := true;
+
+    try
+      MyFile.LoadFromFile(FileName);
+      MyText := MyFile.Text;
+
+      { Only save if text has been changed. }
+      if StringChangeEx(MyText, SearchString, ReplaceString, True) > 0 then
+      begin;
+        MyFile.Text := MyText;
+        MyFile.SaveToFile(FileName);
+      end;
+    except
+      result := false;
+    end;
+  finally
+    MyFile.Free;
+  end;
+end;
+
+// BoolToStr Helper function
+function BoolToStr(Value: Boolean): String; 
+begin
+  if Value then Result := 'true'
+           else Result := 'false';
+end;
+
 // Wrapper function for returning a path relative to {tmp}
 function tmp(Path: String): String;
 begin
   Result := ExpandConstant('{tmp}\') + Path;
+end;
+
+// Return a DefaultDirName based on conditions
+function GetDefaultDirName(Param: string): string;
+begin
+  if updaterMode = true then
+    Result := ExpandConstant('{src}\')
+  else
+    Result := ExpandConstant('{autopf}\') + 'Konami\Silent Hill 2\'; 
 end;
 
 // Recursive function called by SplitString
@@ -48,7 +101,7 @@ end;
 
 // Given a .csv file, return an array of information corresponding to
 // the data in the csv file.
-function CSVToInfoArray(Filename: String): array of TComponentsInfo;
+function WebCSVToInfoArray(Filename: String): array of TWebComponentsInfo;
 var
   Rows: TArrayOfString;
   RowValues: TStrings;
@@ -62,12 +115,37 @@ begin
       // Separate values at commas
       RowValues := SplitString(Rows[i], ',');
       with Result[i - 1] do begin
-        // Store first and second values as the Version and URL respectively
-        Name := RowValues[0];
-        Version := RowValues[1];
-        URL := RowValues[2];
-        ReqInstallerVersion := RowValues[3];
-        SHA512 := RowValues[4];
+        ID := RowValues[0];
+        Name := RowValues[1];
+        Version := RowValues[2];
+        URL := RowValues[3];
+        ReqInstallerVersion := RowValues[4];
+        SHA512 := RowValues[5];
+      end;
+    end;
+  end else begin
+    SetArrayLength(Result, 0);
+  end;
+end;
+
+// Same as above, but tailored to use a different format
+function LocalCSVToInfoArray(Filename: String): array of TLocalComponentsInfo;
+var
+  Rows: TArrayOfString;
+  RowValues: TStrings;
+  i: Integer;
+begin
+  // Read the file at Filename and store the lines in Rows
+  if LoadStringsFromFile(Filename, Rows) then begin
+    // Match length of return array to number of rows
+    SetArrayLength(Result, GetArrayLength(Rows) - 1);
+    for i := 1 to GetArrayLength(Rows) - 1 do begin
+      // Separate values at commas
+      RowValues := SplitString(Rows[i], ',');
+      with Result[i - 1] do begin
+        ID := RowValues[0];
+        isInstalled := StrToBool(RowValues[1]);
+        Version := RowValues[2];
       end;
     end;
   end else begin
