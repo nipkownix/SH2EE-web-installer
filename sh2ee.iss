@@ -1,4 +1,4 @@
-; -- Prototype SH2EE Online Installer --
+; -- SH2EE Web Installer --
 
 #define INSTALLER_VER  "1.0"
 #define DEBUG          "false"
