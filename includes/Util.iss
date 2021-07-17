@@ -21,7 +21,7 @@ type
   end;
 
 
-// Given a filename, replace a string with another
+// Given a text filename, replace a string with another
 function FileReplaceString(const FileName, SearchString, ReplaceString: string): Boolean;
 var
   MyFile : TStrings;
@@ -54,7 +54,7 @@ end;
 function BoolToStr(Value: Boolean): String; 
 begin
   if Value then Result := 'true'
-           else Result := 'false';
+  else Result := 'false';
 end;
 
 // Wrapper function for returning a path relative to {tmp}
@@ -66,7 +66,7 @@ end;
 // Return a DefaultDirName based on conditions
 function GetDefaultDirName(Param: string): string;
 begin
-  if updaterMode = true then
+  if maintenanceMode then
     Result := ExpandConstant('{src}\')
   else
     Result := ExpandConstant('{autopf}\') + 'Konami\Silent Hill 2\'; 

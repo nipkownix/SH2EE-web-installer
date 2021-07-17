@@ -11,7 +11,6 @@ AppName=Silent Hill 2: Enhanced Edition
 AppVersion={#INSTALLER_VER}
 WizardStyle=modern
 DefaultDirName={code:GetDefaultDirName}  
-UninstallDisplayIcon={app}\sh2.ico
 OutputDir=build
 OutputBaseFilename=SH2EEinstaller
 DirExistsWarning=no
@@ -23,10 +22,11 @@ UsePreviousTasks=no
 UsePreviousSetupType=no
 UsePreviousAppDir=no
 RestartApplications=False
-UninstallDisplayName=Silent Hill 2: Enhanced Edition
+Uninstallable=no
 DisableDirPage=no
 ShowLanguageDialog=no
 WizardResizable=True
+SetupIconFile=resources\icon.ico
 LicenseFile=resources\license.rtf
 WizardImageFile=resources\side.bmp
 WizardSmallImageFile=resources\top.bmp
@@ -52,13 +52,16 @@ Name: dsoal; Description: DSOAL; ExtraDiskSpaceRequired: 2217690; Types: full
 Name: xinput_plus; Description: XInput Plus; ExtraDiskSpaceRequired: 941770; Types: full
 
 [Files]
-; Extraction tools bellow
+; Tools below
 Source: "includes\7zip\7za.exe"; Flags: dontcopy
 Source: "includes\cmdlinerunner\cmdlinerunner.dll"; Flags: dontcopy
+Source: "includes\deletefile_util\deletefile_util.exe"; Flags: dontcopy
 //Source: "includes\unshield\unshield.exe"; Flags: dontcopy
-Source: "{srcexe}"; DestDir: "{app}"; DestName: "SH2EEupdater.exe"; Flags: external replacesameversion
-Source: "includes\SH2EEupdater.dat"; Flags: dontcopy
-
+Source: "{srcexe}"; DestDir: "{app}"; DestName: "SH2EEmaintenance.exe"; Flags: external replacesameversion
+Source: "resources\SH2EEmaintenance.dat"; Flags: dontcopy
+Source: "resources\maintenance\icon_install.bmp"; Flags: dontcopy
+Source: "resources\maintenance\icon_update.bmp"; Flags: dontcopy
+Source: "resources\maintenance\icon_uninstall.bmp"; Flags: dontcopy
 [Icons]
 //Name: "{commondesktop}\Silent Hill 2 Enhanced Edition"; Filename: "{app}\sh2pc.exe"; Tasks: add_desktopicon
 
@@ -77,36 +80,29 @@ SelectComponentsDesc=Please select which enhancement packages you would like to 
 SelectComponentsLabel2=Silent Hill 2: Enhanced Edition is comprised of several enhancement packages. Select which enhancement packages you wish to install. For the full, intended experience, install all enhancement packages. 
 FinishedHeadingLabel=Installation Complete!
 
-[UninstallDelete]
-Type: filesandordirs; Name: "{app}\sh2e";
-Type: files; Name: "{app}\alsoft.ini";
-Type: files; Name: "{app}\d3d8.dll";
-Type: files; Name: "{app}\d3d8.ini";
-Type: files; Name: "{app}\d3d8.res";
-Type: files; Name: "{app}\Dinput.dll";
-Type: files; Name: "{app}\Dinput8.dll";
-Type: files; Name: "{app}\dsoal-aldrv.dll";
-Type: files; Name: "{app}\dsound.dll";
-Type: files; Name: "{app}\keyconf.dat";
-Type: files; Name: "{app}\local.fix";
-Type: files; Name: "{app}\SH2EEupdater.dat";
-Type: files; Name: "{app}\sh2pc.exe";
-Type: files; Name: "{app}\XInput1_3.dll";
-Type: files; Name: "{app}\XInputPlus.ini";
-
 [Code]
 var
-  updaterMode: Boolean;
+  maintenanceMode: Boolean;
 
 #include "includes/Extractore.iss"
 #include "includes/Util.iss"
 
 var
-  wpUpdaterPage                 : TInputOptionWizardPage;
-  wpUpdaterComponentList        : String;
+  wpMaintenance                 : TWizardPage;
+  installRadioBtn               : TRadioButton;
+  updateRadioBtn                : TRadioButton;
+  uninstallRadioBtn             : TRadioButton;
+
+  wpInstallNew                  : TInputOptionWizardPage;
+
+  wpUpdater                     : TInputOptionWizardPage;
+
+  MaintenanceCompsList          : String;
   LocalCompsArray               : array of TLocalComponentsInfo;
 
-  wpExtractPage                 : TWizardPage;
+  BoxPointer                    : TInputOptionWizardPage;
+
+  wpExtract                     : TWizardPage;
   intTotalComponents            : Integer;
   selectedComponents            : String;
   intInstalledComponentsCounter : Integer;
@@ -166,20 +162,29 @@ begin
           '\pard\li450\ You can open a support ticket here for help.\par}';
   end;
 end;
-  
+
+// Kill the extraction tool if we cancel the instalation during the extraction process  
 procedure wpExtractCancelButtonClick(Page: TWizardPage; var Cancel, Confirm: Boolean);
 begin
-    if ExitSetupMsgBox then
-    begin
-        WizardForm.Repaint;
-        ExtractionCancel := true;
-        ProcEnd(extProcHandle);
-        Cancel  := true;
-        Confirm := false;
-    end
-    else begin
-        Cancel := false;
-    end;
+  if ExitSetupMsgBox then
+  begin
+      WizardForm.Repaint;
+      ExtractionCancel := true;
+      ProcEnd(extProcHandle);
+      Cancel  := true;
+      Confirm := false;
+  end
+  else begin
+      Cancel := false;
+  end;
+end;
+
+// Skip wpExtract if no components were selected
+function wpExtractShouldSkipPage(Page: TWizardPage): Boolean;
+begin
+  if intTotalComponents = 0 then
+    Result := true;
+  Result := false;
 end;
 
 procedure create_wpExtract;
@@ -192,13 +197,13 @@ var
   CurrentComponentStaticText      : TNewStaticText;
 begin
   // wpExtract shown after the IDPForm page
-  wpExtractPage := CreateCustomPage(IDPForm.Page.ID, 'Extracting compressed components', 'Please wait while Setup extracts components.');
+  wpExtract := CreateCustomPage(IDPForm.Page.ID, 'Extracting compressed components', 'Please wait while Setup extracts components.');
 
   // Progress bars
-  TotalProgressStaticText := TNewStaticText.Create(wpExtractPage);
+  TotalProgressStaticText := TNewStaticText.Create(wpExtract);
   with TotalProgressStaticText do
   begin
-      Parent    := wpExtractPage.Surface;
+      Parent    := wpExtract.Surface;
       Caption   := 'Total Progress';
       Left      := ScaleX(0);
       Top       := ScaleY(0);
@@ -206,14 +211,14 @@ begin
       TabOrder  := 1;
   end;
 
-  TotalProgressBar := TNewProgressBar.Create(wpExtractPage);
+  TotalProgressBar := TNewProgressBar.Create(wpExtract);
   with TotalProgressBar do
   begin
       Name      := 'TotalProgressBar';
-      Parent    := wpExtractPage.Surface;
+      Parent    := wpExtract.Surface;
       Left      := ScaleX(0);
       Top       := ScaleY(16);
-      Width     := wpExtractPage.SurfaceWidth - TotalProgressBar.Left;
+      Width     := wpExtract.SurfaceWidth - TotalProgressBar.Left;
       Height    := ScaleY(20);
       Anchors   := [akLeft, akTop, akRight];
       Min       := -1;
@@ -221,11 +226,11 @@ begin
       Max       := 100;
   end;
 
-  TotalProgressLabel := TLabel.Create(wpExtractPage);
+  TotalProgressLabel := TLabel.Create(wpExtract);
   with TotalProgressLabel do
   begin
       Name        := 'TotalProgressLabel';
-      Parent      := wpExtractPage.Surface;
+      Parent      := wpExtract.Surface;
       Caption     := '--/--';
       Font.Style  := [fsBold];
       Alignment   := taRightJustify;
@@ -237,10 +242,10 @@ begin
       AutoSize    := False;
   end;
 
-  CurrentComponentStaticText := TNewStaticText.Create(wpExtractPage);
+  CurrentComponentStaticText := TNewStaticText.Create(wpExtract);
   with CurrentComponentStaticText do
   begin
-      Parent    := wpExtractPage.Surface;
+      Parent    := wpExtract.Surface;
       Caption   := 'Extracting Component';
       Left      := ScaleX(0);
       Top       := ScaleY(48);
@@ -250,14 +255,14 @@ begin
       TabOrder  := 2;
   end;
 
-  CurrentComponentProgressBar := TNewProgressBar.Create(wpExtractPage);
+  CurrentComponentProgressBar := TNewProgressBar.Create(wpExtract);
   with CurrentComponentProgressBar do
   begin
       Name      := 'CurrentComponentProgressBar';
-      Parent    := wpExtractPage.Surface;
+      Parent    := wpExtract.Surface;
       Left      := ScaleX(0);
       Top       := ScaleY(64);
-      Width     := wpExtractPage.SurfaceWidth - CurrentComponentProgressBar.Left;
+      Width     := wpExtract.SurfaceWidth - CurrentComponentProgressBar.Left;
       Height    := ScaleY(20);
       Anchors   := [akLeft, akTop, akRight];
       Min       := 0;
@@ -265,11 +270,11 @@ begin
       //Style   := npbstMarquee;
   end;
 
-  CurrentComponentLabel := TLabel.Create(wpExtractPage);
+  CurrentComponentLabel := TLabel.Create(wpExtract);
   with CurrentComponentLabel do
   begin
       Name        := 'CurrentComponentLabel';
-      Parent      := wpExtractPage.Surface;
+      Parent      := wpExtract.Surface;
       Caption     := '';
       Alignment   := taRightJustify;
       Font.Style  := [fsBold];
@@ -281,41 +286,61 @@ begin
       AutoSize    := False;
   end;
 
-  ExtractoreListBox := TNewListBox.Create(wpExtractPage);
+  ExtractoreListBox := TNewListBox.Create(wpExtract);
   with ExtractoreListBox do
   begin
-      Parent      := wpExtractPage.Surface;
+      Parent      := wpExtract.Surface;
       Left        := CurrentComponentProgressBar.Left;
       Top         := CurrentComponentProgressBar.Top + ScaleY(40);
       Width       := CurrentComponentProgressBar.Width;
-      Height      := wpExtractPage.SurfaceHeight - ExtractoreListBox.Top - ScaleY(10);
+      Height      := wpExtract.SurfaceHeight - ExtractoreListBox.Top - ScaleY(10);
       Anchors     := [akLeft, akTop, akRight, akBottom];
       Items.Clear();
   end;
 
-  with wpExtractPage do
+  with wpExtract do
   begin
       OnCancelButtonClick := @wpExtractCancelButtonClick;
+      OnShouldSkipPage    := @wpExtractShouldSkipPage;
   end;
 end;
 
-// Helper to populate the updater's CheckListBox's labels
-function VersionLabel(OnlineVer: String; ExistVer: String; isInstalled: Boolean): String;
+// Helper to populate wpInstallNew's CheckListBox's labels
+function wpIVersionLabel(OnlineVer: String; ExistVer: String; isInstalled: Boolean): String;
 begin
-  if isInstalled = true then
+  if not isInstalled then
+    Result := 'Version available: ' + OnlineVer
+  else 
+    Result := 'Already installed'
+end;
+
+// Helper to populate wpUpdater's CheckListBox's labels
+function wpUVersionLabel(OnlineVer: String; ExistVer: String; isInstalled: Boolean): String;
+begin
+  if isInstalled then
   begin
     if SameText(OnlineVer, ExistVer) then
       Result := 'No update available'
     else
       Result := 'New version available: ' + OnlineVer
   end else 
-    Result := 'Component not installed'
+    Result := 'Not installed'
+end;
+
+function wpInstallNewShouldSkipPage(Page: TWizardPage): Boolean;
+begin
+    Result := not installRadioBtn.Checked;
+end;
+
+function wpUpdaterShouldSkipPage(Page: TWizardPage): Boolean;
+begin
+    Result := not updateRadioBtn.Checked;
 end;
 
 // Decides whether or not the component is available for the update
-function isChecked(OnlineVer: String; ExistVer: String; isInstalled: Boolean): Boolean;
+function isAvailable(OnlineVer: String; ExistVer: String; isInstalled: Boolean): Boolean;
 begin
-  if isInstalled = true then
+  if isInstalled then
   begin
     if SameText(OnlineVer, ExistVer) then
       Result := false
@@ -325,32 +350,263 @@ begin
     Result := false
 end;
 
-// Actually creates the updater page
-procedure PrepareUpdater();
+procedure doCustomUninstall;
+var
+  intErrorCode: Integer;
+begin
+  ExtractTemporaryFile('deletefile_util.exe');
+
+  DelTree(ExpandConstant('{src}\sh2e'), True, True, True);
+  DeleteFile(ExpandConstant('{src}\alsoft.ini'));
+  DeleteFile(ExpandConstant('{src}\d3d8.dll'));
+  DeleteFile(ExpandConstant('{src}\d3d8.ini'));
+  DeleteFile(ExpandConstant('{src}\d3d8.log'));
+  DeleteFile(ExpandConstant('{src}\d3d8.res'));
+  DeleteFile(ExpandConstant('{src}\Dinput.dll'));
+  DeleteFile(ExpandConstant('{src}\Dinput8.dll'));
+  DeleteFile(ExpandConstant('{src}\dsoal-aldrv.dll'));
+  DeleteFile(ExpandConstant('{src}\dsound.dll'));
+  DeleteFile(ExpandConstant('{src}\keyconf.dat'));
+  DeleteFile(ExpandConstant('{src}\local.fix'));
+  DeleteFile(ExpandConstant('{src}\SH2EEmaintenance.dat'));
+  DeleteFile(ExpandConstant('{src}\sh2pc.exe'));
+  DeleteFile(ExpandConstant('{src}\XInput1_3.dll'));
+  DeleteFile(ExpandConstant('{src}\XInputPlus.ini'));
+
+  // Restore the .exe backup if it exists
+  if FileExists(ExpandConstant('{src}\') + 'sh2pc.exe.bak') then
+    RenameFile(ExpandConstant('{src}\') + 'sh2pc.exe.bak', ExpandConstant('{src}\') + 'sh2pc.exe');
+
+  // Schedule SH2EEmaintenance.exe for removal as soon as possible
+  Exec(ExpandConstant('{tmp}\') + 'deletefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')), '', SW_HIDE, ewNoWait, intErrorCode);
+end;
+
+function wpMaintenanceNextClick(Page: TWizardPage): Boolean;
+begin
+    if installRadioBtn.Checked then
+      BoxPointer := wpInstallNew
+    else if updateRadioBtn.Checked then
+      BoxPointer := wpUpdater;
+    if not uninstallRadioBtn.Checked then idpDownloadAfter(BoxPointer.ID);
+    Result := True;
+
+    if uninstallRadioBtn.Checked then
+    begin 
+      if MsgBox('Are you sure you want to completely remove all Silent Hill 2: Enhanced Edition project files?', mbConfirmation, MB_YESNO) = IDNO then
+        Result := False
+      else
+        doCustomUninstall();
+    end;
+end;
+
+// Creates the maintenance page
+procedure PrepareMaintenance();
 var
   i: Integer;
+
+  installBmp         : TBitmapImage;
+  updateBmp          : TBitmapImage;
+  uninstallBmp       : TBitmapImage;
+
+  installLabel       : TLabel;
+  updateLabel        : TLabel;
+  uninstallLabel     : TLabel;
+
 begin
-  // Create custom update selection page. It is the first page shown if updaterMode is enabled
-  wpUpdaterPage := CreateInputOptionPage(
-    wpWelcome,
-    'Silent Hill 2: Enhanced Edition Update Wizard',
-    'Setup will download and install the updated components you select.',
+  ExtractTemporaryFile('icon_install.bmp');
+  ExtractTemporaryFile('icon_update.bmp');
+  ExtractTemporaryFile('icon_uninstall.bmp');
+
+  wpMaintenance := CreateCustomPage(wpWelcome, 'Silent Hill 2: Enhanced Edition Maintenance Wizard', 'Install, update, or uninstall files.');
+
+  installBmp := TBitmapImage.Create(wpMaintenance);
+  with installBmp do
+  begin;
+    AutoSize          := False;
+    Stretch           := True;
+    BackColor         := wpMaintenance.Surface.Color;
+    ReplaceColor      := $FFFFFF;
+    ReplaceWithColor  := wpMaintenance.Surface.Color;
+    Left              := ScaleX(16);
+    Top               := ScaleY(5);
+    Anchors           := [akTop, akLeft];
+    Width             := 38;
+    Height            := 38;
+    Parent            := wpMaintenance.Surface;
+    Bitmap.LoadFromFile(ExpandConstant('{tmp}\icon_install.bmp'));
+  end;
+
+  updateBmp := TBitmapImage.Create(wpMaintenance);
+  with updateBmp do
+  begin;
+    AutoSize          := False;
+    Stretch           := True;
+    BackColor         := wpMaintenance.Surface.Color;
+    ReplaceColor      := $FFFFFF;
+    ReplaceWithColor  := wpMaintenance.Surface.Color;
+    Left              := installBmp.Left;
+    Top               := installBmp.Top + ScaleY(74);
+    Anchors           := [akTop, akLeft];
+    Width             := 38;
+    Height            := 38;
+    Parent            := wpMaintenance.Surface;
+    Bitmap.LoadFromFile(ExpandConstant('{tmp}\icon_update.bmp'));
+  end;
+
+  uninstallBmp := TBitmapImage.Create(wpMaintenance);
+  with uninstallBmp do
+  begin;
+    AutoSize          := False;
+    Stretch           := True;
+    BackColor         := wpMaintenance.Surface.Color;
+    ReplaceColor      := $FFFFFF;
+    ReplaceWithColor  := wpMaintenance.Surface.Color;
+    Left              := updateBmp.Left;
+    Top               := updateBmp.Top + ScaleY(74);
+    Anchors           := [akTop, akLeft];
+    Width             := 38;
+    Height            := 38;
+    Parent            := wpMaintenance.Surface;
+    Bitmap.LoadFromFile(ExpandConstant('{tmp}\icon_uninstall.bmp'));
+  end;
+
+  installRadioBtn := TRadioButton.Create(wpMaintenance);
+  with installRadioBtn do
+  begin
+    Parent     := wpMaintenance.Surface;
+    Caption    := 'Install Packages';
+    Font.Style := [fsBold];
+    Checked    := False;
+    Left       := installBmp.Left + ScaleX(54);
+    Top        := installBmp.Top;
+    Anchors    := [akTop, akLeft];
+    Width      := wpMaintenance.SurfaceWidth;
+  end;
+
+  updateRadioBtn := TRadioButton.Create(wpMaintenance);
+  with updateRadioBtn do
+  begin
+    Parent     := wpMaintenance.Surface;
+    Caption    := 'Update Packages';
+    Font.Style := [fsBold];
+    Checked    := True;
+    Left       := updateBmp.Left + ScaleX(54);
+    Top        := updateBmp.Top;
+    Anchors    := [akTop, akLeft];
+    Width      := wpMaintenance.SurfaceWidth;
+  end;
+
+  uninstallRadioBtn := TRadioButton.Create(wpMaintenance);
+  with uninstallRadioBtn do
+  begin
+    Parent     := wpMaintenance.Surface;
+    Caption    := 'Uninstall';
+    Font.Style := [fsBold];
+    Checked    := False;
+    Left       := uninstallBmp.Left + ScaleX(54);
+    Top        := uninstallBmp.Top;
+    Anchors    := [akTop, akLeft];
+    Width      := wpMaintenance.SurfaceWidth;
+  end;
+
+  installLabel := TLabel.Create(wpMaintenance);
+  with installLabel do
+  begin
+    Parent     := wpMaintenance.Surface;
+    Caption    := 'Install enhancement packages that were not previously installed.';
+    Left       := installRadioBtn.Left;
+    Top        := installRadioBtn.Top + ScaleX(22);
+    Width      := wpMaintenance.SurfaceWidth - ScaleX(70);
+    Anchors    := [akTop, akLeft];
+    WordWrap   := True;
+    AutoSize   := True;
+  end;
+
+  updateLabel := TLabel.Create(wpMaintenance);
+  with updateLabel do
+  begin
+    Parent     := wpMaintenance.Surface;
+    Caption    := 'Check and download updates for installed enhancement packages.';
+    Left       := updateRadioBtn.Left;
+    Top        := updateRadioBtn.Top + ScaleX(22);
+    Width      := wpMaintenance.SurfaceWidth - ScaleX(70);
+    Anchors    := [akTop, akLeft];
+    WordWrap   := True;
+    AutoSize   := True;
+  end;
+
+  uninstallLabel := TLabel.Create(wpMaintenance);
+  with uninstallLabel do
+  begin
+    Parent     := wpMaintenance.Surface;
+    Caption    := 'Remove all installed enhancement packages. This only removes the Silent Hill 2: Enhanced Edition project files and does not remove Silent Hill 2 PC files.';
+    Left       := uninstallRadioBtn.Left;
+    Top        := uninstallRadioBtn.Top + ScaleX(22);
+    Width      := wpMaintenance.SurfaceWidth - ScaleX(70);
+    Anchors    := [akTop, akLeft, akRight];
+    WordWrap   := True;
+    AutoSize   := True;
+  end;
+
+  with wpMaintenance do
+  begin
+      OnNextButtonClick := @wpMaintenanceNextClick;
+  end;
+
+  // Create custom install selection page
+  wpInstallNew := CreateInputOptionPage(
+    wpMaintenance.ID,
+    SetupMessage(msgWizardSelectComponents),
+    SetupMessage(msgSelectComponentsDesc),
+    SetupMessage(msgSelectComponentsLabel2),
+    False, True);
+
+  // Use both the local and web arrays to check and populate the download listbox
+  for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+    with WebCompsArray[i] do begin
+      wpInstallNew.CheckListBox.AddCheckBox(
+        Name, // Label next to checkbox
+        wpIVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),  // Label right-justified in list box
+        0,
+        False,
+        not LocalCompsArray[i].isInstalled,
+        False,
+        False,
+        Nil);
+    end;
+  end;
+
+  with wpInstallNew do
+  begin
+      OnShouldSkipPage := @wpInstallNewShouldSkipPage;
+  end;
+
+  // Create custom update selection page
+  wpUpdater := CreateInputOptionPage(
+    wpMaintenance.ID,
+    SetupMessage(msgWizardSelectComponents),
+    'Please select which enhancement packages you would like to update.',
     'Updates will be listed below if available.',
     False, True);
 
   // Use both the local and web arrays to check and populate the update listbox
   for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
     with WebCompsArray[i] do begin
-      wpUpdaterPage.CheckListBox.AddCheckBox(
+      wpUpdater.CheckListBox.AddCheckBox(
         Name, // Label next to checkbox
-        VersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),  // Label right-justified in list box
+        wpUVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),  // Label right-justified in list box
         0,
-        isChecked(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled), // If new version is detected, automatically check the item
-        True,
+        isAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),
+        isAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),
         False,
         False,
         Nil);
     end;
+  end;
+
+  with wpUpdater do
+  begin
+      OnShouldSkipPage    := @wpUpdaterShouldSkipPage;
   end;
 end;
 
@@ -365,7 +621,7 @@ function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := False;
 
-  if updaterMode = true then
+  if maintenanceMode then
   begin
     if (PageID = wpWelcome) or
        (PageID = wpLicense) or
@@ -383,8 +639,9 @@ var
   HelpButton    : TButton;
   DebugLabel    : TNewStaticText;
 begin
-  // Replace some normal labels with RTF equivalents
-  create_RTFlabels();
+  if not maintenanceMode then
+    // Replace some normal labels with RTF equivalents
+    create_RTFlabels();
 
   // IDP settings
   idpSetOption('AllowContinue',  '1');
@@ -399,16 +656,13 @@ begin
 
   idpClearFiles();
   
-  if updaterMode = true then
-  begin
-    PrepareUpdater();
-    idpDownloadAfter(wpUpdaterPage.ID);
-  end;
+  if maintenanceMode then
+    PrepareMaintenance();
 
   // Create the wpExtract page
   create_wpExtract();
 
-  if not updaterMode = true then
+  if not maintenanceMode then
     SetTimer(0, 0, 50, CreateCallback(@HoverTimerProc));
 
   CompTitle := TLabel.Create(WizardForm);
@@ -457,7 +711,7 @@ begin
       Parent     := WizardForm;
   end;
 
-  if {#DEBUG} = true then
+  if {#DEBUG} then
   begin
     DebugLabel := TNewStaticText.Create(WizardForm);
     with DebugLabel do
@@ -502,15 +756,15 @@ begin
     exit;
   end;
 
-  // Determine weather or not we should be in "updater mode"
-  if FileExists(ExpandConstant('{src}\') + 'sh2pc.exe') and FileExists(ExpandConstant('{src}\') + 'SH2EEupdater.dat') then
+  // Determine weather or not we should be in "maintenance mode"
+  if FileExists(ExpandConstant('{src}\') + 'sh2pc.exe') and FileExists(ExpandConstant('{src}\') + 'SH2EEmaintenance.dat') then
   begin
-    updaterMode := True;
-    // Create an array of TWebComponentsInfo records from the existing SH2EEupdater.dat and store it in a global variable
-    LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEupdater.dat'));
+    maintenanceMode := True;
+    // Create an array of TWebComponentsInfo records from the existing SH2EEmaintenance.dat and store it in a global variable
+    LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEmaintenance.dat'));
     // Check if above didn't work
     if GetArrayLength(LocalCompsArray) = 0 then begin
-      MsgBox('Error:' #13#13 'Parsing SH2EEupdater.dat failed.' #13#13 'Please reinstall the project.', mbInformation, MB_OK);
+      MsgBox('Error:' #13#13 'Parsing SH2EEmaintenance.dat failed.' #13#13 'Please reinstall the project.', mbInformation, MB_OK);
       Result := False;
       exit;
     end;
@@ -539,18 +793,18 @@ begin
     Log('# The following [' + IntToStr(intTotalComponents) + '] components are selected: ' + selectedComponents); 
   end;
 
-  if updaterMode = true then
+  if maintenanceMode then
   begin
-    if CurPage = wpUpdaterPage.ID then
+    if (CurPage = wpUpdater.ID) or (CurPage = wpInstallNew.ID) then
     begin
-      // Add files to wpUpdaterComponentList and IDP
-      wpUpdaterComponentList := ''; // Clear list
+      // Add files to MaintenanceCompsList and IDP
+      MaintenanceCompsList := ''; // Clear list
       intTotalComponents := 0; // Clear list
-      for i := 0 to wpUpdaterPage.CheckListBox.Items.Count - 1 do
+      for i := 0 to BoxPointer.CheckListBox.Items.Count - 1 do
       begin
-        if wpUpdaterPage.CheckListBox.Checked[i] = true then
+        if BoxPointer.CheckListBox.Checked[i] = true then
         begin
-          wpUpdaterComponentList := wpUpdaterComponentList + WebCompsArray[i].ID + ',';
+          MaintenanceCompsList := MaintenanceCompsList + WebCompsArray[i].ID + ',';
           intTotalComponents := intTotalComponents + 1;
           idpAddFile(WebCompsArray[i].URL, tmp(GetURLFilePart(WebCompsArray[i].URL)));
         end;
@@ -560,7 +814,7 @@ begin
         Result := False;
         exit;
       end else begin
-        selectedComponents := wpUpdaterComponentList  
+        selectedComponents := MaintenanceCompsList  
         Log('# The following [' + IntToStr(intTotalComponents) + '] components are selected: ' + selectedComponents);
       end;
     end;
@@ -577,13 +831,28 @@ begin
   end;
 end;
 
+// Change the default confirmation dialogue if we're in maintenance mode
+procedure CancelButtonClick(CurPageID: Integer; var Cancel, Confirm: Boolean);
+var
+ Msg : String;
+ Res : Integer;
+begin
+  if maintenanceMode then
+  begin
+    Confirm := False; // Don't show the default dialog
+    Msg := 'Are you sure you want to close the maintenance wizard?'
+    Res := MsgBox(Msg, mbConfirmation,MB_YESNO);
+    Cancel := (Res = IDYES);
+  end;
+end;
+
 // Called when the extraction of a component is finished
 procedure UpdateTotalProgressBar();
 var
     TotalProgressBar   : TNewProgressBar;
     TotalProgressLabel : TLabel;
 begin
-    TotalProgressBar := TNewProgressBar(wpExtractPage.FindComponent('TotalProgressBar'));
+    TotalProgressBar := TNewProgressBar(wpExtract.FindComponent('TotalProgressBar'));
     // Initalize the ProgessBar
     if(TotalProgressBar.Position = -1) then
     begin
@@ -597,7 +866,7 @@ begin
     intInstalledComponentsCounter := intInstalledComponentsCounter + 1;
 
     // Update Label
-    TotalProgressLabel := TLabel(wpExtractPage.FindComponent('TotalProgressLabel'));
+    TotalProgressLabel := TLabel(wpExtract.FindComponent('TotalProgressLabel'));
     TotalProgressLabel.Caption := IntToStr(intInstalledComponentsCounter) + '/' +IntToStr(intTotalComponents);
 
     // Update ProgressBar
@@ -611,12 +880,12 @@ procedure UpdateCurrentComponentName(component: String);
 var
     CurrentComponentLabel : TLabel;
 begin
-    CurrentComponentLabel := TLabel(wpExtractPage.FindComponent('CurrentComponentLabel'));
+    CurrentComponentLabel := TLabel(wpExtract.FindComponent('CurrentComponentLabel'));
     CurrentComponentLabel.Caption := component;
     Log('# Extracting Component: ' + component);
 end;
 
-// Called when CurPageID=wpExtractPage.ID
+// Called when CurPageID=wpExtract.ID
 procedure ExtractFiles();
 var
   NullBox : TNewListBox;     // Dummy box
@@ -686,24 +955,24 @@ begin
   end;
 
   if not ExtractionCancel then WizardForm.NextButton.OnClick(WizardForm.NextButton);
-
 end;
 
 procedure preInstall();
 var i : Integer;
 begin
-  ExtractTemporaryFile('SH2EEupdater.dat');
+  ExtractTemporaryFile('SH2EEmaintenance.dat');
 
-  if updaterMode = false then
+  if not maintenanceMode then
   begin
     for i := 0 to WizardForm.ComponentsList.Items.Count - 1 do
     begin
       if WizardForm.ComponentsList.Checked[i] = true then
       begin
-        FileReplaceString(ExpandConstant('{tmp}\SH2EEupdater.dat'), WebCompsArray[i].ID + ',false,0.0', WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+        FileReplaceString(ExpandConstant('{tmp}\SH2EEmaintenance.dat'), WebCompsArray[i].ID + ',false,0.0', WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
       end;
     end;
-    FileCopy(ExpandConstant('{tmp}\SH2EEupdater.dat'), ExpandConstant('{app}\SH2EEupdater.dat'), false);
+    // Copy fresh components .csv to the game dir
+    FileCopy(ExpandConstant('{tmp}\SH2EEmaintenance.dat'), ExpandConstant('{app}\SH2EEmaintenance.dat'), false);
   end;
 end;
 
@@ -711,16 +980,20 @@ procedure postInstall();
 var
   i : Integer;
 begin
-  if updaterMode = true then
+  if (maintenanceMode = true) and not uninstallRadioBtn.Checked then
   begin
-    for i := 0 to wpUpdaterPage.CheckListBox.Items.Count - 1 do
+    for i := 0 to BoxPointer.CheckListBox.Items.Count - 1 do
     begin
-      if wpUpdaterPage.CheckListBox.Checked[i] = true then
+      if BoxPointer.CheckListBox.Checked[i] = true then
       begin
-        FileReplaceString(ExpandConstant('{src}\SH2EEupdater.dat'), LocalCompsArray[i].ID + ',' + BoolToStr(LocalCompsArray[i].isInstalled) + ',' + LocalCompsArray[i].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+        FileReplaceString(ExpandConstant('{src}\SH2EEmaintenance.dat'), LocalCompsArray[i].ID + ',' + BoolToStr(LocalCompsArray[i].isInstalled) + ',' + LocalCompsArray[i].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
       end;
     end;
   end;
+
+  // Delete SH2EEmaintenance.exe from the game directory if we're currently running from it. Not the most elegant solution, but FileCopy isn't working in this situation for some reason. Inno Setup bug? 
+  if FileExists(ExpandConstant('{src}\') + 'sh2pc.exe') and FileExists(ExpandConstant('{src}\') + 'SH2EEmaintenance.dat') then
+    DeleteFile(ExpandConstant('{src}\SH2EEmaintenance.exe'));
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -731,20 +1004,31 @@ end;
 
 procedure CurPageChanged(CurPageID: Integer);
 begin
-  if CurPageID=wpExtractPage.ID then 
+  if CurPageID = wpExtract.ID then 
   begin
     Wizardform.NextButton.Enabled := false;
     WizardForm.BackButton.Visible := false;
     ExtractFiles();
   end;
-end;
 
-procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
-begin
-  if CurUninstallStep = usPostUninstall then
+  if (CurPageID = wpFinished) and maintenanceMode then 
   begin
-    // Restore the .exe backup if it exists
-    if FileExists(ExpandConstant('{app}\') + 'sh2pc.exe.bak') then
-      RenameFile(ExpandConstant('{app}\') + 'sh2pc.exe.bak', ExpandConstant('{app}\') + 'sh2pc.exe');
+    if installRadioBtn.Checked = true then
+    begin
+      // Change default labels to fit the install action
+      WizardForm.FinishedLabel.Caption        := 'The wizard has successfully installed the selected enhancement packages.' #13#13 'Click finish to exit the wizard.';
+    end else
+    if updateRadioBtn.Checked = true then
+    begin
+      // Change default labels to fit the update action
+      WizardForm.FinishedHeadingLabel.Caption := 'Update complete!';
+      WizardForm.FinishedLabel.Caption        := 'The wizard has successfully updated the selected enhancement packages.' #13#13 'Click finish to exit the wizard.';
+    end else 
+    if uninstallRadioBtn.Checked = true then
+    begin
+      // Change default labels to fit the uninstaller action
+      WizardForm.FinishedHeadingLabel.Caption := 'Uninstallation complete.';
+      WizardForm.FinishedLabel.Caption        := 'The wizard has successfully uninstalled the enhancement packages.' #13#13 'Click finish to exit the wizard.';
+    end;
   end;
 end;
