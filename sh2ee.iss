@@ -57,7 +57,7 @@ Source: "includes\7zip\7za.exe"; Flags: dontcopy
 Source: "includes\cmdlinerunner\cmdlinerunner.dll"; Flags: dontcopy
 Source: "includes\deletefile_util\deletefile_util.exe"; Flags: dontcopy
 //Source: "includes\unshield\unshield.exe"; Flags: dontcopy
-Source: "{srcexe}"; DestDir: "{app}"; DestName: "SH2EEmaintenance.exe"; Flags: external replacesameversion
+Source: "{srcexe}"; DestDir: "{tmp}"; DestName: "SH2EEmaintenance.exe"; Flags: external 
 Source: "resources\SH2EEmaintenance.dat"; Flags: dontcopy
 Source: "resources\maintenance\icon_install.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_update.bmp"; Flags: dontcopy
@@ -971,7 +971,7 @@ begin
         FileReplaceString(ExpandConstant('{tmp}\SH2EEmaintenance.dat'), WebCompsArray[i].ID + ',false,0.0', WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
       end;
     end;
-    // Copy fresh components .csv to the game dir
+    // Copy fresh components .csv to the game's directory
     FileCopy(ExpandConstant('{tmp}\SH2EEmaintenance.dat'), ExpandConstant('{app}\SH2EEmaintenance.dat'), false);
   end;
 end;
@@ -991,9 +991,9 @@ begin
     end;
   end;
 
-  // Delete SH2EEmaintenance.exe from the game directory if we're currently running from it. Not the most elegant solution, but FileCopy isn't working in this situation for some reason. Inno Setup bug? 
-  if FileExists(ExpandConstant('{src}\') + 'sh2pc.exe') and FileExists(ExpandConstant('{src}\') + 'SH2EEmaintenance.dat') then
-    DeleteFile(ExpandConstant('{src}\SH2EEmaintenance.exe'));
+  // Copy SH2EEmaintenance.exe to the game's directory if we're not currently running from it
+  if not FileExists(ExpandConstant('{src}\') + 'sh2pc.exe') and not FileExists(ExpandConstant('{src}\') + 'SH2EEmaintenance.dat') then
+    FileCopy(ExpandConstant('{tmp}\SH2EEmaintenance.exe'), ExpandConstant('{app}\SH2EEmaintenance.exe'), false);
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
