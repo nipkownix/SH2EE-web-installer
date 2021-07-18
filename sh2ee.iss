@@ -53,7 +53,8 @@ Name: xinput_plus; Description: XInput Plus; ExtraDiskSpaceRequired: 941770; Typ
 
 [Files]
 ; Tools below
-Source: "includes\7zip\7za.exe"; Flags: dontcopy
+Source: "includes\7zip\7za_x86.exe"; Flags: dontcopy
+Source: "includes\7zip\7za_x64.exe"; Flags: dontcopy
 Source: "includes\cmdlinerunner\cmdlinerunner.dll"; Flags: dontcopy
 Source: "includes\deletefile_util\deletefile_util.exe"; Flags: dontcopy
 //Source: "includes\unshield\unshield.exe"; Flags: dontcopy
@@ -891,8 +892,11 @@ var
   NullBox : TNewListBox;     // Dummy box
   NullBar : TNewProgressBar; // Dummy bar
 begin
-  ExtractTemporaryFile('7za.exe');
-  //ExtractTemporaryFile('unshield.exe');
+
+  if IsWin64 then
+    ExtractTemporaryFile('7za_x64.exe')
+  else
+    ExtractTemporaryFile('7za_x86.exe');
 
   // Extracte selected components
   if Pos('sh2emodule', selectedComponents) > 0 then

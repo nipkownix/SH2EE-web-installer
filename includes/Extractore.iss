@@ -186,7 +186,10 @@ begin
   // prepare execution tool and parameters
   if extractTool = '7zip' then 
   begin
-    extractTool := ExpandConstant('{tmp}\7za.exe');
+    if IsWin64 then
+      extractTool := ExpandConstant('{tmp}\7za_x64.exe')
+    else
+      extractTool := ExpandConstant('{tmp}\7za_x86.exe');
     extractParams := ' x -sopg -ba "' + source + '" -o"' + targetdir + '" -y'; // -sopg isn't part of the official 7za.exe build. See: https://stackoverflow.com/a/40931992/16421617
   end
   else
