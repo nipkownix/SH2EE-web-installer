@@ -20,4 +20,7 @@ while FileExist(flName)
 	FileDelete, %flName%
 }
 
+Run, %ComSpec% /c del "%A_ScriptFullPath%", , Hide
+ExitApp
+
 ;********************************************************************************
