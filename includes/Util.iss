@@ -138,14 +138,18 @@ begin
   // Read the file at Filename and store the lines in Rows
   if LoadStringsFromFile(Filename, Rows) then begin
     // Match length of return array to number of rows
-    SetArrayLength(Result, GetArrayLength(Rows) - 1);
-    for i := 1 to GetArrayLength(Rows) - 1 do begin
+    SetArrayLength(Result, GetArrayLength(Rows) - 2);
+    for i := 1 to GetArrayLength(Rows) - 2 do begin
       // Separate values at commas
-      RowValues := SplitString(Rows[i], ',');
+      RowValues := SplitString(Rows[i + 1], ',');
       with Result[i - 1] do begin
-        ID := RowValues[0];
-        isInstalled := StrToBool(RowValues[1]);
-        Version := RowValues[2];
+        try
+          ID := RowValues[0];
+          isInstalled := StrToBool(RowValues[1]);
+          Version := RowValues[2];
+        except
+          Log('user might have edited the local .csv');
+        end;
       end;
     end;
   end else begin

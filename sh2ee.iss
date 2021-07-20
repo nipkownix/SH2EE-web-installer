@@ -764,7 +764,7 @@ begin
     // Create an array of TWebComponentsInfo records from the existing SH2EEmaintenance.dat and store it in a global variable
     LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEmaintenance.dat'));
     // Check if above didn't work
-    if GetArrayLength(LocalCompsArray) = 0 then begin
+    if not SamePackedVersion(GetArrayLength(LocalCompsArray), GetArrayLength(WebCompsArray)) then begin
       MsgBox('Error:' #13#13 'Parsing SH2EEmaintenance.dat failed.' #13#13 'Please reinstall the project.', mbInformation, MB_OK);
       Result := False;
       exit;
