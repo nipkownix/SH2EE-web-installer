@@ -12,7 +12,7 @@ AppVersion={#INSTALLER_VER}
 WizardStyle=modern
 DefaultDirName={code:GetDefaultDirName}  
 OutputDir=build
-OutputBaseFilename=SH2EEinstaller
+OutputBaseFilename=SH2EEsetup
 DirExistsWarning=no
 DisableWelcomePage=False
 RestartIfNeededByRun=False
@@ -58,8 +58,8 @@ Source: "includes\7zip\7za_x64.exe"; Flags: dontcopy
 Source: "includes\cmdlinerunner\cmdlinerunner.dll"; Flags: dontcopy
 Source: "includes\deletefile_util\deletefile_util.exe"; Flags: dontcopy
 //Source: "includes\unshield\unshield.exe"; Flags: dontcopy
-Source: "{srcexe}"; DestDir: "{tmp}"; DestName: "SH2EEmaintenance.exe"; Flags: external 
-Source: "resources\SH2EEmaintenance.dat"; Flags: dontcopy
+Source: "{srcexe}"; DestDir: "{tmp}"; DestName: "SH2EEsetup.exe"; Flags: external 
+Source: "resources\SH2EEsetup.dat"; Flags: dontcopy
 Source: "resources\maintenance\icon_install.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_update.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_uninstall.bmp"; Flags: dontcopy
@@ -369,7 +369,7 @@ begin
   DeleteFile(ExpandConstant('{src}\dsound.dll'));
   DeleteFile(ExpandConstant('{src}\keyconf.dat'));
   DeleteFile(ExpandConstant('{src}\local.fix'));
-  DeleteFile(ExpandConstant('{src}\SH2EEmaintenance.dat'));
+  DeleteFile(ExpandConstant('{src}\SH2EEsetup.dat'));
   DeleteFile(ExpandConstant('{src}\sh2pc.exe'));
   DeleteFile(ExpandConstant('{src}\XInput1_3.dll'));
   DeleteFile(ExpandConstant('{src}\XInputPlus.ini'));
@@ -378,7 +378,7 @@ begin
   if FileExists(ExpandConstant('{src}\') + 'sh2pc.exe.bak') then
     RenameFile(ExpandConstant('{src}\') + 'sh2pc.exe.bak', ExpandConstant('{src}\') + 'sh2pc.exe');
 
-  // Schedule SH2EEmaintenance.exe for removal as soon as possible
+  // Schedule SH2EEsetup.exe for removal as soon as possible
   Exec(ExpandConstant('{tmp}\') + 'deletefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')), '', SW_HIDE, ewNoWait, intErrorCode);
 end;
 
@@ -649,7 +649,7 @@ begin
   idpSetOption('DetailsVisible', '1');
   idpSetOption('DetailsButton',  '1');
   idpSetOption('RetryButton',    '1');
-  idpSetOption('UserAgent',      'sh2ee web installer');
+  idpSetOption('UserAgent',      'SH2EE web setup');
   idpSetOption('InvalidCert',    'ignore');
 
   // Start the download after wpReady
@@ -735,7 +735,7 @@ begin
 
   // Download sh2ee.csv; show an error message and exit the installer if downloading fails
   if not idpDownloadFile('{#SH2EE_CSV_URL}', CSVFilePath) then begin
-    MsgBox('Error:' #13#13 'Downloading {#SH2EE_CSV_URL} failed.' #13#13 'The installation cannot continue.', mbInformation, MB_OK);
+    MsgBox('Error: Download Failed' #13#13 'Couldn''t download sh2ee.csv.' #13#13 'The installation cannot continue.', mbInformation, MB_OK);
     Result := False;
     exit;
   end;
@@ -744,7 +744,7 @@ begin
   WebCompsArray := WebCSVToInfoArray(CSVFilePath);
   // Check if above didn't work
   if GetArrayLength(WebCompsArray) = 0 then begin
-    MsgBox('Error:' #13#13 'Parsing {#SH2EE_CSV_URL} failed.' #13#13 'The installation cannot continue.', mbInformation, MB_OK);
+    MsgBox('Error: Parsing Failed' #13#13 'Couldn''t parse sh2ee.csv.' #13#13 'The installation cannot continue.', mbInformation, MB_OK);
     Result := False;
     exit;
   end;
@@ -752,20 +752,20 @@ begin
   // Check if the installer should work correctly with with the current server-side files
   if not SameText(WebCompsArray[0].ReqInstallerVersion, ExpandConstant('{#INSTALLER_VER}')) then
   begin
-    MsgBox('Error:' #13#13 'This installer is outdated.' #13#13 'Please visit the official website and download an updated version.', mbInformation, MB_OK);
+    MsgBox('Error: Outdated Version' #13#13 'An update for the SH2:EE Setup Tool is available.' #13#13 'Please visit the official website to download the update and replace this outdated version.', mbInformation, MB_OK);
     Result := False;
     exit;
   end;
 
   // Determine weather or not we should be in "maintenance mode"
-  if FileExists(ExpandConstant('{src}\') + 'sh2pc.exe') and FileExists(ExpandConstant('{src}\') + 'SH2EEmaintenance.dat') then
+  if FileExists(ExpandConstant('{src}\') + 'sh2pc.exe') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
   begin
     maintenanceMode := True;
-    // Create an array of TWebComponentsInfo records from the existing SH2EEmaintenance.dat and store it in a global variable
-    LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEmaintenance.dat'));
+    // Create an array of TWebComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
+    LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
     // Check if above didn't work
     if not SamePackedVersion(GetArrayLength(LocalCompsArray), GetArrayLength(WebCompsArray)) then begin
-      MsgBox('Error:' #13#13 'Parsing SH2EEmaintenance.dat failed.' #13#13 'Please reinstall the project.', mbInformation, MB_OK);
+      MsgBox('Error: Parsing Failed' #13#13 'Parsing SH2EEsetup.dat failed. The file might be corrupted.' #13#13 'Please reinstall the project.', mbInformation, MB_OK);
       Result := False;
       exit;
     end;
@@ -964,7 +964,7 @@ end;
 procedure preInstall();
 var i : Integer;
 begin
-  ExtractTemporaryFile('SH2EEmaintenance.dat');
+  ExtractTemporaryFile('SH2EEsetup.dat');
 
   if not maintenanceMode then
   begin
@@ -972,11 +972,11 @@ begin
     begin
       if WizardForm.ComponentsList.Checked[i] = true then
       begin
-        FileReplaceString(ExpandConstant('{tmp}\SH2EEmaintenance.dat'), WebCompsArray[i].ID + ',false,0.0', WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+        FileReplaceString(ExpandConstant('{tmp}\SH2EEsetup.dat'), WebCompsArray[i].ID + ',false,0.0', WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
       end;
     end;
     // Copy fresh components .csv to the game's directory
-    FileCopy(ExpandConstant('{tmp}\SH2EEmaintenance.dat'), ExpandConstant('{app}\SH2EEmaintenance.dat'), false);
+    FileCopy(ExpandConstant('{tmp}\SH2EEsetup.dat'), ExpandConstant('{app}\SH2EEsetup.dat'), false);
   end;
 end;
 
@@ -990,14 +990,14 @@ begin
     begin
       if BoxPointer.CheckListBox.Checked[i] = true then
       begin
-        FileReplaceString(ExpandConstant('{src}\SH2EEmaintenance.dat'), LocalCompsArray[i].ID + ',' + BoolToStr(LocalCompsArray[i].isInstalled) + ',' + LocalCompsArray[i].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+        FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), LocalCompsArray[i].ID + ',' + BoolToStr(LocalCompsArray[i].isInstalled) + ',' + LocalCompsArray[i].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
       end;
     end;
   end;
 
-  // Copy SH2EEmaintenance.exe to the game's directory if we're not currently running from it
-  if not FileExists(ExpandConstant('{src}\') + 'sh2pc.exe') and not FileExists(ExpandConstant('{src}\') + 'SH2EEmaintenance.dat') then
-    FileCopy(ExpandConstant('{tmp}\SH2EEmaintenance.exe'), ExpandConstant('{app}\SH2EEmaintenance.exe'), false);
+  // Copy SH2EEsetup.exe to the game's directory if we're not currently running from it
+  if not FileExists(ExpandConstant('{src}\') + 'sh2pc.exe') and not FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
+    FileCopy(ExpandConstant('{tmp}\SH2EEsetup.exe'), ExpandConstant('{app}\SH2EEsetup.exe'), false);
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
