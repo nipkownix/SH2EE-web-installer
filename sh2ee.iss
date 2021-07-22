@@ -4,7 +4,7 @@
 #define DEBUG          "false"
 #define SH2EE_CSV_URL  "http://etc.townofsilenthill.com/sandbox/ee_itmp/sh2ee.csv"
 
-#include "includes\innosetup-download-plugin\idp.iss"
+#include "includes/innosetup-download-plugin/idp.iss"
 
 [Setup]
 AppName=Silent Hill 2: Enhanced Edition
@@ -80,6 +80,7 @@ WizardSelectComponents=Select Enhancement Packages
 SelectComponentsDesc=Please select which enhancement packages you would like to install. 
 SelectComponentsLabel2=Silent Hill 2: Enhanced Edition is comprised of several enhancement packages. Select which enhancement packages you wish to install. For the full, intended experience, install all enhancement packages. 
 FinishedHeadingLabel=Installation Complete!
+ExitSetupMessage=Are you sure you want to close the wizard?
 
 [Code]
 var
@@ -829,21 +830,6 @@ begin
       if MsgBox('Could not find sh2pc.exe in folder!' #13#13 'The selected folder may not be where Silent Hill 2 PC is located.' #13#13 'Proceed anyway?', mbConfirmation, MB_YESNO) = IDNO then
         Result := False;
     end;
-  end;
-end;
-
-// Change the default confirmation dialogue if we're in maintenance mode
-procedure CancelButtonClick(CurPageID: Integer; var Cancel, Confirm: Boolean);
-var
- Msg : String;
- Res : Integer;
-begin
-  if maintenanceMode then
-  begin
-    Confirm := False; // Don't show the default dialog
-    Msg := 'Are you sure you want to close the maintenance wizard?'
-    Res := MsgBox(Msg, mbConfirmation,MB_YESNO);
-    Cancel := (Res = IDYES);
   end;
 end;
 
