@@ -830,6 +830,11 @@ begin
       if MsgBox('Could not find sh2pc.exe in folder!' #13#13 'The selected folder may not be where Silent Hill 2 PC is located.' #13#13 'Proceed anyway?', mbConfirmation, MB_YESNO) = IDNO then
         Result := False;
     end;
+    if Pos(';', WizardDirValue) > 0 then
+    begin
+      MsgBox('Error: Invalid path detected' #13#13 'The chosen directory name contains a semicolon.' #13#13 'This breaks the game. Please rename the game''s directory before continuing.', mbInformation, MB_OK);
+      Result := False;
+    end;
   end;
 end;
 
