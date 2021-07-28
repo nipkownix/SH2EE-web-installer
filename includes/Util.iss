@@ -3,6 +3,9 @@
 
 
 [Code]
+var
+  GCS_sh2pcPath: string;
+
 
 type
   TWebComponentsInfo    = record
@@ -63,13 +66,76 @@ begin
   Result := ExpandConstant('{tmp}\') + Path;
 end;
 
+// Search for sh2pc.exe in "\HKEY_CURRENT_USER\System\GameConfigStore\Children\"
+procedure RegSearch(RootKey: Integer; KeyName: string);
+var
+  I: Integer;
+  Names: TArrayOfString;
+  Name: string;
+  FoundPaths: String;
+begin
+  if RegGetSubkeyNames(RootKey, KeyName, Names) then
+  begin
+    for I := 0 to GetArrayLength(Names) - 1 do
+    begin
+      Name := KeyName + '\' + Names[I];
+
+      if {#DEBUG} then Log(Format('Found key %s', [Name]));
+
+      RegSearch(RootKey, Name);
+    end;
+  end;
+
+  if RegGetValueNames(RootKey, KeyName, Names) then
+  begin
+    for I := 0 to GetArrayLength(Names) - 1 do
+    begin
+      Name := KeyName + '\' + Names[I];
+
+      if Pos('MatchedExeFullPath', Name) > 0 then
+      begin
+        if {#DEBUG} then Log(Format('Found value %s', [Name]));
+
+        if RegQueryStringValue(HKEY_CURRENT_USER, KeyName, 'MatchedExeFullPath', FoundPaths) then
+        begin
+          if {#DEBUG} then Log(Format('Found Path %s', [FoundPaths]));
+
+          if Pos('sh2pc.exe', FoundPaths) > 0 then
+          begin
+            if {#DEBUG} then Log(Format('sh2pc.exe found: %s', [FoundPaths]));
+            GCS_sh2pcPath := ExtractFilePath(FoundPaths);
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
 // Return a DefaultDirName based on conditions
 function GetDefaultDirName(Param: string): string;
+var 
+  InstallationPath : String;
+  RetailInstallDir : String;
 begin
-  if maintenanceMode then
-    Result := ExpandConstant('{src}\')
-  else
-    Result := ExpandConstant('{autopf}\') + 'Konami\Silent Hill 2\'; 
+  if InstallationPath = '' then
+  begin
+    // Search registry if we're not in maintenance mode
+    if not maintenanceMode then 
+      RegSearch(HKEY_CURRENT_USER, 'System\GameConfigStore');
+
+    // Actually choose a path
+    if maintenanceMode then
+      InstallationPath := ExpandConstant('{src}\')
+    else
+    if not (GCS_sh2pcPath = '') then
+      InstallationPath := GCS_sh2pcPath
+    else
+    if RegQueryStringValue(HKLM32, 'Software\Konami\Silent Hill 2', 'INSTALLDIR', RetailInstallDir) then 
+      InstallationPath := RetailInstallDir
+    else
+      InstallationPath := ExpandConstant('{autopf}\') + 'Konami\Silent Hill 2\'; 
+  end;
+  Result := InstallationPath;
 end;
 
 // Recursive function called by SplitString
