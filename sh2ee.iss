@@ -2,7 +2,7 @@
 
 #define INSTALLER_VER  "1.0"
 #define DEBUG          "false"
-#define SH2EE_CSV_URL  "http://etc.townofsilenthill.com/sandbox/ee_itmp/sh2ee.csv"
+#define SH2EE_CSV_URL  "http://etc.townofsilenthill.com/sandbox/ee_itmp/_sh2ee.csv"
 
 #include "includes/innosetup-download-plugin/idp.iss"
 
