@@ -656,8 +656,6 @@ begin
   // Start the download after wpReady
   idpDownloadAfter(wpReady);
 
-  idpClearFiles();
-  
   if maintenanceMode then
     PrepareMaintenance();
 
@@ -783,6 +781,7 @@ begin
   begin
     // Add files to IDP
     intTotalComponents := 0; // Clear list
+    idpClearFiles(); // Make sure idp file list is clean
     for i := 0 to WizardForm.ComponentsList.Items.Count - 1 do
     begin
       if WizardForm.ComponentsList.Checked[i] = true then
@@ -802,6 +801,7 @@ begin
       // Add files to MaintenanceCompsList and IDP
       MaintenanceCompsList := ''; // Clear list
       intTotalComponents := 0; // Clear list
+      idpClearFiles(); // Make sure idp file list is clean
       for i := 0 to BoxPointer.CheckListBox.Items.Count - 1 do
       begin
         if BoxPointer.CheckListBox.Checked[i] = true then
