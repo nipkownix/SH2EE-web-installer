@@ -616,7 +616,7 @@ procedure HelpButtonClick(Sender: TObject);
 var
   ErrorCode: Integer;
 begin
-  ShellExec('open', 'http://www.enhanced.townofsilenthill.com/SH2/install.htm', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
+  ShellExec('open', 'https://github.com/elishacloud/Silent-Hill-2-Enhancements/issues', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
