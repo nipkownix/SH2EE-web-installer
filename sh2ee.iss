@@ -1047,6 +1047,8 @@ begin
 end;
 
 procedure CurPageChanged(CurPageID: Integer);
+var
+  sh2pcFilesExist : Boolean;
 begin
   if CurPageID = wpExtract.ID then 
   begin
@@ -1064,6 +1066,9 @@ begin
 
   if (CurPageID = wpFinished) and maintenanceMode then 
   begin
+    
+    sh2pcFilesExist := DirExists(AddBackslash(WizardDirValue) + 'data');
+
     if installRadioBtn.Checked = true then
     begin
       // Change default labels to fit the install action
@@ -1081,6 +1086,13 @@ begin
       WizardForm.FinishedHeadingLabel.Caption := 'Uninstallation complete.';
       WizardForm.FinishedLabel.Caption        := 'The wizard has successfully uninstalled the enhancement packages.' #13#13 'Click finish to exit the wizard.';
       // Hide and uncheck the run checkbox when uninstalling
+      WizardForm.RunList.Visible := false;
+      WizardForm.RunList.Checked[0] := false;
+    end;
+
+    // Hide and uncheck the run checkbox if the data folder doesn't exist
+    if not sh2pcFilesExist then
+    begin
       WizardForm.RunList.Visible := false;
       WizardForm.RunList.Checked[0] := false;
     end;
