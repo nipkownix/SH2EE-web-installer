@@ -17,12 +17,17 @@ type
     SHA512              : String;
   end;
 
-  TLocalComponentsInfo    = record
-    ID                    : String;
-    isInstalled           : Boolean;
-    Version               : String;
+  TLocalComponentsInfo  = record
+    ID                  : String;
+    isInstalled         : Boolean;
+    Version             : String;
   end;
 
+  TIniArray             = record
+    Section             : String;
+    Key                 : String;
+    Value               : String;
+  end;
 
 // Given a text filename, replace a string with another
 function FileReplaceString(const FileName, SearchString, ReplaceString: string): Boolean;
@@ -80,7 +85,7 @@ begin
     begin
       Name := KeyName + '\' + Names[I];
 
-      if {#DEBUG} then Log(Format('Found key %s', [Name]));
+      //if {#DEBUG} then Log(Format('Found key %s', [Name]));
 
       RegSearch(RootKey, Name);
     end;
@@ -94,16 +99,19 @@ begin
 
       if Pos('MatchedExeFullPath', Name) > 0 then
       begin
-        if {#DEBUG} then Log(Format('Found value %s', [Name]));
+        //if {#DEBUG} then Log(Format('Found value %s', [Name]));
 
         if RegQueryStringValue(HKEY_CURRENT_USER, KeyName, 'MatchedExeFullPath', FoundPaths) then
         begin
-          if {#DEBUG} then Log(Format('Found Path %s', [FoundPaths]));
+          //if {#DEBUG} then Log(Format('Found Path %s', [FoundPaths]));
 
           if Pos('sh2pc.exe', FoundPaths) > 0 then
           begin
-            if {#DEBUG} then Log(Format('sh2pc.exe found: %s', [FoundPaths]));
-            GCS_sh2pcPath := ExtractFilePath(FoundPaths);
+            if FileExists(ExtractFilePath(FoundPaths) + '\sh2pc.exe') then
+            begin
+              if {#DEBUG} then Log(Format('sh2pc.exe found at: %s', [FoundPaths]));
+              GCS_sh2pcPath := ExtractFilePath(FoundPaths);
+            end;
           end;
         end;
       end;
@@ -127,11 +135,11 @@ begin
     if maintenanceMode then
       InstallationPath := ExpandConstant('{src}\')
     else
+    if RegQueryStringValue(HKLM32, 'Software\Konami\Silent Hill 2', 'INSTALLDIR', RetailInstallDir) and FileExists(RetailInstallDir + '\sh2pc.exe') then 
+      InstallationPath := RetailInstallDir
+    else
     if not (GCS_sh2pcPath = '') then
       InstallationPath := GCS_sh2pcPath
-    else
-    if RegQueryStringValue(HKLM32, 'Software\Konami\Silent Hill 2', 'INSTALLDIR', RetailInstallDir) then 
-      InstallationPath := RetailInstallDir
     else
       InstallationPath := ExpandConstant('{autopf}\') + 'Konami\Silent Hill 2\'; 
   end;
@@ -215,6 +223,41 @@ begin
           Version := RowValues[2];
         except
           Log('user might have edited the local .csv');
+        end;
+      end;
+    end;
+  end else begin
+    SetArrayLength(Result, 0);
+  end;
+end;
+
+// Given a .ini file, return an array of settings corresponding to
+// the data in the ini file.
+function IniToSettingsArray(Filename: String): array of TIniArray;
+var
+  Rows: TArrayOfString;
+  RowValues: TStrings;
+  IniSection: String;
+  i: Integer;
+begin
+  // Read the file at Filename and store the lines in Rows
+  if LoadStringsFromFile(Filename, Rows) then begin
+    // Match length of return array to number of rows
+    SetArrayLength(Result, GetArrayLength(Rows) - 1);
+    for i := 1 to GetArrayLength(Rows) - 1 do begin
+      if (Pos('[', Rows[i]) > 0) and not (Pos(';', Rows[i]) > 0) then begin
+        IniSection := Rows[i];
+        Delete(IniSection, 1, 1); 
+        Delete(IniSection, Length(IniSection), 1); 
+      end;
+      if (Pos('=', Rows[i]) > 0) and not (Pos(';', Rows[i]) > 0) then
+      begin
+        // Separate values
+        RowValues := SplitString(Rows[i], '=');
+        with Result[i - 1] do begin
+          Section := IniSection;
+          Key := RowValues[0];
+          Value := RowValues[1];
         end;
       end;
     end;

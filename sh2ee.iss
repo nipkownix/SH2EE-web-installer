@@ -69,6 +69,9 @@ Source: "resources\maintenance\icon_uninstall.bmp"; Flags: dontcopy
 [Tasks]
 //Name: add_desktopicon; Description: Create a &Desktop shortcut for the game; GroupDescription: Additional Icons:; Components: sh2emodule
 
+[Run]
+Filename: "{app}\sh2pc.exe"; Description: Start Silent Hill 2 after finishing the wizard; Flags: nowait postinstall skipifsilent
+
 [CustomMessages]
 HelpButton=Help
 
@@ -95,6 +98,8 @@ var
   updateRadioBtn                : TRadioButton;
   uninstallRadioBtn             : TRadioButton;
 
+  sh2pcExeWasPresent            : Boolean;
+
   wpInstallNew                  : TInputOptionWizardPage;
 
   wpUpdater                     : TInputOptionWizardPage;
@@ -113,6 +118,8 @@ var
 
   CSVFilePath                   : String;
   WebCompsArray                 : array of TWebComponentsInfo;
+
+  CurIniArray                   : array of TIniArray;
 
 
 procedure create_RTFlabels;
@@ -146,12 +153,15 @@ begin
       Left          := WizardForm.FinishedLabel.Left;
       Top           := WizardForm.FinishedLabel.Top;
       Width         := WizardForm.FinishedLabel.Width;
-      Height        := WizardForm.FinishedLabel.Height + ScaleY(250);
+      Height        := WizardForm.FinishedLabel.Height + ScaleY(180);
+      Anchors       := [akLeft, akBottom, akTop, akRight];
       Parent        := WizardForm.FinishedLabel.Parent;
       BorderStyle   := bsNone;
       TabStop       := False;
       ReadOnly      := True;
       WizardForm.FinishedLabel.Visible := False;
+      WizardForm.RunList.Top := FinishedLabel_RTF.Top + ScaleY(270);
+      WizardForm.RunList.Anchors := [akLeft, akBottom];
       RTFText :=
           '{\rtf1 The wizard has successfully installed the selected enhancement packages.\par' +
           '\par If you correctly selected the Silent Hill 2 PC folder at the start of this wizard, Silent Hill 2: Enhanced Edition will automatically run the next time you launch the game.\par' +
@@ -476,7 +486,7 @@ begin
   with installRadioBtn do
   begin
     Parent     := wpMaintenance.Surface;
-    Caption    := 'Install Packages';
+    Caption    := 'Install or Repair Packages';
     Font.Style := [fsBold];
     Checked    := False;
     Left       := installBmp.Left + ScaleX(54);
@@ -515,11 +525,11 @@ begin
   with installLabel do
   begin
     Parent     := wpMaintenance.Surface;
-    Caption    := 'Install enhancement packages that were not previously installed.';
+    Caption    := 'Install enhancement packages that were not previously installed, or repair broken packages.';
     Left       := installRadioBtn.Left;
     Top        := installRadioBtn.Top + ScaleX(22);
     Width      := wpMaintenance.SurfaceWidth - ScaleX(70);
-    Anchors    := [akTop, akLeft];
+    Anchors    := [akTop, akLeft, akRight];
     WordWrap   := True;
     AutoSize   := True;
   end;
@@ -532,7 +542,7 @@ begin
     Left       := updateRadioBtn.Left;
     Top        := updateRadioBtn.Top + ScaleX(22);
     Width      := wpMaintenance.SurfaceWidth - ScaleX(70);
-    Anchors    := [akTop, akLeft];
+    Anchors    := [akTop, akLeft, akRight];
     WordWrap   := True;
     AutoSize   := True;
   end;
@@ -559,7 +569,7 @@ begin
   wpInstallNew := CreateInputOptionPage(
     wpMaintenance.ID,
     SetupMessage(msgWizardSelectComponents),
-    SetupMessage(msgSelectComponentsDesc),
+    'Please select which enhancement packages you would like to install or repair.',
     SetupMessage(msgSelectComponentsLabel2),
     False, True);
 
@@ -571,7 +581,7 @@ begin
         wpIVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),  // Label right-justified in list box
         0,
         False,
-        not LocalCompsArray[i].isInstalled,
+        True,
         False,
         False,
         Nil);
@@ -655,7 +665,7 @@ begin
 
   // Start the download after wpReady
   idpDownloadAfter(wpReady);
-
+  
   if maintenanceMode then
     PrepareMaintenance();
 
@@ -763,7 +773,7 @@ begin
     // Create an array of TWebComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
     LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
     // Check if above didn't work
-    if not SamePackedVersion(GetArrayLength(LocalCompsArray), GetArrayLength(WebCompsArray)) then begin
+    if not SamePackedVersion(GetArrayLength(LocalCompsArray), GetArrayLength(WebCompsArray)) then begin // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
       MsgBox('Error: Parsing Failed' #13#13 'Parsing SH2EEsetup.dat failed. The file might be corrupted.' #13#13 'Please reinstall the project.', mbInformation, MB_OK);
       Result := False;
       exit;
@@ -827,9 +837,16 @@ begin
   begin
     if not FileExists(AddBackslash(WizardDirValue) + 'sh2pc.exe') then 
     begin 
-      if MsgBox('Could not find sh2pc.exe in folder!' #13#13 'The selected folder may not be where Silent Hill 2 PC is located.' #13#13 'Proceed anyway?', mbConfirmation, MB_YESNO) = IDNO then
+      if MsgBox('Could not find sh2pc.exe in folder!' #13#13 'The selected folder may not be where Silent Hill 2 PC is located.' #13#13 'Proceed anyway?', mbConfirmation, MB_YESNO) = IDYES then
+      begin
+        Result := True;
+        sh2pcExeWasPresent := False;
+      end else
         Result := False;
-    end;
+    end else
+      sh2pcExeWasPresent := True;
+
+    // Check for the presence of a semicolon in the installation path
     if Pos(';', WizardDirValue) > 0 then
     begin
       MsgBox('Error: Invalid path detected' #13#13 'The chosen directory name contains a semicolon.' #13#13 'This breaks the game. Please rename the game''s directory before continuing.', mbInformation, MB_OK);
@@ -882,8 +899,8 @@ procedure ExtractFiles();
 var
   NullBox : TNewListBox;     // Dummy box
   NullBar : TNewProgressBar; // Dummy bar
+  i : Integer;
 begin
-
   if IsWin64 then
     ExtractTemporaryFile('7za_x64.exe')
   else
@@ -893,15 +910,47 @@ begin
   if Pos('sh2emodule', selectedComponents) > 0 then
   begin
     UpdateCurrentComponentName('SH2 Enhancements Module');
+
+      // Backup custom .ini settings if we are in maintenance mode
+      if maintenanceMode and FileExists(WizardDirValue + '\d3d8.ini') then
+      begin 
+        // Store current .ini settings into an array
+        CurIniArray := IniToSettingsArray(WizardDirValue + '\d3d8.ini');
+        if {#DEBUG} then Log('# Backed up d3d8.ini settings');
+      end;
+
       Extractore(tmp(GetURLFilePart(WebCompsArray[0].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+
+      // Restore .ini settings if we are in maintenance mode
+      if maintenanceMode and not (GetArrayLength(CurIniArray) = 0) then
+      begin
+        // Write stored .ini settings onto the new .ini file
+        for i := 0 to GetArrayLength(CurIniArray) - 1 do begin
+          with CurIniArray[i] do begin
+            if not (Trim(CurIniArray[i].Key) = '') then
+            begin 
+              // Log(CurIniArray[i].Section + ' - ' + CurIniArray[i].Key + ' = ' + CurIniArray[i].Value);  // <--- Enabling this Log will somewhat break the SetIniString function. No idea why. Inno Setup bug?
+              if IniKeyExists(CurIniArray[i].Section, CurIniArray[i].Key, WizardDirValue + '\d3d8.ini') then
+              begin
+                SetIniString(CurIniArray[i].Section, CurIniArray[i].Key, CurIniArray[i].Value, WizardDirValue + '\d3d8.ini');
+                if {#DEBUG} then
+                  Log('# key "' + CurIniArray[i].Key + '" has been restored');
+              end else 
+              if {#DEBUG} then
+                Log('# key "' + CurIniArray[i].Key + '" doesn''t exist in the new .ini file');
+            end;
+          end;
+        end;
+        if {#DEBUG} then Log('# Restored d3d8.ini settings');
+      end;
     UpdateTotalProgressBar();
   end;
 
   if Pos('ee_exe', selectedComponents) > 0 then
   begin
     UpdateCurrentComponentName('Enhanced Executable');
+      // Backup the original .exe before extracting the new one, if a backup doesn't already exist
       if not FileExists(WizardDirValue + '\sh2pc.exe.bak') then
-        // Backup the .exe before extracting the new one, if a backup doesn't already exist
         RenameFile(WizardDirValue + '\sh2pc.exe', WizardDirValue + '\sh2pc.exe.bak');
       Extractore(tmp(GetURLFilePart(WebCompsArray[1].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
     UpdateTotalProgressBar(); 
@@ -1004,6 +1053,13 @@ begin
     Wizardform.NextButton.Enabled := false;
     WizardForm.BackButton.Visible := false;
     ExtractFiles();
+  end;
+
+  // Hide and uncheck the run checkbox if sh2pc.exe wasn't present when the installation directory was selected, and we're not in maintenance mode 
+  if (CurPageID = wpFinished) and not sh2pcExeWasPresent and not maintenanceMode then
+  begin
+    WizardForm.RunList.Visible := false;
+    WizardForm.RunList.Checked[0] := false;
   end;
 
   if (CurPageID = wpFinished) and maintenanceMode then 
