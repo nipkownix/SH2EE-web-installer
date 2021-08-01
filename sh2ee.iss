@@ -98,7 +98,7 @@ var
   updateRadioBtn                : TRadioButton;
   uninstallRadioBtn             : TRadioButton;
 
-  sh2pcExeWasPresent            : Boolean;
+  sh2pcFilesWerePresent         : Boolean;
 
   wpInstallNew                  : TInputOptionWizardPage;
 
@@ -835,16 +835,16 @@ begin
   // Check for file presence in WizardDirValue
   if CurPage = wpSelectDir then
   begin
-    if not FileExists(AddBackslash(WizardDirValue) + 'sh2pc.exe') then 
+    if not FileExists(AddBackslash(WizardDirValue) + 'sh2pc.exe') or not DirExists(AddBackslash(WizardDirValue) + 'data') then 
     begin 
-      if MsgBox('Could not find sh2pc.exe in folder!' #13#13 'The selected folder may not be where Silent Hill 2 PC is located.' #13#13 'Proceed anyway?', mbConfirmation, MB_YESNO) = IDYES then
+      if MsgBox('The selected folder may not be where Silent Hill 2 PC is located.' #13#13 'Proceed anyway?', mbConfirmation, MB_YESNO) = IDYES then
       begin
         Result := True;
-        sh2pcExeWasPresent := False;
+        sh2pcFilesWerePresent := False;
       end else
         Result := False;
     end else
-      sh2pcExeWasPresent := True;
+      sh2pcFilesWerePresent := True;
 
     // Check for the presence of a semicolon in the installation path
     if Pos(';', WizardDirValue) > 0 then
@@ -1056,7 +1056,7 @@ begin
   end;
 
   // Hide and uncheck the run checkbox if sh2pc.exe wasn't present when the installation directory was selected, and we're not in maintenance mode 
-  if (CurPageID = wpFinished) and not sh2pcExeWasPresent and not maintenanceMode then
+  if (CurPageID = wpFinished) and not maintenanceMode and not sh2pcFilesWerePresent then
   begin
     WizardForm.RunList.Visible := false;
     WizardForm.RunList.Checked[0] := false;
@@ -1080,6 +1080,9 @@ begin
       // Change default labels to fit the uninstaller action
       WizardForm.FinishedHeadingLabel.Caption := 'Uninstallation complete.';
       WizardForm.FinishedLabel.Caption        := 'The wizard has successfully uninstalled the enhancement packages.' #13#13 'Click finish to exit the wizard.';
+      // Hide and uncheck the run checkbox when uninstalling
+      WizardForm.RunList.Visible := false;
+      WizardForm.RunList.Checked[0] := false;
     end;
   end;
 end;
