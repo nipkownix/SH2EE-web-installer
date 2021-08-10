@@ -57,6 +57,7 @@ Source: "includes\7zip\7za_x86.exe"; Flags: dontcopy
 Source: "includes\7zip\7za_x64.exe"; Flags: dontcopy
 Source: "includes\cmdlinerunner\cmdlinerunner.dll"; Flags: dontcopy
 Source: "includes\deletefile_util\deletefile_util.exe"; Flags: dontcopy
+Source: "includes\renamefile_util\renamefile_util.exe"; Flags: dontcopy
 //Source: "includes\unshield\unshield.exe"; Flags: dontcopy
 Source: "{srcexe}"; DestDir: "{tmp}"; DestName: "SH2EEsetup.exe"; Flags: external 
 Source: "resources\SH2EEsetup.dat"; Flags: dontcopy
@@ -70,7 +71,7 @@ Source: "resources\maintenance\icon_uninstall.bmp"; Flags: dontcopy
 //Name: add_desktopicon; Description: Create a &Desktop shortcut for the game; GroupDescription: Additional Icons:; Components: sh2emodule
 
 [Run]
-Filename: "{app}\sh2pc.exe"; Description: Start Silent Hill 2 after finishing the wizard; Flags: nowait postinstall skipifsilent
+Filename: "{app}\sh2pc.exe"; Description: Start Silent Hill 2 after finishing the wizard; Flags: nowait postinstall skipifsilent unchecked
 
 [CustomMessages]
 HelpButton=Help
@@ -87,7 +88,8 @@ ExitSetupMessage=Are you sure you want to close the wizard?
 
 [Code]
 var
-  maintenanceMode: Boolean;
+  maintenanceMode : Boolean;
+  selfUpdateMode  : Boolean;
 
 #include "includes/Extractore.iss"
 #include "includes/Util.iss"
@@ -103,6 +105,8 @@ var
   wpInstallNew                  : TInputOptionWizardPage;
 
   wpUpdater                     : TInputOptionWizardPage;
+
+  wpSelfUpdate                  : TWizardPage;
 
   MaintenanceCompsList          : String;
   LocalCompsArray               : array of TLocalComponentsInfo;
@@ -574,7 +578,7 @@ begin
     False, True);
 
   // Use both the local and web arrays to check and populate the download listbox
-  for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+  for i := 0 to GetArrayLength(WebCompsArray) - 2 do begin
     with WebCompsArray[i] do begin
       wpInstallNew.CheckListBox.AddCheckBox(
         Name, // Label next to checkbox
@@ -602,7 +606,7 @@ begin
     False, True);
 
   // Use both the local and web arrays to check and populate the update listbox
-  for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+  for i := 0 to GetArrayLength(WebCompsArray) - 2 do begin
     with WebCompsArray[i] do begin
       wpUpdater.CheckListBox.AddCheckBox(
         Name, // Label next to checkbox
@@ -633,6 +637,17 @@ function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := False;
 
+  // Skip to updater page if started with argument
+  if CmdLineParamExists('-update') and maintenanceMode then
+  begin
+    if (PageID = wpMaintenance.ID) then
+    begin
+      BoxPointer := wpUpdater;
+      Result := True;
+    end;
+  end;
+
+  // Skip normal setup pages if in maintenanceMode
   if maintenanceMode then
   begin
     if (PageID = wpWelcome) or
@@ -643,6 +658,38 @@ begin
     begin
       Result := True;
     end;
+  end;
+  
+  // Skip finished page if in selfUpdateMode
+  if selfUpdateMode then
+  begin
+    if (PageID = wpFinished) then
+    begin
+      Result := True;
+    end;
+  end;
+
+end;
+
+procedure selfUpdateNext(Page: TWizardPage);
+begin
+  WizardForm.NextButton.OnClick(WizardForm.NextButton);
+end;
+
+// Creates a dummy self update page, so IDP can start straight away
+procedure PrepareSelfUpdate();
+begin
+  ExtractTemporaryFile('renamefile_util.exe');
+
+  idpAddFile(WebCompsArray[8].URL, ExpandConstant('{src}\SH2EEsetup_new.exe'));
+
+  wpSelfUpdate := CreateCustomPage(wpWelcome, 'Silent Hill 2: EE Setup Tool self-update', 'Self-update in progress');
+
+  idpDownloadAfter(wpSelfUpdate.ID);
+
+  with wpSelfUpdate do
+  begin
+      OnActivate := @selfUpdateNext;
   end;
 end;
 
@@ -666,8 +713,11 @@ begin
   // Start the download after wpReady
   idpDownloadAfter(wpReady);
   
-  if maintenanceMode then
+  if maintenanceMode and (not selfUpdateMode) then
     PrepareMaintenance();
+
+  if selfUpdateMode then
+    PrepareSelfUpdate();
 
   // Create the wpExtract page
   create_wpExtract();
@@ -739,6 +789,7 @@ end;
 function InitializeSetup(): Boolean;
 begin
   Result := True;
+
   // Store the path to sh2ee.csv in a global variable
   CSVFilePath := tmp(GetURLFilePart('{#SH2EE_CSV_URL}'));
 
@@ -759,11 +810,16 @@ begin
   end;
 
   // Check if the installer should work correctly with with the current server-side files
-  if not SameText(WebCompsArray[0].ReqInstallerVersion, ExpandConstant('{#INSTALLER_VER}')) then
+  if not SameText(WebCompsArray[8].version, ExpandConstant('{#INSTALLER_VER}')) then
   begin
-    MsgBox('Error: Outdated Version' #13#13 'An update for the SH2:EE Setup Tool is available.' #13#13 'Please visit the official website to download the update and replace this outdated version.', mbInformation, MB_OK);
-    Result := False;
-    exit;
+    if MsgBox('Error: Outdated Version' #13#13 'An update for the SH2:EE Setup Tool is available.' #13#13 'Do you wish to update the Setup Tool now?', mbConfirmation, MB_YESNO) = IDYES then
+    begin
+      selfUpdateMode := True;
+    end else
+    begin
+      Result := False;
+      exit;
+    end;
   end;
 
   // Determine weather or not we should be in "maintenance mode"
@@ -773,7 +829,7 @@ begin
     // Create an array of TWebComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
     LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
     // Check if above didn't work
-    if not SamePackedVersion(GetArrayLength(LocalCompsArray), GetArrayLength(WebCompsArray)) then begin // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
+    if not SamePackedVersion(GetArrayLength(LocalCompsArray), GetArrayLength(WebCompsArray) - 1) then begin // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
       MsgBox('Error: Parsing Failed' #13#13 'Parsing SH2EEsetup.dat failed. The file might be corrupted.' #13#13 'Please reinstall the project.', mbInformation, MB_OK);
       Result := False;
       exit;
@@ -804,7 +860,7 @@ begin
     Log('# The following [' + IntToStr(intTotalComponents) + '] components are selected: ' + selectedComponents); 
   end;
 
-  if maintenanceMode then
+  if maintenanceMode and (not selfUpdateMode) then
   begin
     if (CurPage = wpUpdater.ID) or (CurPage = wpInstallNew.ID) then
     begin
@@ -1023,16 +1079,26 @@ end;
 procedure postInstall();
 var
   i : Integer;
+  intErrorCode: Integer;
 begin
-  if (maintenanceMode = true) and not uninstallRadioBtn.Checked then
+  if not selfUpdateMode then
   begin
-    for i := 0 to BoxPointer.CheckListBox.Items.Count - 1 do
+    if maintenanceMode and (not uninstallRadioBtn.Checked) then
     begin
-      if BoxPointer.CheckListBox.Checked[i] = true then
+      for i := 0 to BoxPointer.CheckListBox.Items.Count - 1 do
       begin
-        FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), LocalCompsArray[i].ID + ',' + BoolToStr(LocalCompsArray[i].isInstalled) + ',' + LocalCompsArray[i].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+        if BoxPointer.CheckListBox.Checked[i] = true then
+        begin
+          FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), LocalCompsArray[i].ID + ',' + BoolToStr(LocalCompsArray[i].isInstalled) + ',' + LocalCompsArray[i].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+        end;
       end;
     end;
+  end;
+
+  if selfUpdateMode then
+  begin
+    // Schedule SH2EEsetup_new.exe for renaming as soon as possible
+    Exec(ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')), '', SW_HIDE, ewNoWait, intErrorCode);
   end;
 
   // Copy SH2EEsetup.exe to the game's directory if we're not currently running from it
@@ -1057,44 +1123,51 @@ begin
     ExtractFiles();
   end;
 
-  // Hide and uncheck the run checkbox if sh2pc.exe wasn't present when the installation directory was selected, and we're not in maintenance mode 
+  // Hide the run checkbox if the sh2pc files were present when the installation directory was selected, and we're not in maintenance mode 
   if (CurPageID = wpFinished) and not maintenanceMode and not sh2pcFilesWerePresent then
   begin
     WizardForm.RunList.Visible := false;
-    WizardForm.RunList.Checked[0] := false;
   end;
 
+  // Check the run checkbox if the sh2pc files were present when the installation directory was selected, and we're not in maintenance mode 
+  if (CurPageID = wpFinished) and not maintenanceMode and sh2pcFilesWerePresent then
+  begin
+    WizardForm.RunList.Checked[0] := true;
+  end;
+
+  // maintenanceMode's wpFinished tweaks
   if (CurPageID = wpFinished) and maintenanceMode then 
   begin
-    
     sh2pcFilesExist := DirExists(AddBackslash(WizardDirValue) + 'data');
 
     if installRadioBtn.Checked = true then
     begin
       // Change default labels to fit the install action
-      WizardForm.FinishedLabel.Caption        := 'The wizard has successfully installed the selected enhancement packages.' #13#13 'Click finish to exit the wizard.';
+      WizardForm.FinishedLabel.Caption := 'The wizard has successfully installed the selected enhancement packages.' #13#13 'Click finish to exit the wizard.';
+      WizardForm.RunList.Visible       := true;
+      WizardForm.RunList.Checked[0]    := true;
     end else
     if updateRadioBtn.Checked = true then
     begin
       // Change default labels to fit the update action
       WizardForm.FinishedHeadingLabel.Caption := 'Update complete!';
       WizardForm.FinishedLabel.Caption        := 'The wizard has successfully updated the selected enhancement packages.' #13#13 'Click finish to exit the wizard.';
+      WizardForm.RunList.Visible              := true;
+      WizardForm.RunList.Checked[0]           := true;
     end else 
     if uninstallRadioBtn.Checked = true then
     begin
       // Change default labels to fit the uninstaller action
       WizardForm.FinishedHeadingLabel.Caption := 'Uninstallation complete.';
       WizardForm.FinishedLabel.Caption        := 'The wizard has successfully uninstalled the enhancement packages.' #13#13 'Click finish to exit the wizard.';
-      // Hide and uncheck the run checkbox when uninstalling
+      // Hide the run checkbox when uninstalling
       WizardForm.RunList.Visible := false;
-      WizardForm.RunList.Checked[0] := false;
     end;
 
-    // Hide and uncheck the run checkbox if the data folder doesn't exist
+    // Hide the run checkbox if the data folder doesn't exist
     if not sh2pcFilesExist then
     begin
       WizardForm.RunList.Visible := false;
-      WizardForm.RunList.Checked[0] := false;
     end;
   end;
 end;

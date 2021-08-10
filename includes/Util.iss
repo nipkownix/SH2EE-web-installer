@@ -29,6 +29,20 @@ type
     Value               : String;
   end;
 
+// Returns true if the setup was started with a specific parameter
+function CmdLineParamExists(const Value: string): Boolean;
+var
+  I: Integer;  
+begin
+  Result := False;
+  for I := 1 to ParamCount do
+    if CompareText(ParamStr(I), Value) = 0 then
+    begin
+      Result := True;
+      Exit;
+    end;
+end;
+
 // Given a text filename, replace a string with another
 function FileReplaceString(const FileName, SearchString, ReplaceString: string): Boolean;
 var
@@ -193,8 +207,6 @@ begin
         Name := RowValues[1];
         Version := RowValues[2];
         URL := RowValues[3];
-        ReqInstallerVersion := RowValues[4];
-        SHA512 := RowValues[5];
       end;
     end;
   end else begin
