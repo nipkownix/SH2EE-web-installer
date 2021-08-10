@@ -1,9 +1,0 @@
-id,name,version,url,requiredVer,sha512
-sh2emodule,SH2 Enhancements Module,1.8.1900.0,https://github.com/elishacloud/Silent-Hill-2-Enhancements/releases/download/v1.8.1900.0/d3d8.zip,1.0,
-ee_exe,Enhanced Executable,1.0,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Enhanced_EXE_NA_v1.0_noroot.zip,,
-ee_essentials,Enhanced Edition Essential Files,1.2.1,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/Enhanced_Edition_Essential_Files_1.2.1_noroot.zip,,
-img_pack,Image Enhancement Pack,1.1.0,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Image_Enhancement_Pack_1.1.0_noroot.zip,,
-fmv_pack,FMV Enhancement Pack,1.5.2,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Enhanced_FMV_Pack_1.5.2_noroot.zip,,
-audio_pack,Audio Enhancement Pack,2.0.3,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Audio_Enhancement_Pack_2.0.3_noroot.zip,,
-dsoal,DSOAL,1.31a.02,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/DSOAL_1.31a.02_noroot.zip,,
-xinput_plus,XInput Plus,4.15.2,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/XInputPlus_4.15.2_noroot.zip,,
