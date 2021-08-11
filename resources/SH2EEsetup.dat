@@ -1,5 +1,6 @@
 # **DO NOT MODIFY THIS FILE!**
 id,isInstalled,version
+setup_tool,false,0.0
 sh2emodule,false,0.0
 ee_exe,false,0.0
 ee_essentials,false,0.0

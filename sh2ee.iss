@@ -2,7 +2,7 @@
 
 #define INSTALLER_VER  "1.0"
 #define DEBUG          "false"
-#define SH2EE_CSV_URL  "http://etc.townofsilenthill.com/sandbox/ee_itmp/_sh2ee.csv"
+#define SH2EE_CSV_URL  "http://etc.townofsilenthill.com/sandbox/ee_itmp/_sh2eeTest.csv"
 
 #include "includes/innosetup-download-plugin/idp.iss"
 
@@ -578,17 +578,20 @@ begin
     False, True);
 
   // Use both the local and web arrays to check and populate the download listbox
-  for i := 0 to GetArrayLength(WebCompsArray) - 2 do begin
-    with WebCompsArray[i] do begin
-      wpInstallNew.CheckListBox.AddCheckBox(
-        Name, // Label next to checkbox
-        wpIVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),  // Label right-justified in list box
-        0,
-        False,
-        True,
-        False,
-        False,
-        Nil);
+  for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+    if not (WebCompsArray[i].id = 'setup_tool') then
+    begin
+      with WebCompsArray[i] do begin
+        wpInstallNew.CheckListBox.AddCheckBox(
+          Name, // Label next to checkbox
+          wpIVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),  // Label right-justified in list box
+          0,
+          False,
+          True,
+          False,
+          False,
+          Nil);
+      end;
     end;
   end;
 
@@ -606,17 +609,20 @@ begin
     False, True);
 
   // Use both the local and web arrays to check and populate the update listbox
-  for i := 0 to GetArrayLength(WebCompsArray) - 2 do begin
-    with WebCompsArray[i] do begin
-      wpUpdater.CheckListBox.AddCheckBox(
-        Name, // Label next to checkbox
-        wpUVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),  // Label right-justified in list box
-        0,
-        isAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),
-        isAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),
-        False,
-        False,
-        Nil);
+  for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+    if not (WebCompsArray[i].id = 'setup_tool') then
+    begin
+      with WebCompsArray[i] do begin
+        wpUpdater.CheckListBox.AddCheckBox(
+          Name, // Label next to checkbox
+          wpUVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),  // Label right-justified in list box
+          0,
+          isAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),
+          isAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),
+          False,
+          False,
+          Nil);
+      end;
     end;
   end;
 
@@ -691,6 +697,24 @@ begin
   begin
       OnActivate := @selfUpdateNext;
   end;
+end;
+
+procedure UpdateLocalCSV();
+var
+  i: Integer;
+begin
+  Log('# updating local csv');
+
+  // Extract fresh CSV to tmp dir
+  ExtractTemporaryFile('SH2EEsetup.dat');
+
+  // Populate with new values
+  for i := 0 to GetArrayLength(LocalCompsArray) - 1 do begin
+    FileReplaceString(ExpandConstant('{tmp}\SH2EEsetup.dat'), LocalCompsArray[i].ID + ',false,0.0', LocalCompsArray[i].ID + ',' + BoolToStr(LocalCompsArray[i].isInstalled) + ',' + LocalCompsArray[i].version);
+  end;
+
+  // Copy to the game's dir
+  FileCopy(ExpandConstant('{tmp}\SH2EEsetup.dat'), ExpandConstant('{src}\SH2EEsetup.dat'), false);
 end;
 
 procedure InitializeWizard();
@@ -787,6 +811,7 @@ begin
 end;
 
 function InitializeSetup(): Boolean;
+var i: integer;
 begin
   Result := True;
 
@@ -810,15 +835,20 @@ begin
   end;
 
   // Check if the installer should work correctly with with the current server-side files
-  if not SameText(WebCompsArray[8].version, ExpandConstant('{#INSTALLER_VER}')) then
-  begin
-    if MsgBox('Error: Outdated Version' #13#13 'An update for the SH2:EE Setup Tool is available.' #13#13 'Do you wish to update the Setup Tool now?', mbConfirmation, MB_YESNO) = IDYES then
+  for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+    if WebCompsArray[i].id = 'setup_tool' then
     begin
-      selfUpdateMode := True;
-    end else
-    begin
-      Result := False;
-      exit;
+      if not SameText(WebCompsArray[i].version, ExpandConstant('{#INSTALLER_VER}')) then
+      begin
+        if MsgBox('Error: Outdated Version' #13#13 'The SH2:EE Setup Tool must be updated in order to use.' #13#13 'Update the Setup Tool?', mbConfirmation, MB_YESNO) = IDYES then
+        begin
+          selfUpdateMode := True;
+        end else
+        begin
+          Result := False;
+          exit;
+        end;
+      end;
     end;
   end;
 
@@ -826,13 +856,27 @@ begin
   if FileExists(ExpandConstant('{src}\') + 'sh2pc.exe') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
   begin
     maintenanceMode := True;
+
     // Create an array of TWebComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
     LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
+
     // Check if above didn't work
-    if not SamePackedVersion(GetArrayLength(LocalCompsArray), GetArrayLength(WebCompsArray) - 1) then begin // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
-      MsgBox('Error: Parsing Failed' #13#13 'Parsing SH2EEsetup.dat failed. The file might be corrupted.' #13#13 'Please reinstall the project.', mbInformation, MB_OK);
+    if GetArrayLength(WebCompsArray) = 0 then begin
+      MsgBox('Error: Parsing Failed' #13#13 'Couldn''t parse SH2EEsetup.dat.' #13#13 'The installation cannot continue.', mbInformation, MB_OK);
       Result := False;
       exit;
+    end;
+
+    // Check if the local CSV needs to be updated
+    // Update CSV if array sizes are different
+    if not SamePackedVersion(GetArrayLength(LocalCompsArray), GetArrayLength(WebCompsArray)) then begin // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
+      UpdateLocalCSV();
+    end;
+
+    // Update CSV if the order of ids don't match  
+    for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+      if not SameText(LocalCompsArray[i].id, WebCompsArray[i].id) then
+        UpdateLocalCSV();
     end;
   end;
 end;
@@ -853,7 +897,7 @@ begin
       if WizardForm.ComponentsList.Checked[i] = true then
       begin
         intTotalComponents := intTotalComponents + 1;
-        idpAddFile(WebCompsArray[i].URL, tmp(GetURLFilePart(WebCompsArray[i].URL)));
+        idpAddFile(WebCompsArray[i + 1].URL, tmp(GetURLFilePart(WebCompsArray[i + 1].URL)));
       end;
     end;
     selectedComponents := WizardSelectedComponents(false);  
@@ -872,9 +916,9 @@ begin
       begin
         if BoxPointer.CheckListBox.Checked[i] = true then
         begin
-          MaintenanceCompsList := MaintenanceCompsList + WebCompsArray[i].ID + ',';
+          MaintenanceCompsList := MaintenanceCompsList + WebCompsArray[i + 1].ID + ',';
           intTotalComponents := intTotalComponents + 1;
-          idpAddFile(WebCompsArray[i].URL, tmp(GetURLFilePart(WebCompsArray[i].URL)));
+          idpAddFile(WebCompsArray[i + 1].URL, tmp(GetURLFilePart(WebCompsArray[i + 1].URL)));
         end;
       end;
       if intTotalComponents = 0 then begin
@@ -1160,14 +1204,16 @@ begin
       // Change default labels to fit the uninstaller action
       WizardForm.FinishedHeadingLabel.Caption := 'Uninstallation complete.';
       WizardForm.FinishedLabel.Caption        := 'The wizard has successfully uninstalled the enhancement packages.' #13#13 'Click finish to exit the wizard.';
-      // Hide the run checkbox when uninstalling
-      WizardForm.RunList.Visible := false;
+      // Hide and uncheck the run checkbox when uninstalling
+      WizardForm.RunList.Visible    := false;
+      WizardForm.RunList.Checked[0] := false;
     end;
 
-    // Hide the run checkbox if the data folder doesn't exist
+    // Hide and uncheck the run checkbox if the data folder doesn't exist
     if not sh2pcFilesExist then
     begin
-      WizardForm.RunList.Visible := false;
+      WizardForm.RunList.Visible    := false;
+      WizardForm.RunList.Checked[0] := false;
     end;
   end;
 end;
