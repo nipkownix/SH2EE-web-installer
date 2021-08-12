@@ -448,7 +448,7 @@ begin
   ExtractTemporaryFile('icon_update.bmp');
   ExtractTemporaryFile('icon_uninstall.bmp');
 
-  wpMaintenance := CreateCustomPage(wpWelcome, 'Silent Hill 2: Enhanced Edition Maintenance Wizard', 'Install, update, or uninstall files.');
+  wpMaintenance := CreateCustomPage(wpWelcome, 'Silent Hill 2: Enhanced Edition Maintenance Wizard', 'Install, repair, update, or uninstall files.');
 
   installBmp := TBitmapImage.Create(wpMaintenance);
   with installBmp do
