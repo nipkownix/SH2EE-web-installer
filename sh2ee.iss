@@ -2,7 +2,7 @@
 
 #define INSTALLER_VER  "1.0"
 #define DEBUG          "false"
-#define SH2EE_CSV_URL  "http://etc.townofsilenthill.com/sandbox/ee_itmp/_sh2eeTest.csv"
+#define SH2EE_CSV_URL  "http://etc.townofsilenthill.com/sandbox/ee_itmp/_sh2ee.csv"
 
 #include "includes/innosetup-download-plugin/idp.iss"
 
@@ -42,8 +42,8 @@ Name: minimal; Description: Minimal installation (Not recommended)
 Name: custom; Description: Custom installation; Flags: iscustom
 
 [Components]
-Name: sh2emodule; Description: SH2 Enhancements Module; ExtraDiskSpaceRequired: 4174272; Types: full minimal custom; Flags: fixed
-Name: ee_exe; Description: Enhanced Executable; ExtraDiskSpaceRequired: 5459968; Types: full minimal custom; Flags: fixed
+Name: sh2emodule; Description: SH2 Enhancements Module; ExtraDiskSpaceRequired: 4174272; Types: full minimal custom
+Name: ee_exe; Description: Enhanced Executable; ExtraDiskSpaceRequired: 5459968; Types: full minimal custom
 Name: ee_essentials; Description: Enhanced Edition Essential Files; ExtraDiskSpaceRequired: 288792943; Types: full
 Name: img_pack; Description: Image Enhancement Pack; ExtraDiskSpaceRequired: 1229057424; Types: full
 Name: fmv_pack; Description: FMV Enhancement Pack; ExtraDiskSpaceRequired: 3427749254; Types: full
@@ -60,7 +60,6 @@ Source: "includes\deletefile_util\deletefile_util.exe"; Flags: dontcopy
 Source: "includes\renamefile_util\renamefile_util.exe"; Flags: dontcopy
 //Source: "includes\unshield\unshield.exe"; Flags: dontcopy
 Source: "{srcexe}"; DestDir: "{tmp}"; DestName: "SH2EEsetup.exe"; Flags: external 
-Source: "resources\SH2EEsetup.dat"; Flags: dontcopy
 Source: "resources\maintenance\icon_install.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_update.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_uninstall.bmp"; Flags: dontcopy
@@ -95,6 +94,8 @@ var
 #include "includes/Util.iss"
 
 var
+  ComponentsListClickCheckPrev  : TNotifyEvent;
+
   wpMaintenance                 : TWizardPage;
   installRadioBtn               : TRadioButton;
   updateRadioBtn                : TRadioButton;
@@ -102,16 +103,12 @@ var
 
   sh2pcFilesWerePresent         : Boolean;
 
-  wpInstallNew                  : TInputOptionWizardPage;
-
   wpUpdater                     : TInputOptionWizardPage;
 
   wpSelfUpdate                  : TWizardPage;
 
-  MaintenanceCompsList          : String;
+  UpdateCompsList               : String;
   LocalCompsArray               : array of TLocalComponentsInfo;
-
-  BoxPointer                    : TInputOptionWizardPage;
 
   wpExtract                     : TWizardPage;
   intTotalComponents            : Integer;
@@ -321,51 +318,6 @@ begin
   end;
 end;
 
-// Helper to populate wpInstallNew's CheckListBox's labels
-function wpIVersionLabel(OnlineVer: String; ExistVer: String; isInstalled: Boolean): String;
-begin
-  if not isInstalled then
-    Result := 'Version available: ' + OnlineVer
-  else 
-    Result := 'Already installed'
-end;
-
-// Helper to populate wpUpdater's CheckListBox's labels
-function wpUVersionLabel(OnlineVer: String; ExistVer: String; isInstalled: Boolean): String;
-begin
-  if isInstalled then
-  begin
-    if SameText(OnlineVer, ExistVer) then
-      Result := 'No update available'
-    else
-      Result := 'New version available: ' + OnlineVer
-  end else 
-    Result := 'Not installed'
-end;
-
-function wpInstallNewShouldSkipPage(Page: TWizardPage): Boolean;
-begin
-    Result := not installRadioBtn.Checked;
-end;
-
-function wpUpdaterShouldSkipPage(Page: TWizardPage): Boolean;
-begin
-    Result := not updateRadioBtn.Checked;
-end;
-
-// Decides whether or not the component is available for the update
-function isAvailable(OnlineVer: String; ExistVer: String; isInstalled: Boolean): Boolean;
-begin
-  if isInstalled then
-  begin
-    if SameText(OnlineVer, ExistVer) then
-      Result := false
-    else
-      Result := true
-  end else 
-    Result := false
-end;
-
 procedure doCustomUninstall;
 var
   intErrorCode: Integer;
@@ -397,14 +349,43 @@ begin
   Exec(ExpandConstant('{tmp}\') + 'deletefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')), '', SW_HIDE, ewNoWait, intErrorCode);
 end;
 
+// Helper to populate wpUpdater's CheckListBox's labels
+function wpUVersionLabel(OnlineVer: String; ExistVer: String; isInstalled: Boolean): String;
+begin
+  if isInstalled then
+  begin
+    if SameText(OnlineVer, ExistVer) then
+      Result := 'No update available'
+    else
+      Result := 'New version available: ' + OnlineVer
+  end else 
+    Result := 'Not installed'
+end;
+
+function wpUpdaterShouldSkipPage(Page: TWizardPage): Boolean;
+begin
+    Result := not updateRadioBtn.Checked;
+end;
+
+// Decides whether or not the component is available for the update
+function isUpdateAvailable(OnlineVer: String; ExistVer: String; isInstalled: Boolean): Boolean;
+begin
+  if isInstalled then
+  begin
+    if SameText(OnlineVer, ExistVer) then
+      Result := false
+    else
+      Result := true
+  end else 
+    Result := false
+end;
+
 function wpMaintenanceNextClick(Page: TWizardPage): Boolean;
 begin
-    if installRadioBtn.Checked then
-      BoxPointer := wpInstallNew
-    else if updateRadioBtn.Checked then
-      BoxPointer := wpUpdater;
-    if not uninstallRadioBtn.Checked then idpDownloadAfter(BoxPointer.ID);
     Result := True;
+    
+    if updateRadioBtn.Checked then
+      idpDownloadAfter(wpUpdater.ID);
 
     if uninstallRadioBtn.Checked then
     begin 
@@ -413,6 +394,40 @@ begin
       else
         doCustomUninstall();
     end;
+end;
+
+procedure ComponentsListClickCheck(Sender: TObject);
+var
+  i: integer;
+  CompCount: integer;
+begin
+  // Call Inno's original OnClick action
+  ComponentsListClickCheckPrev(Sender);
+  
+  // Customize components list
+  CompCount := 0;
+  for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+    if not (WebCompsArray[i].id = 'setup_tool') then
+    begin
+      if LocalCompsArray[i].isInstalled then
+      begin
+        with Wizardform.ComponentsList do
+        begin
+          ItemSubItem[i - 1] := 'Already installed';
+        end;
+      end;
+
+      // Calculate how many components are selected
+      if WizardForm.ComponentsList.Checked[i - 1] then
+        CompCount := CompCount + 1;
+    end;
+  end;
+
+  // Show disk space label is components are selected
+  if not (CompCount = 0) then
+    WizardForm.ComponentsDiskSpaceLabel.Visible := True
+  else
+    WizardForm.ComponentsDiskSpaceLabel.Visible := False
 end;
 
 // Creates the maintenance page
@@ -569,36 +584,35 @@ begin
       OnNextButtonClick := @wpMaintenanceNextClick;
   end;
 
-  // Create custom install selection page
-  wpInstallNew := CreateInputOptionPage(
-    wpMaintenance.ID,
-    SetupMessage(msgWizardSelectComponents),
-    'Please select which enhancement packages you would like to install or repair.',
-    SetupMessage(msgSelectComponentsLabel2),
-    False, True);
-
-  // Use both the local and web arrays to check and populate the download listbox
+  // Customize wpSelectComponents for maintenance mode
   for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
     if not (WebCompsArray[i].id = 'setup_tool') then
     begin
-      with WebCompsArray[i] do begin
-        wpInstallNew.CheckListBox.AddCheckBox(
-          Name, // Label next to checkbox
-          wpIVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),  // Label right-justified in list box
-          0,
-          False,
-          True,
-          False,
-          False,
-          Nil);
+      with Wizardform.ComponentsList do
+      begin
+        Checked[i - 1] := false;
+      end;
+
+      if LocalCompsArray[i].isInstalled then
+      begin
+        with Wizardform.ComponentsList do
+        begin
+          ItemSubItem[i - 1] := 'Already installed';
+        end;
       end;
     end;
   end;
 
-  with wpInstallNew do
-  begin
-      OnShouldSkipPage := @wpInstallNewShouldSkipPage;
-  end;
+  // Initially hide disk space label
+  WizardForm.ComponentsDiskSpaceLabel.Visible := False;
+
+  // Register new OnClick event
+  ComponentsListClickCheckPrev := WizardForm.ComponentsList.OnClickCheck;
+  WizardForm.ComponentsList.OnClickCheck := @ComponentsListClickCheck;
+
+  // Hide TypesCombo 
+  WizardForm.TypesCombo.Visible := False;
+  WizardForm.IncTopDecHeight(WizardForm.ComponentsList, - (WizardForm.ComponentsList.Top - WizardForm.TypesCombo.Top));
 
   // Create custom update selection page
   wpUpdater := CreateInputOptionPage(
@@ -617,8 +631,8 @@ begin
           Name, // Label next to checkbox
           wpUVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),  // Label right-justified in list box
           0,
-          isAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),
-          isAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),
+          isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),
+          isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled),
           False,
           False,
           Nil);
@@ -643,12 +657,31 @@ function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := False;
 
+  // Skip pages if in selfUpdateMode
+  if selfUpdateMode then
+  begin
+    if (PageID = wpMaintenance.ID) or
+       (PageID = wpUpdater.ID) or
+       (PageID = wpSelectComponents) or
+       (PageID = wpFinished) then
+    begin
+      Result := True;
+    end;
+  end;
+
+  // Skip wpSelectComponents if updating components or uninstalling
+  if maintenanceMode and not selfUpdateMode then
+  begin
+    if (PageID = wpSelectComponents) then
+      if updateRadioBtn.Checked or uninstallRadioBtn.Checked then
+        Result := True;
+  end;
+
   // Skip to updater page if started with argument
   if CmdLineParamExists('-update') and maintenanceMode then
   begin
     if (PageID = wpMaintenance.ID) then
     begin
-      BoxPointer := wpUpdater;
       Result := True;
     end;
   end;
@@ -659,22 +692,11 @@ begin
     if (PageID = wpWelcome) or
        (PageID = wpLicense) or
        (PageID = wpSelectDir) or
-       (PageID = wpSelectComponents) or
        (PageID = wpReady) then
     begin
       Result := True;
     end;
   end;
-  
-  // Skip finished page if in selfUpdateMode
-  if selfUpdateMode then
-  begin
-    if (PageID = wpFinished) then
-    begin
-      Result := True;
-    end;
-  end;
-
 end;
 
 procedure selfUpdateNext(Page: TWizardPage);
@@ -682,15 +704,16 @@ begin
   WizardForm.NextButton.OnClick(WizardForm.NextButton);
 end;
 
-// Creates a dummy self update page, so IDP can start straight away
+// Prepare for the self-update procedure
 procedure PrepareSelfUpdate();
 begin
   ExtractTemporaryFile('renamefile_util.exe');
 
-  idpAddFile(WebCompsArray[8].URL, ExpandConstant('{src}\SH2EEsetup_new.exe'));
+  // Add file to IDP list
+  idpAddFile(WebCompsArray[0].URL, ExpandConstant('{src}\SH2EEsetup_new.exe'));
 
+  // Creates a dummy self update page, so IDP can start straight away
   wpSelfUpdate := CreateCustomPage(wpWelcome, 'Silent Hill 2: EE Setup Tool self-update', 'Self-update in progress');
-
   idpDownloadAfter(wpSelfUpdate.ID);
 
   with wpSelfUpdate do
@@ -699,22 +722,90 @@ begin
   end;
 end;
 
-procedure UpdateLocalCSV();
+procedure UpdateLocalCSV(recoverOnly: Boolean);
 var
   i: Integer;
 begin
   Log('# updating local csv');
 
-  // Extract fresh CSV to tmp dir
-  ExtractTemporaryFile('SH2EEsetup.dat');
-
-  // Populate with new values
-  for i := 0 to GetArrayLength(LocalCompsArray) - 1 do begin
-    FileReplaceString(ExpandConstant('{tmp}\SH2EEsetup.dat'), LocalCompsArray[i].ID + ',false,0.0', LocalCompsArray[i].ID + ',' + BoolToStr(LocalCompsArray[i].isInstalled) + ',' + LocalCompsArray[i].version);
+  // Create fresh local .csv to the game's directory
+  if not maintenanceMode then
+  begin
+    SaveStringToFile(ExpandConstant('{app}\SH2EEsetup.dat')
+    ,'# **DO NOT MODIFY THIS FILE!**' + #13#10 +
+    'id,isInstalled,version' + #13#10 +
+    'setup_tool,true,' + ExpandConstant('{#INSTALLER_VER}') + #13#10,
+    False);
+  end else
+  begin
+    SaveStringToFile(ExpandConstant('{src}\SH2EEsetup.dat')
+    ,'# **DO NOT MODIFY THIS FILE!**' + #13#10 +
+    'id,isInstalled,version' + #13#10 +
+    'setup_tool,true,' + ExpandConstant('{#INSTALLER_VER}') + #13#10,
+    False);
   end;
 
-  // Copy to the game's dir
-  FileCopy(ExpandConstant('{tmp}\SH2EEsetup.dat'), ExpandConstant('{src}\SH2EEsetup.dat'), false);
+  // Populate entries based on the web csv
+  for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+  begin
+    if not (WebCompsArray[i].id = 'setup_tool') then
+    begin
+      if not maintenanceMode then
+      begin
+        SaveStringToFile(ExpandConstant('{app}\SH2EEsetup.dat')
+        ,WebCompsArray[i].ID + ',false,' + '0.0' + #13#10,
+        True);
+      end else
+      begin
+        SaveStringToFile(ExpandConstant('{src}\SH2EEsetup.dat')
+        ,WebCompsArray[i].ID + ',false,' + '0.0' + #13#10,
+        True);
+      end;
+    end;
+  end;
+
+  // Write version info and installation status
+  for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+  begin
+    if not (WebCompsArray[i].id = 'setup_tool') then
+    begin
+      // Rewrite existing local csv info
+      if maintenanceMode then
+      begin
+        try
+          if LocalCompsArray[i].isInstalled then
+            FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), LocalCompsArray[i].ID + ',false,' + '0.0', LocalCompsArray[i].ID + ',true,' + LocalCompsArray[i].Version);
+        except
+          Log('# Entry is missing from local CSV.');
+        end;
+      end;
+
+      // If in maintenance mode, check for maintenance page's radio buttons
+      if maintenanceMode and not selfUpdateMode and not recoverOnly then
+      begin
+        // Write info from new selected components using wpSelectComponents' list box
+        if installRadioBtn.Checked then
+        begin
+          if WizardForm.ComponentsList.Checked[i - 1] = true then
+          FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), LocalCompsArray[i].ID + ',' + BoolToStr(LocalCompsArray[i].isInstalled) + ',' + LocalCompsArray[i].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+        end else
+        // Write info from new selected components using wpUpdater's list box
+        if updateRadioBtn.Checked then
+        begin
+          if wpUpdater.CheckListBox.Checked[i - 1] = true then
+          FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), LocalCompsArray[i].ID + ',' + BoolToStr(LocalCompsArray[i].isInstalled) + ',' + LocalCompsArray[i].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+        end;
+      end;
+
+      // If not in maintenance mode, use the default method
+      if not maintenanceMode then
+      begin
+        if WizardForm.ComponentsList.Checked[i - 1] = true then
+          FileReplaceString(ExpandConstant('{app}\SH2EEsetup.dat'), WebCompsArray[i].ID + ',false,0.0', WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+      end;
+
+    end;
+  end;
 end;
 
 procedure InitializeWizard();
@@ -722,8 +813,16 @@ var
   HelpButton    : TButton;
   DebugLabel    : TNewStaticText;
 begin
+
+  // Compare lenghts of the installer's component list and the web CSV
+  if not SamePackedVersion(WizardForm.ComponentsList.Items.Count, GetArrayLength(WebCompsArray) - 1) then // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
+  begin
+    MsgBox('Error: Invalid Components List Size' #13#13 'The installer should be updated to handle the new components from sh2ee.csv.', mbInformation, MB_OK);
+    Abort;
+  end;
+
+  // Replace some normal labels with RTF equivalents if not in maintenance mode
   if not maintenanceMode then
-    // Replace some normal labels with RTF equivalents
     create_RTFlabels();
 
   // IDP settings
@@ -737,7 +836,7 @@ begin
   // Start the download after wpReady
   idpDownloadAfter(wpReady);
   
-  if maintenanceMode and (not selfUpdateMode) then
+  if maintenanceMode then
     PrepareMaintenance();
 
   if selfUpdateMode then
@@ -746,8 +845,17 @@ begin
   // Create the wpExtract page
   create_wpExtract();
 
+  // Force installation of the SH2E module and EE exe if not in maintenance mode
   if not maintenanceMode then
-    SetTimer(0, 0, 50, CreateCallback(@HoverTimerProc));
+  begin
+    WizardForm.ComponentsList.Checked[0] := true;
+    WizardForm.ComponentsList.Checked[1] := true;
+    WizardForm.ComponentsList.ItemEnabled[0] := false;
+    WizardForm.ComponentsList.ItemEnabled[1] := false;
+  end;
+
+  // Create onhover process for wpSelectComponents
+  SetTimer(0, 0, 50, CreateCallback(@HoverTimerProc));
 
   CompTitle := TLabel.Create(WizardForm);
   with CompTitle do
@@ -819,7 +927,8 @@ begin
   CSVFilePath := tmp(GetURLFilePart('{#SH2EE_CSV_URL}'));
 
   // Download sh2ee.csv; show an error message and exit the installer if downloading fails
-  if not idpDownloadFile('{#SH2EE_CSV_URL}', CSVFilePath) then begin
+  if not idpDownloadFile('{#SH2EE_CSV_URL}', CSVFilePath) then
+  begin
     MsgBox('Error: Download Failed' #13#13 'Couldn''t download sh2ee.csv.' #13#13 'The installation cannot continue.', mbInformation, MB_OK);
     Result := False;
     exit;
@@ -828,25 +937,35 @@ begin
   // Create an array of TWebComponentsInfo records from sh2ee.csv and store them in a global variable
   WebCompsArray := WebCSVToInfoArray(CSVFilePath);
   // Check if above didn't work
-  if GetArrayLength(WebCompsArray) = 0 then begin
+  if GetArrayLength(WebCompsArray) = 0 then
+  begin
     MsgBox('Error: Parsing Failed' #13#13 'Couldn''t parse sh2ee.csv.' #13#13 'The installation cannot continue.', mbInformation, MB_OK);
     Result := False;
     exit;
   end;
 
+  // Enable selfUpdate if started with argument
+  if CmdLineParamExists('-selfUpdate') then
+  begin
+    selfUpdateMode := True;
+  end;
+
   // Check if the installer should work correctly with with the current server-side files
-  for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
-    if WebCompsArray[i].id = 'setup_tool' then
-    begin
-      if not SameText(WebCompsArray[i].version, ExpandConstant('{#INSTALLER_VER}')) then
+  if not selfUpdateMode then
+  begin
+    for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+      if WebCompsArray[i].id = 'setup_tool' then
       begin
-        if MsgBox('Error: Outdated Version' #13#13 'The SH2:EE Setup Tool must be updated in order to use.' #13#13 'Update the Setup Tool?', mbConfirmation, MB_YESNO) = IDYES then
+        if not SameText(WebCompsArray[i].version, ExpandConstant('{#INSTALLER_VER}')) then
         begin
-          selfUpdateMode := True;
-        end else
-        begin
-          Result := False;
-          exit;
+          if MsgBox('Error: Outdated Version' #13#13 'The SH2:EE Setup Tool must be updated in order to use.' #13#13 'Update the Setup Tool?', mbConfirmation, MB_YESNO) = IDYES then
+          begin
+            selfUpdateMode := True;
+          end else
+          begin
+            Result := False;
+            exit;
+          end;
         end;
       end;
     end;
@@ -861,22 +980,26 @@ begin
     LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
 
     // Check if above didn't work
-    if GetArrayLength(WebCompsArray) = 0 then begin
+    if GetArrayLength(WebCompsArray) = 0 then
+    begin
       MsgBox('Error: Parsing Failed' #13#13 'Couldn''t parse SH2EEsetup.dat.' #13#13 'The installation cannot continue.', mbInformation, MB_OK);
       Result := False;
       exit;
     end;
 
-    // Check if the local CSV needs to be updated
-    // Update CSV if array sizes are different
-    if not SamePackedVersion(GetArrayLength(LocalCompsArray), GetArrayLength(WebCompsArray)) then begin // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
-      UpdateLocalCSV();
+    // Update and reload local CSV if array sizes are different
+    if not SamePackedVersion(GetArrayLength(LocalCompsArray), GetArrayLength(WebCompsArray)) then // [2] Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
+    begin
+      UpdateLocalCSV(true);
+      LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
     end;
 
-    // Update CSV if the order of ids don't match  
-    for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+    // Update and reload local CSV if the order of ids don't match  
+    for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+    begin
       if not SameText(LocalCompsArray[i].id, WebCompsArray[i].id) then
-        UpdateLocalCSV();
+        UpdateLocalCSV(true);
+        LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
     end;
   end;
 end;
@@ -900,23 +1023,29 @@ begin
         idpAddFile(WebCompsArray[i + 1].URL, tmp(GetURLFilePart(WebCompsArray[i + 1].URL)));
       end;
     end;
-    selectedComponents := WizardSelectedComponents(false);  
-    Log('# The following [' + IntToStr(intTotalComponents) + '] components are selected: ' + selectedComponents); 
+    if intTotalComponents = 0 then begin
+      MsgBox('Error:' #13#13 'No componentes are selected.', mbInformation, MB_OK);
+      Result := False;
+      exit;
+    end else begin
+      selectedComponents := WizardSelectedComponents(false);  
+      Log('# The following [' + IntToStr(intTotalComponents) + '] components are selected: ' + selectedComponents);
+    end;
   end;
 
   if maintenanceMode and (not selfUpdateMode) then
   begin
-    if (CurPage = wpUpdater.ID) or (CurPage = wpInstallNew.ID) then
+    if CurPage = wpUpdater.ID then
     begin
-      // Add files to MaintenanceCompsList and IDP
-      MaintenanceCompsList := ''; // Clear list
+      // Add files to UpdateCompsList and IDP
+      UpdateCompsList := ''; // Clear list
       intTotalComponents := 0; // Clear list
       idpClearFiles(); // Make sure idp file list is clean
-      for i := 0 to BoxPointer.CheckListBox.Items.Count - 1 do
+      for i := 0 to wpUpdater.CheckListBox.Items.Count - 1 do
       begin
-        if BoxPointer.CheckListBox.Checked[i] = true then
+        if wpUpdater.CheckListBox.Checked[i] = true then
         begin
-          MaintenanceCompsList := MaintenanceCompsList + WebCompsArray[i + 1].ID + ',';
+          UpdateCompsList := UpdateCompsList + WebCompsArray[i + 1].ID + ',';
           intTotalComponents := intTotalComponents + 1;
           idpAddFile(WebCompsArray[i + 1].URL, tmp(GetURLFilePart(WebCompsArray[i + 1].URL)));
         end;
@@ -926,7 +1055,7 @@ begin
         Result := False;
         exit;
       end else begin
-        selectedComponents := MaintenanceCompsList  
+        selectedComponents := UpdateCompsList  
         Log('# The following [' + IntToStr(intTotalComponents) + '] components are selected: ' + selectedComponents);
       end;
     end;
@@ -1019,7 +1148,7 @@ begin
         if {#DEBUG} then Log('# Backed up d3d8.ini settings');
       end;
 
-      Extractore(tmp(GetURLFilePart(WebCompsArray[0].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+      Extractore(tmp(GetURLFilePart(WebCompsArray[1].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
 
       // Restore .ini settings if we are in maintenance mode
       if maintenanceMode and not (GetArrayLength(CurIniArray) = 0) then
@@ -1052,97 +1181,96 @@ begin
       // Backup the original .exe before extracting the new one, if a backup doesn't already exist
       if not FileExists(WizardDirValue + '\sh2pc.exe.bak') then
         RenameFile(WizardDirValue + '\sh2pc.exe', WizardDirValue + '\sh2pc.exe.bak');
-      Extractore(tmp(GetURLFilePart(WebCompsArray[1].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+      Extractore(tmp(GetURLFilePart(WebCompsArray[2].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
     UpdateTotalProgressBar(); 
   end;
   
   if Pos('ee_essentials', selectedComponents) > 0 then
   begin
     UpdateCurrentComponentName('Enhanced Edition Essential Files');
-      Extractore(tmp(GetURLFilePart(WebCompsArray[2].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+      Extractore(tmp(GetURLFilePart(WebCompsArray[3].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
     UpdateTotalProgressBar();
   end;
 
   if Pos('img_pack', selectedComponents) > 0 then
   begin
     UpdateCurrentComponentName('Image Enhancement Pack');
-      Extractore(tmp(GetURLFilePart(WebCompsArray[3].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+      Extractore(tmp(GetURLFilePart(WebCompsArray[4].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
     UpdateTotalProgressBar();
   end;
 
   if Pos('fmv_pack', selectedComponents) > 0 then
   begin
     UpdateCurrentComponentName('FMV Enhancement Pack');
-      Extractore(tmp(GetURLFilePart(WebCompsArray[4].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+      Extractore(tmp(GetURLFilePart(WebCompsArray[5].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
     UpdateTotalProgressBar();
   end;
 
   if Pos('audio_pack', selectedComponents) > 0 then
   begin
     UpdateCurrentComponentName('Audio Enhancement Pack');
-      Extractore(tmp(GetURLFilePart(WebCompsArray[5].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+      Extractore(tmp(GetURLFilePart(WebCompsArray[6].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
     UpdateTotalProgressBar();
   end;
 
   if Pos('dsoal', selectedComponents) > 0 then
   begin
     UpdateCurrentComponentName('DSOAL');
-      Extractore(tmp(GetURLFilePart(WebCompsArray[6].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+      Extractore(tmp(GetURLFilePart(WebCompsArray[7].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
     UpdateTotalProgressBar();
   end;
 
   if Pos('xinput_plus', selectedComponents) > 0 then
   begin
     UpdateCurrentComponentName('XInput Plus');
-      Extractore(tmp(GetURLFilePart(WebCompsArray[7].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+      Extractore(tmp(GetURLFilePart(WebCompsArray[8].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
     UpdateTotalProgressBar();
   end;
 
   if not ExtractionCancel then WizardForm.NextButton.OnClick(WizardForm.NextButton);
 end;
 
-procedure preInstall();
-var i : Integer;
-begin
-  ExtractTemporaryFile('SH2EEsetup.dat');
-
-  if not maintenanceMode then
-  begin
-    for i := 0 to WizardForm.ComponentsList.Items.Count - 1 do
-    begin
-      if WizardForm.ComponentsList.Checked[i] = true then
-      begin
-        FileReplaceString(ExpandConstant('{tmp}\SH2EEsetup.dat'), WebCompsArray[i].ID + ',false,0.0', WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
-      end;
-    end;
-    // Copy fresh components .csv to the game's directory
-    FileCopy(ExpandConstant('{tmp}\SH2EEsetup.dat'), ExpandConstant('{app}\SH2EEsetup.dat'), false);
-  end;
-end;
-
 procedure postInstall();
 var
-  i : Integer;
   intErrorCode: Integer;
+  ShouldUpdate: Boolean;
+  i: Integer;
 begin
-  if not selfUpdateMode then
-  begin
-    if maintenanceMode and (not uninstallRadioBtn.Checked) then
-    begin
-      for i := 0 to BoxPointer.CheckListBox.Items.Count - 1 do
-      begin
-        if BoxPointer.CheckListBox.Checked[i] = true then
-        begin
-          FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), LocalCompsArray[i].ID + ',' + BoolToStr(LocalCompsArray[i].isInstalled) + ',' + LocalCompsArray[i].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
-        end;
-      end;
-    end;
-  end;
+  // Update local CSV file after installation
+  if maintenanceMode then
+  begin 
+    if not uninstallRadioBtn.Checked then
+      UpdateLocalCSV(false);
+  end else
+  if not maintenanceMode then
+    UpdateLocalCSV(false);
 
   if selfUpdateMode then
   begin
+    // Check is there's an update available
+    for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+      if not (WebCompsArray[i].id = 'setup_tool') then
+      begin
+        if isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled) then
+          ShouldUpdate := True;
+      end;
+    end;
+
     // Schedule SH2EEsetup_new.exe for renaming as soon as possible
-    Exec(ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')), '', SW_HIDE, ewNoWait, intErrorCode);
+    if not ShouldUpdate and CmdLineParamExists('-selfUpdate') then
+    begin
+      // Don't reopen the setup tool if launched with selfUpdate parameter and there's no update available
+      ShellExec('', ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')) + ' false false', '', SW_HIDE, ewNoWait, intErrorCode);
+      // Reopen the game
+      ShellExec('', ExpandConstant('{src}\') + 'sh2pc.exe', '', '', SW_SHOW, ewNoWait, intErrorCode);
+    end
+    else
+    if ShouldUpdate and CmdLineParamExists('-selfUpdate') then 
+      // Open the updater page after renaming
+      ShellExec('', ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')) + ' true true', '', SW_HIDE, ewNoWait, intErrorCode)
+    else
+      // Don't open the updater page after renaming
+      ShellExec('', ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')) + ' true false', '', SW_HIDE, ewNoWait, intErrorCode);
   end;
 
   // Copy SH2EEsetup.exe to the game's directory if we're not currently running from it
@@ -1152,7 +1280,7 @@ end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
-  if CurStep = ssInstall then preInstall();
+  //if CurStep = ssInstall then preInstall();
   if CurStep = ssPostInstall then postInstall();
 end;
 
@@ -1160,6 +1288,12 @@ procedure CurPageChanged(CurPageID: Integer);
 var
   sh2pcFilesExist : Boolean;
 begin
+
+  // Change wpSelectComponents label for maintenanceMode
+  if (CurPageID = wpSelectComponents) and maintenanceMode then
+    WizardForm.PageDescriptionLabel.Caption := 'Please select which enhancement packages you would like to install or repair.';
+
+
   if CurPageID = wpExtract.ID then 
   begin
     Wizardform.NextButton.Enabled := false;

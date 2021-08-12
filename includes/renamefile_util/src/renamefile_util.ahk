@@ -14,6 +14,10 @@ SetWorkingDir %A_ScriptDir%
 
 flName = %1%
 
+shouldRun = %2%
+
+shouldUpdate = %3%
+
 SplitPath, flName,, dir
 
 newSetupExe := dir . "\SH2EEsetup_new.exe"
@@ -27,7 +31,14 @@ if FileExist(newSetupExe)
 		FileDelete, %flName%
 	}
 	FileMove, %newSetupExe%, %destSetupExe%
-	Run, "%destSetupExe%",,UseErrorLevel
+	
+	if shouldRun = true
+	{
+		if shouldUpdate = true
+			Run, "%destSetupExe%" -update,,UseErrorLevel
+		else
+			Run, "%destSetupExe%",,UseErrorLevel
+	}
 }
 
 Run, %ComSpec% /c del "%A_ScriptFullPath%", , Hide

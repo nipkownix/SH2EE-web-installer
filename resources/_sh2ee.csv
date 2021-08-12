@@ -1,7 +1,7 @@
 # SH2EE web csv
 id,name,version,url
 setup_tool,SH2:EE Setup Tool,1.0,http://etc.townofsilenthill.com/sandbox/ee_itmp/testbuild/SH2EEsetup.exe
-sh2emodule,SH2 Enhancements Module,1.8.1900.0,https://github.com/elishacloud/Silent-Hill-2-Enhancements/releases/download/v1.8.1900.0/d3d8.zip,1.0
+sh2emodule,SH2 Enhancements Module,1.8.1900.0-csv,http://etc.townofsilenthill.com/sandbox/ee_itmp/testbuild/d3d8_csvTest.zip
 ee_exe,Enhanced Executable,1.0,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Enhanced_EXE_NA_v1.0_noroot.zip
 ee_essentials,Enhanced Edition Essential Files,1.2.1,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/Enhanced_Edition_Essential_Files_1.2.1_noroot.zip
 img_pack,Image Enhancement Pack,1.1.0,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Image_Enhancement_Pack_1.1.0_noroot.zip

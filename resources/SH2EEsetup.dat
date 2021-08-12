@@ -1,11 +1,3 @@
 # **DO NOT MODIFY THIS FILE!**
 id,isInstalled,version
-setup_tool,false,0.0
-sh2emodule,false,0.0
-ee_exe,false,0.0
-ee_essentials,false,0.0
-img_pack,false,0.0
-fmv_pack,false,0.0
-audio_pack,false,0.0
-dsoal,false,0.0
-xinput_plus,false,0.0
+setup_tool,true,0.0
