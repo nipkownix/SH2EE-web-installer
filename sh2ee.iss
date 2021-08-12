@@ -176,7 +176,7 @@ begin
   end;
 end;
 
-// Kill the extraction tool if we cancel the instalation during the extraction process  
+// Kill the extraction tool if we cancel the installation during the extraction process  
 procedure wpExtractCancelButtonClick(Page: TWizardPage; var Cancel, Confirm: Boolean);
 begin
   if ExitSetupMsgBox then
@@ -209,7 +209,7 @@ var
   CurrentComponentLabel           : TLabel;
   CurrentComponentStaticText      : TNewStaticText;
 begin
-  // wpExtract shown after the IDPForm page
+  // Create wpExtract and show it after the IDPForm page
   wpExtract := CreateCustomPage(IDPForm.Page.ID, 'Extracting compressed components', 'Please wait while Setup extracts components.');
 
   // Progress bars
@@ -368,7 +368,7 @@ begin
     Result := not updateRadioBtn.Checked;
 end;
 
-// Decides whether or not the component is available for the update
+// Decides whether or not there's an update available for the component
 function isUpdateAvailable(OnlineVer: String; ExistVer: String; isInstalled: Boolean): Boolean;
 begin
   if isInstalled then
@@ -424,7 +424,7 @@ begin
     end;
   end;
 
-  // Show disk space label is components are selected
+  // Show disk space label if components are selected
   if not (CompCount = 0) then
     WizardForm.ComponentsDiskSpaceLabel.Visible := True
   else
@@ -713,7 +713,7 @@ begin
   // Add file to IDP list
   idpAddFile(WebCompsArray[0].URL, ExpandConstant('{src}\SH2EEsetup_new.exe'));
 
-  // Creates a dummy self update page, so IDP can start straight away
+  // Create a dummy self update page, so IDP can start straight away
   wpSelfUpdate := CreateCustomPage(wpWelcome, 'Silent Hill 2: EE Setup Tool self-update', 'Self-update in progress');
   idpDownloadAfter(wpSelfUpdate.ID);
 
@@ -729,7 +729,7 @@ var
 begin
   Log('# updating local csv');
 
-  // Create fresh local .csv to the game's directory
+  // Create fresh local .csv in the game's directory
   if not maintenanceMode then
   begin
     SaveStringToFile(ExpandConstant('{app}\SH2EEsetup.dat')
@@ -804,7 +804,6 @@ begin
         if WizardForm.ComponentsList.Checked[i - 1] = true then
           FileReplaceString(ExpandConstant('{app}\SH2EEsetup.dat'), WebCompsArray[i].ID + ',false,0.0', WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
       end;
-
     end;
   end;
 end;
@@ -815,7 +814,7 @@ var
   DebugLabel    : TNewStaticText;
 begin
 
-  // Compare lenghts of the installer's component list and the web CSV
+  // Compare the lenght of the web CSV array with the installer's component list
   if not SamePackedVersion(WizardForm.ComponentsList.Items.Count, GetArrayLength(WebCompsArray) - 1) then // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
   begin
     MsgBox('Error: Invalid Components List Size' #13#13 'The installer should be updated to handle the new components from sh2ee.csv.', mbInformation, MB_OK);
@@ -1136,7 +1135,7 @@ begin
   else
     ExtractTemporaryFile('7za_x86.exe');
 
-  // Extracte selected components
+  // Extract selected components
   if Pos('sh2emodule', selectedComponents) > 0 then
   begin
     UpdateCurrentComponentName('SH2 Enhancements Module');
@@ -1260,7 +1259,7 @@ begin
     // Schedule SH2EEsetup_new.exe for renaming as soon as possible
     if not ShouldUpdate and CmdLineParamExists('-selfUpdate') then
     begin
-      // Don't reopen the setup tool if launched with selfUpdate parameter and there's no update available
+      // Don't reopen the setup tool if launched with the -selfUpdate parameter and there's no update available
       ShellExec('', ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')) + ' false false', '', SW_HIDE, ewNoWait, intErrorCode);
       // Reopen the game
       ShellExec('', ExpandConstant('{src}\') + 'sh2pc.exe', '', '', SW_SHOW, ewNoWait, intErrorCode);
