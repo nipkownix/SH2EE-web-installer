@@ -330,6 +330,7 @@ begin
   DeleteFile(ExpandConstant('{src}\d3d8.ini'));
   DeleteFile(ExpandConstant('{src}\d3d8.log'));
   DeleteFile(ExpandConstant('{src}\d3d8.res'));
+  DeleteFile(ExpandConstant('{src}\d3d8.cfg'));
   DeleteFile(ExpandConstant('{src}\Dinput.dll'));
   DeleteFile(ExpandConstant('{src}\Dinput8.dll'));
   DeleteFile(ExpandConstant('{src}\dsoal-aldrv.dll'));
