@@ -1,11 +1,11 @@
 # SH2EE web csv
-id,name,version,url
-setup_tool,SH2:EE Setup Tool,1.0,http://etc.townofsilenthill.com/sandbox/ee_itmp/testbuild/SH2EEsetup.exe
-sh2emodule,SH2 Enhancements Module,1.8.1900.0-csv,http://etc.townofsilenthill.com/sandbox/ee_itmp/testbuild/d3d8_csvTest.zip
-ee_exe,Enhanced Executable,1.0,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Enhanced_EXE_NA_v1.0_noroot.zip
-ee_essentials,Enhanced Edition Essential Files,1.2.1,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/Enhanced_Edition_Essential_Files_1.2.1_noroot.zip
-img_pack,Image Enhancement Pack,1.1.0,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Image_Enhancement_Pack_1.1.0_noroot.zip
-fmv_pack,FMV Enhancement Pack,1.5.2,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Enhanced_FMV_Pack_1.5.2_noroot.zip
-audio_pack,Audio Enhancement Pack,2.0.3,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Audio_Enhancement_Pack_2.0.3_noroot.zip
-dsoal,DSOAL,1.31a.02,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/DSOAL_1.31a.02_noroot.zip
-xinput_plus,XInput Plus,4.15.2,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/XInputPlus_4.15.2_noroot.zip
+id,name,version,url,SHA256
+setup_tool,SH2:EE Setup Tool,1.0,http://etc.townofsilenthill.com/sandbox/ee_itmp/testbuild/SH2EEsetup.exe,notUsed
+sh2emodule,SH2 Enhancements Module,1.8.1900.0-csv,http://etc.townofsilenthill.com/sandbox/ee_itmp/testbuild/d3d8_csvTest.zip,50c87a6960ba423cea0a1f45f195ae871106f06bc123a8e569a405e0ee7c150e
+ee_exe,Enhanced Executable,1.0,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Enhanced_EXE_NA_v1.0_noroot.zip,dac1e62d57ceb504f1134727e10d5620b938e4fd4838ca7e687d44c0cf3097ca
+ee_essentials,Enhanced Edition Essential Files,1.2.1,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/Enhanced_Edition_Essential_Files_1.2.1_noroot.zip,0bf077e69d32a10a410ea745da99b0508be2c742b6b280b94d23be581213ac3a
+img_pack,Image Enhancement Pack,1.1.0,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Image_Enhancement_Pack_1.1.0_noroot.zip,c001167f999ad655f8a8a7fd3a42ca64de5ebb7b05befbaf7218ef41d3138873
+fmv_pack,FMV Enhancement Pack,1.5.2,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Enhanced_FMV_Pack_1.5.2_noroot.zip,a66d9508a77231303717ea0e16c53baf126d77a1f1288825c9277849bfbf7235
+audio_pack,Audio Enhancement Pack,2.0.3,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/SH2PC_Audio_Enhancement_Pack_2.0.3_noroot.zip,2ec09f2432917b2aaaaeebb79400f3bfe2385e08bbd28fe770e84e74cad488ff
+dsoal,DSOAL,1.31a.02,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/DSOAL_1.31a.02_noroot.zip,25c0b902056575bb61c5269f419cb794fee7997231a858fe639161ded0d6516f
+xinput_plus,XInput Plus,4.15.2,http://etc.townofsilenthill.com/sandbox/ee_itmp/testfiles/XInputPlus_4.15.2_noroot.zip,a8a0fab784c73d51874c151fdacf077ef407c54f0defc4b311f205a35b83d7b6

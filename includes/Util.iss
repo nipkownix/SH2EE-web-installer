@@ -1,11 +1,8 @@
 // Inno Setup - Util.iss
 
-
-
 [Code]
 var
   GCS_sh2pcPath: string;
-
 
 type
   TWebComponentsInfo    = record
@@ -13,8 +10,7 @@ type
     Name                : String;
     Version             : String;
     URL                 : String;
-    ReqInstallerVersion : String;
-    SHA512              : String;
+    SHA256              : String;
   end;
 
   TLocalComponentsInfo  = record
@@ -28,6 +24,9 @@ type
     Key                 : String;
     Value               : String;
   end;
+
+procedure ExitProcess(uExitCode: Integer);
+  external 'ExitProcess@kernel32.dll stdcall';
 
 // Returns true if the setup was started with a specific parameter
 function CmdLineParamExists(const Value: string): Boolean;
@@ -207,6 +206,7 @@ begin
         Name := RowValues[1];
         Version := RowValues[2];
         URL := RowValues[3];
+        SHA256 := RowValues[4];
       end;
     end;
   end else begin

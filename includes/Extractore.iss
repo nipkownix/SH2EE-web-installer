@@ -3,7 +3,6 @@
 
 [code]
 var
-  ExtractionCancel: Boolean;
   extProcHandle: Longword;
 
 // "Application.ProcessMessage" Helper
@@ -205,7 +204,7 @@ begin
   then MsgBox('File was not found while trying to unzip: ' + source, mbError, MB_OK)
   else begin
     ExitCode := -1;
-    if ({#DEBUG} and logToListBox = true) then 
+    if ({#DEBUG} and logToListBox) then 
        boxName.Items.Add('Running command: ' + extractTool + extractParams);
     Log(extractTool + extractParams);
     extProcHandle := ProcStart(extractTool + extractParams, ExpandConstant('{tmp}'))
