@@ -1,7 +1,6 @@
 // InnoSetup - Extractore.iss
 
-
-[code]
+[Code]
 var
   extProcHandle: Longword;
 
@@ -9,7 +8,7 @@ var
 type
   TMsg = record
     hwnd: HWND;
-    message: UINT;
+   message: UINT;
     wParam: Longint;
     lParam: Longint;
     time: DWORD;
