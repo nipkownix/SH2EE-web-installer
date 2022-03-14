@@ -80,6 +80,7 @@ begin
       if not SameText(curFileChecksum, WebCompsArray[i].SHA256) then
       begin
         MsgBox('Error: Checksum mismatch' #13#13 'File "' + GetURLFilePart(WebCompsArray[i].URL) + '" is corrupted.' #13#13 'The installation cannot continue. Please try again, and if the issue persists, report it to the developers.', mbInformation, MB_OK);
+        doCustomUninstall(); // Try to undo the changes done so far
         ExitProcess(1);
       end;
 
