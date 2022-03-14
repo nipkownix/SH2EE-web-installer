@@ -38,13 +38,12 @@ VersionInfoTextVersion={#INSTALLER_VER}
 
 [Types]
 Name: full; Description: Full installation (Recommended)
-Name: minimal; Description: Minimal installation (Not recommended)
 Name: custom; Description: Custom installation; Flags: iscustom
 
 [Components]
 ; *** component name MUST match the component "id" in _sh2ee.csv! ***
-Name: sh2emodule; Description: SH2 Enhancements Module; ExtraDiskSpaceRequired: 4174272; Types: full minimal custom
-Name: ee_exe; Description: Enhanced Executable; ExtraDiskSpaceRequired: 5459968; Types: full minimal custom
+Name: sh2emodule; Description: SH2 Enhancements Module; ExtraDiskSpaceRequired: 4174272; Types: full custom
+Name: ee_exe; Description: Enhanced Executable; ExtraDiskSpaceRequired: 5459968; Types: full custom
 Name: ee_essentials; Description: Enhanced Edition Essential Files; ExtraDiskSpaceRequired: 288792943; Types: full
 Name: img_pack; Description: Image Enhancement Pack; ExtraDiskSpaceRequired: 1229057424; Types: full
 Name: fmv_pack; Description: FMV Enhancement Pack; ExtraDiskSpaceRequired: 3427749254; Types: full
