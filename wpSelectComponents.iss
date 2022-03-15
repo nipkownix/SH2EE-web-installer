@@ -1,71 +1,135 @@
 [Code]
 
 var
-  bDidSizeBackup  : Boolean;
-  FileSizeArray   : array of String;
   CompTitle       : TLabel;
   CompDescription : TLabel;
+  iTotalCompSize  : Int64;
+  iTotalCompCount : integer;
   ComponentsListClickCheckPrev : TNotifyEvent;
 
-// Called when you click somewhere in the components list
-procedure ComponentsListClickCheck(Sender: TObject);
-var
+// Customize wpSelectComponents according to our needs 
+procedure custom_wpSelectComponents();
+  var
   i: integer;
-  CompCount: integer;
 begin
-  // Call Inno's original OnClick action
-  ComponentsListClickCheckPrev(Sender);
-  
-  // Customize components list
-  CompCount := 0;
+  // Reset component lists
+  iTotalCompCount := 0;
+  iTotalCompSize  := 0;
 
-  // "Install/Repair" page
-  if installRadioBtn.Checked then
+  // Update component sizes using the FileSizeArray
+  for i := 0 to GetArrayLength(FileSizeArray) - 1 do
   begin
-    for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
-      if not (WebCompsArray[i].id = 'setup_tool') then
-      begin
-        if LocalCompsArray[i].isInstalled then
-        begin
-          with Wizardform.ComponentsList do
-          begin
-            ItemSubItem[i - 1] := 'Already installed';
-          end;
-        end else
-        begin
-          with Wizardform.ComponentsList do
-          begin
-            ItemSubItem[i - 1] := FileSizeArray[i - 1];
-          end;
-        end;
+    with Wizardform.ComponentsList do
+    begin
+      ItemSubItem[i] := FileSizeArray[i].String;
 
-        // Calculate how many components are selected
-        if WizardForm.ComponentsList.Checked[i - 1] then
-          CompCount := CompCount + 1;
+      // Calculate how many components are selected
+      if WizardForm.ComponentsList.Checked[i] then
+      begin
+        iTotalCompCount := iTotalCompCount + 1;
+
+        iTotalCompSize := iTotalCompSize + FileSizeArray[i].Bytes;
       end;
     end;
-  end else if updateRadioBtn.Checked then // "Update" page
-  begin
-    for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
-      if not (WebCompsArray[i].id = 'setup_tool') then
-      begin
-        with Wizardform.ComponentsList do
-        begin
-          ItemSubItem[i - 1] := wpUVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
-        end;
+  end;
 
-        // Calculate how many components are selected
-        if WizardForm.ComponentsList.Checked[i - 1] then
-          CompCount := CompCount + 1;
+  if {#DEBUG} then Log('# ' + IntToStr(iTotalCompCount) + ' components selected, with a total size of ' + BytesToString(iTotalCompSize));
+
+  // Replace DiskSpaceLabel //-> TODO: Maybe create a new label and hide the old one? 
+  WizardForm.ComponentsDiskSpaceLabel.Caption := 'Current selection requires at least ' + BytesToString(iTotalCompSize) + ' of disk space.';
+
+  if maintenanceMode then
+  begin
+    // "Install/Repair" page
+    if installRadioBtn.Checked then
+    begin
+      // Text adjustments
+      WizardForm.PageDescriptionLabel.Caption := 'Please select which enhancement packages you would like to install or repair.';
+      WizardForm.SelectComponentsLabel.Caption := 'Silent Hill 2: Enhanced Edition is comprised of several enhancement packages. Select which enhancement packages you wish to install. For the full, intended experience, install all enhancement packages.'
+      WizardForm.SelectComponentsLabel.Height := 40; // Default value
+      WizardForm.ComponentsList.Top := 50; // Default value
+  
+      // Update the components title/desc Top pos
+      CompTitle.Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(-40);
+      CompDescription.Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
+
+      // ComponentsList adjustments
+      for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+        if not (WebCompsArray[i].id = 'setup_tool') then
+        begin
+          // Reset items in "Install/Repair" page 
+          with Wizardform.ComponentsList do
+          begin
+            ItemEnabled[i - 1] := True;
+            Checked[i - 1] := False;
+          end;
+
+          // Show custom text if the component is already installed
+          if LocalCompsArray[i].isInstalled then
+          begin
+            with Wizardform.ComponentsList do
+            begin
+              ItemSubItem[i - 1] := 'Already installed - ' + FileSizeArray[i - 1].String;
+            end;
+          end else
+          begin
+            with Wizardform.ComponentsList do
+            begin
+              ItemSubItem[i - 1] := FileSizeArray[i - 1].String;
+            end;
+          end;
+  
+          // Calculate how many components are selected
+          if WizardForm.ComponentsList.Checked[i - 1] then
+            iTotalCompCount := iTotalCompCount + 1;
+        end;
+      end;
+    end else if updateRadioBtn.Checked then // "Update" page
+    begin
+      // Text adjustments
+      WizardForm.PageDescriptionLabel.Caption := 'Please select which enhancement packages you would like to update.'
+      WizardForm.SelectComponentsLabel.Caption := 'Updates will be listed below if available.'
+      WizardForm.SelectComponentsLabel.Height := 20;
+      WizardForm.ComponentsList.Top := 30;
+  
+      // Gotta update the components title/desc Top pos as well
+      CompTitle.Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(-40);
+      CompDescription.Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
+
+      // ComponentsList adjustments
+      for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+        if not (WebCompsArray[i].id = 'setup_tool') then
+        begin
+          with Wizardform.ComponentsList do
+          begin
+            Checked[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
+            ItemEnabled[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
+            ItemSubItem[i - 1] := wpUVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
+          end;
+  
+          // Calculate how many components are selected
+          if WizardForm.ComponentsList.Checked[i - 1] then
+            iTotalCompCount := iTotalCompCount + 1;
+        end;
       end;
     end;
   end;
 
   // Show disk space label if components are selected
-  if not (CompCount = 0) then
+  if not (iTotalCompCount = 0) then
     WizardForm.ComponentsDiskSpaceLabel.Visible := True
   else
     WizardForm.ComponentsDiskSpaceLabel.Visible := False
+end;
+
+// Called when you click somewhere in the components list
+procedure NewComponentsListClickCheck(Sender: TObject);
+begin
+  // Call Inno's original OnClick action
+  ComponentsListClickCheckPrev(Sender);
+
+  // Customize wpSelectComponents
+  custom_wpSelectComponents();
 end;
 
 // Create new labels for name and descriptions
@@ -101,82 +165,6 @@ begin
   end;
 
   WizardForm.ComponentsList.Height := WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(30);
-end;
-
-// Customize wpSelectComponents according to our needs 
-procedure custom_wpSelectComponents(newType: String);
-var
-  i : Integer;
-begin
-  // Backup file size info
-  if (not bDidSizeBackup) then
-  begin
-    SetArrayLength(FileSizeArray, GetArrayLength(WebCompsArray));
-  
-    for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
-      if not (WebCompsArray[i].id = 'setup_tool') then
-      begin
-        with Wizardform.ComponentsList do
-        begin
-          FileSizeArray[i - 1] := ItemSubItem[i - 1];
-        end;
-      end;
-    end;
-
-    if maintenancemode then
-    begin
-      // Initially hide disk space label
-      WizardForm.ComponentsDiskSpaceLabel.Visible := False;
-  
-      // Register new OnClick event
-      ComponentsListClickCheckPrev := WizardForm.ComponentsList.OnClickCheck;
-      WizardForm.ComponentsList.OnClickCheck := @ComponentsListClickCheck;
-    end;
-
-    bDidSizeBackup := True;
-  end;
-
-  // "Install/Repair" page
-  if (newType = 'install') then
-  begin
-    for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
-      if not (WebCompsArray[i].id = 'setup_tool') then
-      begin
-        with Wizardform.ComponentsList do
-        begin
-          Checked[i - 1] := false; // Uncheck all by default
-          ItemEnabled[i - 1] := true; // Enable all options since they might have been disabled if the user went to the "Update" page first
-        end;
-    
-        if LocalCompsArray[i].isInstalled then
-        begin
-          with Wizardform.ComponentsList do
-          begin
-            ItemSubItem[i - 1] := 'Already installed';
-          end;
-        end else
-        begin
-          with Wizardform.ComponentsList do
-          begin
-            ItemSubItem[i - 1] := FileSizeArray[i - 1];
-          end;
-        end;
-      end;
-    end;
-  end else if (newType = 'update') then// "Update" page
-  begin
-    for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
-      if not (WebCompsArray[i].id = 'setup_tool') then
-      begin
-        with Wizardform.ComponentsList do
-        begin
-          Checked[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
-          ItemEnabled[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
-          ItemSubItem[i - 1] := wpUVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
-        end;
-      end;
-    end;
-  end;
 end;
 
 // "On hover" item descriptions

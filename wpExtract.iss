@@ -3,7 +3,6 @@
 var
   wpExtract : TWizardPage;
 
-  intTotalComponents : Integer;
   selectedComponents : String;
 
   ExtractoreListBox : TNewListBox;
@@ -25,7 +24,7 @@ begin
     begin
         TotalProgressBar.Min := 0;
         TotalProgressBar.Position := 0;
-        TotalProgressBar.Max := (intTotalComponents * 100);
+        TotalProgressBar.Max := (iTotalCompCount * 100);
         Log('# ProgressBar.Max set to: [' + IntToStr(TotalProgressBar.Max) + '].');
     end;
 
@@ -34,11 +33,11 @@ begin
 
     // Update Label
     TotalProgressLabel := TLabel(wpExtract.FindComponent('TotalProgressLabel'));
-    TotalProgressLabel.Caption := IntToStr(intInstalledComponentsCounter) + '/' +IntToStr(intTotalComponents);
+    TotalProgressLabel.Caption := IntToStr(intInstalledComponentsCounter) + '/' +IntToStr(iTotalCompCount);
 
     // Update ProgressBar
     TotalProgressBar.Position := (intInstalledComponentsCounter * 100);
-    Log('# Processed Components '+IntToStr(intInstalledComponentsCounter) +'/'+IntToStr(intTotalComponents)+'.');
+    Log('# Processed Components '+IntToStr(intInstalledComponentsCounter) +'/'+IntToStr(iTotalCompCount)+'.');
 end;
 
 
@@ -54,8 +53,6 @@ end;
 // Called by wpExtract's OnActivate
 procedure ExtractFiles();
 var
-  NullBox : TNewListBox;     // Dummy box
-  NullBar : TNewProgressBar; // Dummy bar
   i : Integer;
   curFileChecksum : String;
 begin
@@ -70,18 +67,21 @@ begin
     if WizardIsComponentSelected(WebCompsArray[i].id) then
     begin
       // Check for corrupted files
-      UpdateCurrentComponentName(WebCompsArray[i].name + ' - Checking file integrity...', true); // Update label
-
-      curFileChecksum := GetSHA256OfFile(tmp(GetURLFilePart(WebCompsArray[i].URL)));
-
-      Log('# ' + WebCompsArray[i].name + ' - Checksum (from .csv): ' + WebCompsArray[i].SHA256);
-      Log('# ' + WebCompsArray[i].name + ' - Checksum (temp file): ' + curFileChecksum);
-
-      if not SameText(curFileChecksum, WebCompsArray[i].SHA256) then
+      if not (WebCompsArray[i].SHA256 = 'notUsed') then
       begin
-        MsgBox('Error: Checksum mismatch' #13#13 'File "' + GetURLFilePart(WebCompsArray[i].URL) + '" is corrupted.' #13#13 'The installation cannot continue. Please try again, and if the issue persists, report it to the developers.', mbInformation, MB_OK);
-        doCustomUninstall(); // Try to undo the changes done so far
-        ExitProcess(1);
+        UpdateCurrentComponentName(WebCompsArray[i].name + ' - Checking file integrity...', true); // Update label
+  
+        curFileChecksum := GetSHA256OfFile(tmp(GetURLFilePart(WebCompsArray[i].URL)));
+  
+        Log('# ' + WebCompsArray[i].name + ' - Checksum (from .csv): ' + WebCompsArray[i].SHA256);
+        Log('# ' + WebCompsArray[i].name + ' - Checksum (temp file): ' + curFileChecksum);
+  
+        if not SameText(curFileChecksum, WebCompsArray[i].SHA256) then
+        begin
+          MsgBox('Error: Checksum mismatch' #13#13 'File "' + GetURLFilePart(WebCompsArray[i].URL) + '" is corrupted.' #13#13 'The installation cannot continue. Please try again, and if the issue persists, report it to the developers.', mbInformation, MB_OK);
+          doCustomUninstall(); // Try to undo the changes done so far
+          ExitProcess(1);
+        end;
       end;
 
       // Update label after integrity check
@@ -166,7 +166,7 @@ end;
 // Skip wpExtract if no components were selected
 function wpExtractShouldSkipPage(Page: TWizardPage): Boolean;
 begin
-  if intTotalComponents = 0 then
+  if iTotalCompCount = 0 then
     Result := true;
   Result := false;
 end;

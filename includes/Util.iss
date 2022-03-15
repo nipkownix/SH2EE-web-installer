@@ -7,6 +7,23 @@ var
 procedure ExitProcess(uExitCode: Integer);
   external 'ExitProcess@kernel32.dll stdcall';
 
+function BytesToString(size: Int64): PAnsiChar; 
+  external 'BytesToString@files:BytesToString.dll cdecl';
+
+// Determines if there is enough free space on a drive of a specific folder
+function IsEnoughFreeSpace(const Path: string; MinSpace: Cardinal): Boolean;
+var
+  FreeSpace, TotalSpace: Cardinal;
+begin
+  // the second parameter set to True means that the function operates with
+  // megabyte units; if you set it to False, it will operate with bytes; by
+  // the chosen units you must reflect the value of the MinSpace paremeter
+  if GetSpaceOnDisk(Path, False, FreeSpace, TotalSpace) then
+    Result := FreeSpace >= MinSpace
+  else
+    RaiseException('Failed to check free space.');
+end;
+
 // Returns true if the setup was started with a specific parameter
 function CmdLineParamExists(const Value: string): Boolean;
 var
