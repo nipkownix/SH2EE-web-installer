@@ -107,6 +107,9 @@ begin
   
       // Actually extract the files
       Extractore(tmp(GetURLFilePart(WebCompsArray[i].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+
+      // Delete extracted file to save space.
+      DeleteFile(tmp(GetURLFilePart(WebCompsArray[i].URL)));
   
       // Restore .ini settings if we are in maintenance mode
       if WebCompsArray[i].id = 'sh2emodule' then
