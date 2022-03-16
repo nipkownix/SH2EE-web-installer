@@ -197,8 +197,4 @@ begin
   begin
       OnNextButtonClick := @wpMaintenanceNextClick;
   end;
-  
-  // Hide TypesCombo 
-  WizardForm.TypesCombo.Visible := False;
-  WizardForm.IncTopDecHeight(WizardForm.ComponentsList, - (WizardForm.ComponentsList.Top - WizardForm.TypesCombo.Top));
 end;

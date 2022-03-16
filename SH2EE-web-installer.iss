@@ -268,6 +268,10 @@ begin
   // Register new OnClick event
   ComponentsListClickCheckPrev := WizardForm.ComponentsList.OnClickCheck;
   WizardForm.ComponentsList.OnClickCheck := @NewComponentsListClickCheck;
+  
+  // Register new OnChange event
+  TypesComboOnChangePrev := WizardForm.TypesCombo.OnChange;
+  WizardForm.TypesCombo.OnChange := @NewTypesComboOnChange;
 
   // Start the download after wpReady
   idpDownloadAfter(wpReady);
@@ -512,12 +516,65 @@ end;
 procedure CurPageChanged(CurPage: Integer);
 var
   sh2pcFilesExist : Boolean;
+  i : Integer;
 begin
-
   // Customize wpSelectComponents
   if (CurPage = wpSelectComponents) then
   begin
-    custom_wpSelectComponents();
+    if maintenanceMode then
+      begin
+        // Hide TypesCombo 
+        WizardForm.TypesCombo.Visible := False;
+        WizardForm.IncTopDecHeight(WizardForm.ComponentsList, - (WizardForm.ComponentsList.Top - WizardForm.TypesCombo.Top));
+    
+        // "Install/Repair" page
+        if installRadioBtn.Checked then
+        begin
+          // Text adjustments
+          WizardForm.PageDescriptionLabel.Caption := 'Please select which enhancement packages you would like to install or repair.';
+          WizardForm.SelectComponentsLabel.Caption := 'Silent Hill 2: Enhanced Edition is comprised of several enhancement packages. Select which enhancement packages you wish to install. For the full, intended experience, install all enhancement packages.'
+          WizardForm.SelectComponentsLabel.Height := 40; // Default value
+          WizardForm.ComponentsList.Top := 50; // Default value
+          WizardForm.ComponentsList.Height := ScaleY(150);
+      
+          // Update the components title/desc Top pos
+          CompTitle.Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(-40);
+          CompDescription.Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
+        end else if updateRadioBtn.Checked then // "Update" page
+        begin
+          // Text adjustments
+          WizardForm.PageDescriptionLabel.Caption := 'Please select which enhancement packages you would like to update.'
+          WizardForm.SelectComponentsLabel.Caption := 'Updates will be listed below if available.'
+          WizardForm.SelectComponentsLabel.Height := 20;
+          WizardForm.ComponentsList.Top := 30;
+          WizardForm.ComponentsList.Height := ScaleY(170);
+      
+          // Gotta update the components title/desc Top pos as well
+          CompTitle.Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(-40);
+          CompDescription.Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
+        end;
+
+        // ComponentsList adjustments
+        for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+          if not (WebCompsArray[i].id = 'setup_tool') then
+          begin
+            with Wizardform.ComponentsList do
+            begin
+              // Unchecked and enabled by default
+              Checked[i - 1] := false;
+              ItemEnabled[i - 1] := true;
+  
+              if updateRadioBtn.Checked then // "Update" page
+              begin
+                Checked[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
+                ItemEnabled[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
+              end;
+            end;
+          end;
+        end;
+      end;
+    // Customize ComponentsList
+    custom_ComponentsList();
   end;
 
   // Hide the run checkbox if the sh2pc files were present when the installation directory was selected, and we're not in maintenance mode 
