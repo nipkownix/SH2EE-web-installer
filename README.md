@@ -23,6 +23,8 @@ References used when coding this installer:
 #
 [Inno Setup](https://jrsoftware.org/isinfo.php) by Jordan Russell.
 
-[Inno Download Plugin](https://mitrichsoftware.wordpress.com/inno-setup-tools/inno-download-plugin/) by Mitrich Software.)
+[Inno Download Plugin](https://mitrichsoftware.wordpress.com/inno-setup-tools/inno-download-plugin/) by Mitrich Software.
 
 [7-zip](https://www.7-zip.org/) by Igor Pavlov.
+
+[AutoHotkey](https://www.autohotkey.com/).
