@@ -8,7 +8,7 @@
 
 //#define VERBOSE
 
-static char* humanSize(uint64_t bytes)
+static char* humanSize(int32_t bytes)
 {
     const char* suffix[] = { "B", "KB", "MB", "GB", "TB" };
     char length = sizeof(suffix) / sizeof(suffix[0]);
@@ -26,7 +26,7 @@ static char* humanSize(uint64_t bytes)
     return output;
 }
 
-extern "C" __declspec(dllexport) const char* cdecl BytesToString(uint64_t size)
+extern "C" __declspec(dllexport) const char* __cdecl BytesToString(int32_t size)
 {
     #ifdef VERBOSE
     std::cout << humanSize(size) << std::endl;
