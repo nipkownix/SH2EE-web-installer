@@ -71,20 +71,22 @@ Source: "resources\maintenance\icon_uninstall.bmp"; Flags: dontcopy
 //Name: add_desktopicon; Description: Create a &Desktop shortcut for the game; GroupDescription: Additional Icons:; Components: sh2emodule
 
 [Run]
-Filename: "{app}\sh2pc.exe"; Description: Start Silent Hill 2 after finishing the wizard; Flags: nowait postinstall skipifsilent unchecked
+Filename: "{app}\sh2pc.exe"; Description: Start Silent Hill 2 after exiting the Setup Tool; Flags: nowait postinstall skipifsilent unchecked
 
 [CustomMessages]
 HelpButton=Help
 
 [Messages]
+SetupAppTitle = Silent Hill 2: Enhanced Edition Setup Tool
+SetupWindowTitle = Silent Hill 2: Enhanced Edition Setup Tool
+WelcomeLabel1=Silent Hill 2: Enhanced Edition Setup Tool
 StatusExtractFiles=Placing files...
-WelcomeLabel1=[name] Installation Wizard
-SelectDirLabel3=[name] must be installed in the same folder as Silent Hill 2 PC. Please specify the directory where Silent Hill 2 PC is located.
+SelectDirLabel3=Silent Hill 2: Enhanced Edition must be installed in the same folder as Silent Hill 2 PC. Please specify the directory where Silent Hill 2 PC is located.
 WizardSelectComponents=Select Enhancement Packages
 SelectComponentsDesc=Please select which enhancement packages you would like to install. 
 SelectComponentsLabel2=Silent Hill 2: Enhanced Edition is comprised of several enhancement packages. Select which enhancement packages you wish to install. For the full, intended experience, install all enhancement packages. 
 FinishedHeadingLabel=Installation Complete!
-ExitSetupMessage=Are you sure you want to close the wizard?
+ExitSetupMessage=Are you sure you want to close the Setup Tool?
 
 // Seems IDP must be included before [Code]
 #include "includes/innosetup-download-plugin/idp.iss"
@@ -597,7 +599,7 @@ begin
     if installRadioBtn.Checked then
     begin
       // Change default labels to fit the install action
-      WizardForm.FinishedLabel.Caption := 'The wizard has successfully installed the selected enhancement packages.' #13#13 'Click finish to exit the wizard.';
+      WizardForm.FinishedLabel.Caption := 'The Setup Tool has successfully installed the selected enhancement packages.' #13#13 'Click finish to exit the Setup Tool.';
       WizardForm.RunList.Visible       := true;
       WizardForm.RunList.Checked[0]    := true;
     end else
@@ -605,7 +607,7 @@ begin
     begin
       // Change default labels to fit the update action
       WizardForm.FinishedHeadingLabel.Caption := 'Update complete!';
-      WizardForm.FinishedLabel.Caption        := 'The wizard has successfully updated the selected enhancement packages.' #13#13 'Click finish to exit the wizard.';
+      WizardForm.FinishedLabel.Caption        := 'The Setup Tool has successfully updated the selected enhancement packages.' #13#13 'Click finish to exit the Setup Tool.';
       WizardForm.RunList.Visible              := true;
       WizardForm.RunList.Checked[0]           := true;
     end else 
@@ -613,7 +615,7 @@ begin
     begin
       // Change default labels to fit the uninstaller action
       WizardForm.FinishedHeadingLabel.Caption := 'Uninstallation complete.';
-      WizardForm.FinishedLabel.Caption        := 'The wizard has successfully uninstalled the enhancement packages.' #13#13 'Click finish to exit the wizard.';
+      WizardForm.FinishedLabel.Caption        := 'The Setup Tool has successfully uninstalled the enhancement packages.' #13#13 'Click finish to exit the Setup Tool.';
       // Hide and uncheck the run checkbox when uninstalling
       WizardForm.RunList.Visible    := false;
       WizardForm.RunList.Checked[0] := false;

@@ -18,11 +18,11 @@ begin
       ReadOnly      := True;
       WizardForm.WelcomeLabel2.Visible := False;
       RTFText :=
-          '{\rtf1 This wizard will guide you through installing Silent Hill 2: Enhanced Edition for use with Silent Hill 2 PC.\par' +
-          '\par\b Note: This wizard does not include a copy of Silent Hill 2 PC.\b0\par' +
+          '{\rtf1 This Setup Tool will guide you through installing Silent Hill 2: Enhanced Edition for use with Silent Hill 2 PC.\par' +
+          '\par\b Note: This Setup Tool does not include a copy of Silent Hill 2 PC.\b0\par' +
           '\par You must install your own copy of Silent Hill 2 PC in order to use Silent Hill 2: Enhanced Edition.\par' +
-          '\par\b You should install Silent Hill 2 PC before running this wizard.\par\b0' +
-          '\par Click Next to continue, or Cancel to exit this wizard.}';
+          '\par\b You should install Silent Hill 2 PC before running this Setup Tool.\par\b0' +
+          '\par Click Next to continue, or Cancel to exit this Setup Tool.}';
   end;
 
   FinishedLabel_RTF := TRichEditViewer.Create(WizardForm);
@@ -41,8 +41,8 @@ begin
       WizardForm.RunList.Top := FinishedLabel_RTF.Top + ScaleY(270);
       WizardForm.RunList.Anchors := [akLeft, akBottom];
       RTFText :=
-          '{\rtf1 The wizard has successfully installed the selected enhancement packages.\par' +
-          '\par If you correctly selected the Silent Hill 2 PC folder at the start of this wizard, Silent Hill 2: Enhanced Edition will automatically run the next time you launch the game.\par' +
+          '{\rtf1 The Setup Tool has successfully installed the selected enhancement packages.\par' +
+          '\par If you correctly selected the Silent Hill 2 PC folder at the start of this Setup Tool, Silent Hill 2: Enhanced Edition will automatically run the next time you launch the game.\par' +
           '\par \b Useful links:\b0\par' +
           '\pard\sa50\par {\field{\*\fldinst HYPERLINK "http://enhanced.townofsilenthill.com/SH2/"}{\fldrslt Project Website}}\par' +
           '\pard\li450 Silent Hill 2: Enhanced Edition project website.\par' +
