@@ -72,6 +72,7 @@ Source: "resources\maintenance\icon_uninstall.bmp"; Flags: dontcopy
 
 [Run]
 Filename: "{app}\sh2pc.exe"; Description: Start Silent Hill 2 after exiting the Setup Tool; Flags: nowait postinstall skipifsilent unchecked
+Filename: "{app}\SH2EEconfig.exe"; Description: Open the Configuration Tool to adjust project settings for the game; Flags: nowait postinstall skipifsilent unchecked
 
 [CustomMessages]
 HelpButton=Help
@@ -153,11 +154,11 @@ begin
   end;
 
   // Determine weather or not we should be in "maintenance mode"
-  if FileExists(ExpandConstant('{src}\') + 'sh2pc.exe') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
+  if DirExists(ExpandConstant('{src}\') + 'data') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
   begin
     maintenanceMode := True;
 
-    // Create an array of TWebComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
+    // Create an array of TLocalComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
     LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
 
     // Check if above didn't work
@@ -267,11 +268,15 @@ begin
       end;
   end;
 
-  // Register new OnClick event
+  // Register new RunList OnClick event
+  WizardForm.RunList.OnClickCheck := @RunListClickCheck;
+  RunListLastChecked := -1;
+
+  // Register new ComponentsList OnClick event
   ComponentsListClickCheckPrev := WizardForm.ComponentsList.OnClickCheck;
   WizardForm.ComponentsList.OnClickCheck := @NewComponentsListClickCheck;
   
-  // Register new OnChange event
+  // Register new ComponentsList OnChange event
   TypesComboOnChangePrev := WizardForm.TypesCombo.OnChange;
   WizardForm.TypesCombo.OnChange := @NewTypesComboOnChange;
 
@@ -492,8 +497,9 @@ begin
     begin
       // Don't reopen the setup tool if launched with the -selfUpdate parameter and there's no update available
       ShellExec('', ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')) + ' false false', '', SW_HIDE, ewNoWait, intErrorCode);
-      // Reopen the game
-      ShellExec('', ExpandConstant('{src}\') + 'sh2pc.exe', '', '', SW_SHOW, ewNoWait, intErrorCode);
+      // Run launcher
+      if FileExists(ExpandConstant('{src}\') + 'SH2EEconfig.dat') then
+        ShellExec('', ExpandConstant('{src}\') + 'SH2EEconfig.exe', '', '', SW_SHOW, ewNoWait, intErrorCode);
     end
     else
     if ShouldUpdate and CmdLineParamExists('-selfUpdate') then 
@@ -505,7 +511,7 @@ begin
   end;
 
   // Copy SH2EEsetup.exe to the game's directory if we're not currently running from it
-  if not FileExists(ExpandConstant('{src}\') + 'sh2pc.exe') and not FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
+  if not DirExists(ExpandConstant('{src}\') + 'data') and not FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
     FileCopy(ExpandConstant('{tmp}\SH2EEsetup.exe'), ExpandConstant('{app}\SH2EEsetup.exe'), false);
 end;
 
@@ -579,16 +585,19 @@ begin
     custom_ComponentsList();
   end;
 
-  // Hide the run checkbox if the sh2pc files were present when the installation directory was selected, and we're not in maintenance mode 
+  // Disable the run checkbox if the sh2pc files were not present when the installation directory was selected, and we're not in maintenance mode 
   if (CurPage = wpFinished) and not maintenanceMode and not sh2pcFilesWerePresent then
   begin
-    WizardForm.RunList.Visible := false;
+    WizardForm.RunList.ItemEnabled[0] := False;
+    WizardForm.RunList.Checked[0] := False;
+    WizardForm.RunList.ItemCaption[0] := 'Start Silent Hill 2 after exiting the Setup Tool (Unavailable)';
   end;
 
   // Check the run checkbox if the sh2pc files were present when the installation directory was selected, and we're not in maintenance mode 
   if (CurPage = wpFinished) and not maintenanceMode and sh2pcFilesWerePresent then
   begin
     WizardForm.RunList.Checked[0] := true;
+    RunListLastChecked := 0;
   end;
 
   // maintenanceMode's wpFinished tweaks
@@ -602,6 +611,7 @@ begin
       WizardForm.FinishedLabel.Caption := 'The Setup Tool has successfully installed the selected enhancement packages.' #13#13 'Click finish to exit the Setup Tool.';
       WizardForm.RunList.Visible       := true;
       WizardForm.RunList.Checked[0]    := true;
+      RunListLastChecked := 0;
     end else
     if updateRadioBtn.Checked then
     begin
@@ -610,6 +620,7 @@ begin
       WizardForm.FinishedLabel.Caption        := 'The Setup Tool has successfully updated the selected enhancement packages.' #13#13 'Click finish to exit the Setup Tool.';
       WizardForm.RunList.Visible              := true;
       WizardForm.RunList.Checked[0]           := true;
+      RunListLastChecked := 0;
     end else 
     if uninstallRadioBtn.Checked then
     begin
@@ -619,6 +630,7 @@ begin
       // Hide and uncheck the run checkbox when uninstalling
       WizardForm.RunList.Visible    := false;
       WizardForm.RunList.Checked[0] := false;
+      WizardForm.RunList.Checked[1] := false;
     end;
 
     // Hide and uncheck the run checkbox if the data folder doesn't exist
@@ -626,6 +638,15 @@ begin
     begin
       WizardForm.RunList.Visible    := false;
       WizardForm.RunList.Checked[0] := false;
+      WizardForm.RunList.Checked[1] := false;
+    end;
+
+    // Disable the run checkbox if the sh2pc.exe doesn't exist
+    if not FileExists(ExpandConstant('{src}\') + 'sh2pc.exe') then
+    begin
+      WizardForm.RunList.ItemEnabled[0] := False;
+      WizardForm.RunList.Checked[0] := False;
+      WizardForm.RunList.ItemCaption[0] := 'Start Silent Hill 2 after exiting the Setup Tool (Unavailable)';
     end;
   end;
 end;

@@ -2,6 +2,7 @@
 
 [Code]
 var
+  RunListLastChecked: Integer;
   GCS_sh2pcPath: string;
 
 procedure ExitProcess(uExitCode: Integer);
@@ -95,6 +96,42 @@ end;
 function tmp(Path: String): String;
 begin
   Result := ExpandConstant('{tmp}\') + Path;
+end;
+
+// When one checkbox is checked, all others get unchecked
+procedure RunListClickCheck(Sender: TObject);
+var
+  I: Integer;
+  Checked: Integer;
+begin
+  { Find if some other checkbox got checked }
+  Checked := -1;
+  for I := 0 to WizardForm.RunList.Items.Count - 1 do
+  begin
+    if WizardForm.RunList.Checked[I] and (I <> RunListLastChecked) then
+    begin
+      Checked := I;
+    end;
+  end;
+
+  { If it was, uncheck the previously checked box and remember the new one }
+  if Checked >= 0 then
+  begin
+    if RunListLastChecked >= 0 then
+    begin
+      WizardForm.RunList.Checked[RunListLastChecked] := False;
+    end;
+
+    RunListLastChecked := Checked;
+  end;
+
+  { Or if the previously checked box got unchecked, forget it. }
+  { (This is not really necessary, it's just to clean the things up) }
+  if (RunListLastChecked >= 0) and
+     (not WizardForm.RunList.Checked[RunListLastChecked]) then
+  begin
+    RunListLastChecked := -1;
+  end;
 end;
 
 // Search for sh2pc.exe in "\HKEY_CURRENT_USER\System\GameConfigStore\Children\"

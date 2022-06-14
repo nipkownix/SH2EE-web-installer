@@ -31,14 +31,14 @@ begin
       Left          := WizardForm.FinishedLabel.Left;
       Top           := WizardForm.FinishedLabel.Top;
       Width         := WizardForm.FinishedLabel.Width;
-      Height        := WizardForm.FinishedLabel.Height + ScaleY(180);
+      Height        := WizardForm.FinishedLabel.Height + ScaleY(150);
       Anchors       := [akLeft, akBottom, akTop, akRight];
       Parent        := WizardForm.FinishedLabel.Parent;
       BorderStyle   := bsNone;
       TabStop       := False;
       ReadOnly      := True;
       WizardForm.FinishedLabel.Visible := False;
-      WizardForm.RunList.Top := FinishedLabel_RTF.Top + ScaleY(270);
+      WizardForm.RunList.Top := FinishedLabel_RTF.Top + FinishedLabel_RTF.Height + 35;
       WizardForm.RunList.Anchors := [akLeft, akBottom];
       RTFText :=
           '{\rtf1 The Setup Tool has successfully installed the selected enhancement packages.\par' +
