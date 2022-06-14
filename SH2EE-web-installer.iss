@@ -498,7 +498,7 @@ begin
       // Don't reopen the setup tool if launched with the -selfUpdate parameter and there's no update available
       ShellExec('', ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')) + ' false false', '', SW_HIDE, ewNoWait, intErrorCode);
       // Run launcher
-      if FileExists(ExpandConstant('{src}\') + 'SH2EEconfig.dat') then
+      if FileExists(ExpandConstant('{src}\') + 'SH2EEconfig.exe') then
         ShellExec('', ExpandConstant('{src}\') + 'SH2EEconfig.exe', '', '', SW_SHOW, ewNoWait, intErrorCode);
     end
     else
