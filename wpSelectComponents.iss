@@ -207,7 +207,7 @@ begin
        end;
     2: begin
          Title := 'Enhanced Edition Essential Files';
-         Description := 'The Enhanced Edition Essential Files provides geometry adjustments, camera clipping fixes, and text fixes for the game.';
+         Description := 'The Enhanced Edition Essential Files provides geometry fixes, camera clipping adjustments, high resolution text, and language/textual improvements for the game.';
        end;
     3: begin
          Title := 'Image Enhancement Pack';

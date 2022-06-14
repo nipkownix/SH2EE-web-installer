@@ -63,6 +63,7 @@ Source: "includes\renamefile_util\renamefile_util.exe"; Flags: dontcopy
 Source: "{srcexe}"; DestDir: "{tmp}"; DestName: "SH2EEsetup.exe"; Flags: external 
 Source: "resources\maintenance\icon_install.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_update.bmp"; Flags: dontcopy
+Source: "resources\maintenance\icon_adjust.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_uninstall.bmp"; Flags: dontcopy
 [Icons]
 //Name: "{commondesktop}\Silent Hill 2 Enhanced Edition"; Filename: "{app}\sh2pc.exe"; Tasks: add_desktopicon
@@ -354,12 +355,24 @@ begin
     end;
   end;
 
-  // Skip wpSelectComponents if uninstalling
+  // Skip wpSelectComponents and wpExtract if uninstalling
   if maintenanceMode and not selfUpdateMode then
   begin
     if (CurPage = wpSelectComponents) or
        (CurPage = wpExtract.ID) then
           if uninstallRadioBtn.Checked then
+            Result := True;
+  end;
+
+  // Skip pages if running launcher
+  if maintenanceMode and not selfUpdateMode then
+  begin
+    if (CurPage = wpSelectComponents) or
+       (CurPage = wpExtract.ID) or
+       (CurPage = wpPreparing) or
+       (CurPage = wpInstalling) or
+       (CurPage = wpFinished) then
+          if adjustRadioBtn.Checked then
             Result := True;
   end;
 
@@ -460,7 +473,7 @@ begin
   // Update local CSV file after installation
   if maintenanceMode then
   begin 
-    if not uninstallRadioBtn.Checked then
+    if (not uninstallRadioBtn.Checked) and (not adjustRadioBtn.Checked) then
       UpdateLocalCSV(false);
   end else
   if not maintenanceMode then

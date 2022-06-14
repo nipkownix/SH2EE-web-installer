@@ -5,6 +5,7 @@ var
 
   installRadioBtn   : TRadioButton;
   updateRadioBtn    : TRadioButton;
+  adjustRadioBtn    : TRadioButton;
   uninstallRadioBtn : TRadioButton;
 
 // Helper to populate wpSelectComponents's CheckListBox's labels
@@ -34,8 +35,21 @@ begin
 end;
 
 function wpMaintenanceNextClick(Page: TWizardPage): Boolean;
+var
+  intErrorCode: Integer;
 begin
     Result := True;
+
+    if adjustRadioBtn.Checked then
+    begin
+      if FileExists(ExpandConstant('{src}\') + 'SH2EEconfig.exe') then
+        ShellExec('', ExpandConstant('{src}\') + 'SH2EEconfig.exe', '', '', SW_SHOW, ewNoWait, intErrorCode)
+      else
+      begin
+        MsgBox('Error: File not found' #13#13 'Couldn''t find SH2EEconfig.exe', mbCriticalError, MB_OK);
+        Result := False;
+      end;
+    end;
 
     if uninstallRadioBtn.Checked then
     begin 
@@ -51,15 +65,18 @@ procedure PrepareMaintenance();
 var
   installBmp         : TBitmapImage;
   updateBmp          : TBitmapImage;
+  adjustBmp          : TBitmapImage;
   uninstallBmp       : TBitmapImage;
 
   installLabel       : TLabel;
   updateLabel        : TLabel;
+  adjustLabel        : TLabel;
   uninstallLabel     : TLabel;
 
 begin
   ExtractTemporaryFile('icon_install.bmp');
   ExtractTemporaryFile('icon_update.bmp');
+  ExtractTemporaryFile('icon_adjust.bmp');
   ExtractTemporaryFile('icon_uninstall.bmp');
 
   wpMaintenance := CreateCustomPage(wpWelcome, 'Silent Hill 2: Enhanced Edition Maintenance Wizard', 'Install, repair, update, or uninstall files.');
@@ -97,6 +114,23 @@ begin
     Parent            := wpMaintenance.Surface;
     Bitmap.LoadFromFile(ExpandConstant('{tmp}\icon_update.bmp'));
   end;
+  
+  adjustBmp := TBitmapImage.Create(wpMaintenance);
+  with adjustBmp do
+  begin;
+    AutoSize          := False;
+    Stretch           := True;
+    BackColor         := wpMaintenance.Surface.Color;
+    ReplaceColor      := $FFFFFF;
+    ReplaceWithColor  := wpMaintenance.Surface.Color;
+    Left              := updateBmp.Left;
+    Top               := updateBmp.Top + ScaleY(74);
+    Anchors           := [akTop, akLeft];
+    Width             := 38;
+    Height            := 38;
+    Parent            := wpMaintenance.Surface;
+    Bitmap.LoadFromFile(ExpandConstant('{tmp}\icon_adjust.bmp'));
+  end;
 
   uninstallBmp := TBitmapImage.Create(wpMaintenance);
   with uninstallBmp do
@@ -106,8 +140,8 @@ begin
     BackColor         := wpMaintenance.Surface.Color;
     ReplaceColor      := $FFFFFF;
     ReplaceWithColor  := wpMaintenance.Surface.Color;
-    Left              := updateBmp.Left;
-    Top               := updateBmp.Top + ScaleY(74);
+    Left              := adjustBmp.Left;
+    Top               := adjustBmp.Top + ScaleY(74);
     Anchors           := [akTop, akLeft];
     Width             := 38;
     Height            := 38;
@@ -137,6 +171,19 @@ begin
     Checked    := True;
     Left       := updateBmp.Left + ScaleX(54);
     Top        := updateBmp.Top;
+    Anchors    := [akTop, akLeft];
+    Width      := wpMaintenance.SurfaceWidth;
+  end;
+  
+  adjustRadioBtn := TRadioButton.Create(wpMaintenance);
+  with adjustRadioBtn do
+  begin
+    Parent     := wpMaintenance.Surface;
+    Caption    := 'Adjust Settings';
+    Font.Style := [fsBold];
+    Checked    := True;
+    Left       := adjustBmp.Left + ScaleX(54);
+    Top        := adjustBmp.Top;
     Anchors    := [akTop, akLeft];
     Width      := wpMaintenance.SurfaceWidth;
   end;
@@ -174,6 +221,19 @@ begin
     Caption    := 'Check and download updates for installed enhancement packages.';
     Left       := updateRadioBtn.Left;
     Top        := updateRadioBtn.Top + ScaleX(22);
+    Width      := wpMaintenance.SurfaceWidth - ScaleX(70);
+    Anchors    := [akTop, akLeft, akRight];
+    WordWrap   := True;
+    AutoSize   := True;
+  end;
+  
+  adjustLabel := TLabel.Create(wpMaintenance);
+  with adjustLabel do
+  begin
+    Parent     := wpMaintenance.Surface;
+    Caption    := 'Open the Silent Hill 2: Enhanced Edition Configuration Tool to adjust project settings for the game.';
+    Left       := adjustRadioBtn.Left;
+    Top        := adjustRadioBtn.Top + ScaleX(22);
     Width      := wpMaintenance.SurfaceWidth - ScaleX(70);
     Anchors    := [akTop, akLeft, akRight];
     WordWrap   := True;
