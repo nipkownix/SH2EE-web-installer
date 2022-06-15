@@ -8,7 +8,7 @@ var
 procedure ExitProcess(uExitCode: Integer);
   external 'ExitProcess@kernel32.dll stdcall';
 
-function BytesToString(size: Integer): PAnsiChar; 
+function BytesToString(size: Int64): PAnsiChar; 
   external 'BytesToString@files:BytesToString.dll cdecl';
 
 // Determines if there is enough free space on a drive of a specific folder
