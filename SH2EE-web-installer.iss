@@ -2,7 +2,7 @@
 
 #define INSTALLER_VER  "1.0"
 #define DEBUG          "false"
-#define SH2EE_CSV_URL  "http://etc.townofsilenthill.com/sandbox/ee_itmp/_sh2ee.csv"
+#define SH2EE_CSV_URL  "http://www.enhanced.townofsilenthill.com/SH2/files/_sh2ee.csv"
 #define HELP_URL       "https://github.com/elishacloud/Silent-Hill-2-Enhancements/issues"
 #define LOCAL_REPO     "D:\Porgrams\git_repos\SH2EE-web-installer\"
 
