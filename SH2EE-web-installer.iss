@@ -1,6 +1,6 @@
 ; -- SH2EE Web Installer --
 
-#define INSTALLER_VER  "1.01"
+#define INSTALLER_VER  "1.0.4"
 #define DEBUG          "false"
 #define SH2EE_CSV_URL  "http://www.enhanced.townofsilenthill.com/SH2/files/_sh2ee.csv"
 #define HELP_URL       "https://github.com/elishacloud/Silent-Hill-2-Enhancements/issues"
@@ -139,9 +139,21 @@ begin
   // Download sh2ee.csv; show an error message and exit the installer if downloading fails
   if not {#DEBUG} and not idpDownloadFile('{#SH2EE_CSV_URL}', CSVFilePath) then
   begin
-    MsgBox('Error: Download Failed' #13#13 'Couldn''t download sh2ee.csv.' #13#13 'The installation cannot continue.', mbCriticalError, MB_OK);
-    Result := False;
-    exit;
+    if MsgBox('Error: Download Failed' #13#13 'Couldn''t download sh2ee.csv.' #13#13 'The installation cannot continue.' #13#13 'Retry download?', mbConfirmation, MB_YESNO) = IDYES then
+    begin
+      // Try again
+      if not idpDownloadFile('{#SH2EE_CSV_URL}', CSVFilePath) then
+      begin
+        MsgBox('Error: Download Failed' #13#13 'Couldn''t download sh2ee.csv.' #13#13 'The installation cannot continue.', mbCriticalError, MB_OK);
+        Result := False;
+        exit;
+      end;
+    end
+    else
+    begin
+      Result := False;
+      exit;
+    end;
   end;
 
   // Create an array of TWebComponentsInfo records from sh2ee.csv and store them in a global variable
@@ -417,7 +429,8 @@ begin
 
     // Check if we have enough free space
     iRequiredSize := iTotalCompSize * 2;
-    if not IsEnoughFreeSpace(ExtractFileDrive(WizardDirValue), iRequiredSize) then
+    Log(WizardDirValue);
+    if not IsEnoughFreeSpace(WizardDirValue, iRequiredSize) then
     begin
       MsgBox('Error: Not enough free space!' #13#13 'The installation requires at least double the total size of components (' + BytesToString(iRequiredSize) + ') to be completed safely.' #13#13 'Please free some space and try again.', mbCriticalError, MB_OK);
       ExitProcess(666);
@@ -474,6 +487,8 @@ begin
   if maintenanceMode then
   begin 
     if (not uninstallRadioBtn.Checked) and (not adjustRadioBtn.Checked) then
+      UpdateLocalCSV(false)
+    else if updateMode then
       UpdateLocalCSV(false);
   end else
   if not maintenanceMode then
@@ -504,6 +519,8 @@ begin
           ShouldUpdate := True;
       end;
     end;
+
+    UpdateLocalCSV(false);
 
     // Schedule SH2EEsetup_new.exe for renaming as soon as possible
     if not ShouldUpdate and CmdLineParamExists('-selfUpdate') then

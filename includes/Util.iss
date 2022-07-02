@@ -12,15 +12,16 @@ function BytesToString(size: Int64): PAnsiChar;
   external 'BytesToString@files:BytesToString.dll cdecl';
 
 // Determines if there is enough free space on a drive of a specific folder
-function IsEnoughFreeSpace(const Path: string; MinSpace: Cardinal): Boolean;
+function IsEnoughFreeSpace(const Path: string; MinSpace: Int64): Boolean;
 var
-  FreeSpace, TotalSpace: Cardinal;
+  FreeSpace, TotalSpace: Int64;
 begin
-  // the second parameter set to True means that the function operates with
-  // megabyte units; if you set it to False, it will operate with bytes; by
-  // the chosen units you must reflect the value of the MinSpace paremeter
-  if GetSpaceOnDisk(Path, False, FreeSpace, TotalSpace) then
-    Result := FreeSpace >= MinSpace
+  if GetSpaceOnDisk64(Path, FreeSpace, TotalSpace) then
+  begin
+    Log('# FreeSpace = ' + BytesToString(FreeSpace));
+    Log('# MinSpace = ' + BytesToString(MinSpace));
+    Result := FreeSpace >= MinSpace;
+  end
   else
     RaiseException('Failed to check free space.');
 end;

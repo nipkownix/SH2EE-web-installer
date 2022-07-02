@@ -140,7 +140,7 @@ begin
       if maintenanceMode and not selfUpdateMode and not recoverOnly then
       begin
         // Write info from new selected components using wpSelectComponents' list box
-        if installRadioBtn.Checked or updateRadioBtn.Checked then
+        if installRadioBtn.Checked or updateRadioBtn.Checked or updateMode then
         begin
           if WizardForm.ComponentsList.Checked[i - 1] = true then
             FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), LocalCompsArray[i].ID + ',' + BoolToStr(LocalCompsArray[i].isInstalled) + ',' + LocalCompsArray[i].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
