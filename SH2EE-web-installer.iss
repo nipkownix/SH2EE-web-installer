@@ -4,7 +4,7 @@
 #define DEBUG          "false"
 #define SH2EE_CSV_URL  "http://www.enhanced.townofsilenthill.com/SH2/files/_sh2ee.csv"
 #define HELP_URL       "https://github.com/elishacloud/Silent-Hill-2-Enhancements/issues"
-#define LOCAL_REPO     "D:\Porgrams\git_repos\SH2EE-web-installer\"
+#define LOCAL_REPO     "E:\Porgrams\git_repos\SH2EE-web-installer\"
 
 [Setup]
 AppName=Silent Hill 2: Enhanced Edition
@@ -561,7 +561,7 @@ begin
           // Update the components title/desc Top pos
           CompTitle.Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(-40);
           CompDescription.Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
-        end else if updateRadioBtn.Checked then // "Update" page
+        end else if updateRadioBtn.Checked or updateMode then // "Update" page
         begin
           // Text adjustments
           WizardForm.PageDescriptionLabel.Caption := 'Please select which enhancement packages you would like to update.'
@@ -585,7 +585,7 @@ begin
               Checked[i - 1] := false;
               ItemEnabled[i - 1] := true;
   
-              if updateRadioBtn.Checked then // "Update" page
+              if updateRadioBtn.Checked or updateMode then // "Update" page
               begin
                 Checked[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
                 ItemEnabled[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);

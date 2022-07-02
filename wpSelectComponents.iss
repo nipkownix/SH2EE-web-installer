@@ -34,7 +34,7 @@ begin
           else if installRadioBtn.Checked then // "Install/Repair" page 
             ItemSubItem[i - 1] := FileSizeArray[i - 1].String;
   
-          if updateRadioBtn.Checked then // "Update" page
+          if updateRadioBtn.Checked or updateMode then // "Update" page
             ItemSubItem[i - 1] := wpUVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
         end;
 
