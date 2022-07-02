@@ -1,6 +1,6 @@
 ; -- SH2EE Web Installer --
 
-#define INSTALLER_VER  "1.0"
+#define INSTALLER_VER  "1.01"
 #define DEBUG          "false"
 #define SH2EE_CSV_URL  "http://www.enhanced.townofsilenthill.com/SH2/files/_sh2ee.csv"
 #define HELP_URL       "https://github.com/elishacloud/Silent-Hill-2-Enhancements/issues"
@@ -365,7 +365,7 @@ begin
   end;
 
   // Skip pages if running launcher
-  if maintenanceMode and not selfUpdateMode then
+  if maintenanceMode and not selfUpdateMode and not updateMode then
   begin
     if (CurPage = wpSelectComponents) or
        (CurPage = wpExtract.ID) or
