@@ -32,6 +32,10 @@ begin
   DeleteFile(path + '\XInput1_3.dll');
   DeleteFile(path + '\XInputPlus.ini');
 
+  // Remove Wine d3d8 DLL override
+  if RegValueExists(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8') then
+    RegDeleteValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8');
+
   // Restore the .exe backup if it exists
   if FileExists(path + '\sh2pc.exe.bak') then
     RenameFile(path + '\sh2pc.exe.bak', path + '\sh2pc.exe');
