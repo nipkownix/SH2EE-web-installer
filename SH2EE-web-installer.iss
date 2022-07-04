@@ -555,6 +555,13 @@ begin
   // Copy SH2EEsetup.exe to the game's directory if we're not currently running from it
   if not DirExists(ExpandConstant('{src}\') + 'data') and not FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
     FileCopy(ExpandConstant('{tmp}\SH2EEsetup.exe'), ExpandConstant('{app}\SH2EEsetup.exe'), false);
+
+  // Display Wine message
+  if IsWine then
+  begin
+    RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8', 'native,builtin');
+    MsgBox('Wine detected' #13#13 'This installation was ran in Wine.' #13#13 'The "d3d8" DLL has automatically been set to "native, builtin" in the Wine configuration options. For more information, see https://wiki.winehq.org/Wine_User%27s_Guide#DLL_Overrides', mbInformation, MB_OK);
+  end;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
