@@ -10,7 +10,7 @@
 AppName=Silent Hill 2: Enhanced Edition
 AppVersion={#INSTALLER_VER}
 WizardStyle=modern
-DefaultDirName={code:GetDefaultDirName}  
+DefaultDirName={code:GetDefaultDirName}
 OutputDir=build
 OutputBaseFilename=SH2EEsetup
 DirExistsWarning=no
@@ -60,7 +60,7 @@ Source: "includes\BytesToString\BytesToString.dll"; Flags: dontcopy
 Source: "includes\deletefile_util\deletefile_util.exe"; Flags: dontcopy
 Source: "includes\renamefile_util\renamefile_util.exe"; Flags: dontcopy
 //Source: "includes\unshield\unshield.exe"; Flags: dontcopy
-Source: "{srcexe}"; DestDir: "{tmp}"; DestName: "SH2EEsetup.exe"; Flags: external 
+Source: "{srcexe}"; DestDir: "{tmp}"; DestName: "SH2EEsetup.exe"; Flags: external
 Source: "resources\maintenance\icon_install.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_update.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_adjust.bmp"; Flags: dontcopy
@@ -85,8 +85,8 @@ WelcomeLabel1=Silent Hill 2: Enhanced Edition Setup Tool
 StatusExtractFiles=Placing files...
 SelectDirLabel3=Silent Hill 2: Enhanced Edition must be installed in the same folder as Silent Hill 2 PC. Please specify the directory where Silent Hill 2 PC is located.
 WizardSelectComponents=Select Enhancement Packages
-SelectComponentsDesc=Please select which enhancement packages you would like to install. 
-SelectComponentsLabel2=Silent Hill 2: Enhanced Edition is comprised of several enhancement packages. Select which enhancement packages you wish to install. For the full, intended experience, install all enhancement packages. 
+SelectComponentsDesc=Please select which enhancement packages you would like to install.
+SelectComponentsLabel2=Silent Hill 2: Enhanced Edition is comprised of several enhancement packages. Select which enhancement packages you wish to install. For the full, intended experience, install all enhancement packages.
 FinishedHeadingLabel=Installation Complete!
 ExitSetupMessage=Are you sure you want to close the Setup Tool?
 
@@ -113,6 +113,18 @@ var
   CurIniArray     : array of TIniArray;
   FileSizeArray   : array of TSizeArray;
   sh2pcFilesWerePresent : Boolean;
+
+// Used to detect if the user is using WINE or not
+function LoadLibraryA(lpLibFileName: PAnsiChar): THandle;
+external 'LoadLibraryA@kernel32.dll stdcall';
+function GetProcAddress(Module: THandle; ProcName: PAnsiChar): Longword;
+external 'GetProcAddress@kernel32.dll stdcall';
+function IsWine: boolean;
+var  LibHandle  : THandle;
+begin
+  LibHandle := LoadLibraryA('ntdll.dll');
+  Result:= GetProcAddress(LibHandle, 'wine_get_version')<> 0;
+end;
 
 #include "includes/Extractore.iss"
 #include "includes/Util.iss"
@@ -189,7 +201,7 @@ begin
       LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
     end;
 
-    // Update and reload local CSV if the order of ids don't match  
+    // Update and reload local CSV if the order of ids don't match
     for i := 0 to GetArrayLength(WebCompsArray) - 1 do
     begin
       if not SameText(LocalCompsArray[i].id, WebCompsArray[i].id) then
@@ -270,7 +282,7 @@ begin
   for i := 0 to GetArrayLength(WebCompsArray) - 1 do
   begin
       if not (WebCompsArray[i].id = 'setup_tool') then
-      begin  
+      begin
         if not idpGetFileSize(WebCompsArray[i].URL, FileSizeArray[i - 1].Bytes) then
           begin
             MsgBox('Error: Files unavailable' #13#13 'Failed to query for one or more components.' #13#13 'The installation cannot continue. Please try again, and if the issue persists, report it to the developers.', mbCriticalError, MB_OK);
@@ -288,19 +300,19 @@ begin
   // Register new ComponentsList OnClick event
   ComponentsListClickCheckPrev := WizardForm.ComponentsList.OnClickCheck;
   WizardForm.ComponentsList.OnClickCheck := @NewComponentsListClickCheck;
-  
+
   // Register new ComponentsList OnChange event
   TypesComboOnChangePrev := WizardForm.TypesCombo.OnChange;
   WizardForm.TypesCombo.OnChange := @NewTypesComboOnChange;
 
   // Start the download after wpReady
   idpDownloadAfter(wpReady);
-  
+
   // "Install/Update/Uninstall", etc
   if maintenanceMode then
     PrepareMaintenance();
-  
-  // Updates the setup tool itself  
+
+  // Updates the setup tool itself
   if selfUpdateMode then
     PrepareSelfUpdate();
 
@@ -319,7 +331,7 @@ begin
   // Items names and descriptions on wpSelectComponents
   create_CompNameDesc();
   SetTimer(0, 0, 50, CreateCallback(@HoverTimerProc));  // Create onhover process
- 
+
   // Show help button on bottom left
   HelpButton := TButton.Create(WizardForm);
   with HelpButton do
@@ -435,7 +447,7 @@ begin
       MsgBox('Error: Not enough free space!' #13#13 'The installation requires at least double the total size of components (' + BytesToString(iRequiredSize) + ') to be completed safely.' #13#13 'Please free some space and try again.', mbCriticalError, MB_OK);
       ExitProcess(666);
     end;
-  
+
     // Add files to IDP
     iTotalCompCount := 0; // Clear list
     idpClearFiles(); // Make sure idp file list is clean
@@ -448,7 +460,7 @@ begin
       end;
     end;
 
-    selectedComponents := WizardSelectedComponents(false);  
+    selectedComponents := WizardSelectedComponents(false);
     Log('# The following [' + IntToStr(iTotalCompCount) + '] components are selected: ' + selectedComponents);
   end;
 
@@ -456,8 +468,8 @@ begin
   // Check for file presence in WizardDirValue
   if CurPage = wpSelectDir then
   begin
-    if not FileExists(AddBackslash(WizardDirValue) + 'sh2pc.exe') or not DirExists(AddBackslash(WizardDirValue) + 'data') then 
-    begin 
+    if not FileExists(AddBackslash(WizardDirValue) + 'sh2pc.exe') or not DirExists(AddBackslash(WizardDirValue) + 'data') then
+    begin
       if MsgBox('The selected folder may not be where Silent Hill 2 PC is located.' #13#13 'Proceed anyway?', mbConfirmation, MB_YESNO) = IDYES then
       begin
         Result := True;
@@ -485,7 +497,7 @@ var
 begin
   // Update local CSV file after installation
   if maintenanceMode then
-  begin 
+  begin
     if (not uninstallRadioBtn.Checked) and (not adjustRadioBtn.Checked) then
       UpdateLocalCSV(false)
     else if updateMode then
@@ -500,16 +512,16 @@ begin
     if not (WebCompsArray[0].SHA256 = 'notUsed') then
     begin
       webInstallerChecksum := GetSHA256OfFile(tmp(GetURLFilePart(WebCompsArray[0].URL)));
-  
+
       Log('# ' + WebCompsArray[0].name + ' - Checksum (from .csv): ' + WebCompsArray[i].SHA256);
       Log('# ' + WebCompsArray[0].name + ' - Checksum (temp file): ' + webInstallerChecksum);
-  
+
       if not SameText(webInstallerChecksum, WebCompsArray[0].SHA256) then
       begin
         MsgBox('Error: Checksum mismatch' #13#13 'The downloaded "SH2EEsetup" is corrupted.' #13#13 'The installation cannot continue. Please try again, and if the issue persists, report it to the developers.', mbInformation, MB_OK);
         ExitProcess(1);
       end;
-    end; 
+    end;
 
     // Check if there's an update available for any component
     for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
@@ -532,7 +544,7 @@ begin
         ShellExec('', ExpandConstant('{src}\') + 'SH2EEconfig.exe', '', '', SW_SHOW, ewNoWait, intErrorCode);
     end
     else
-    if ShouldUpdate and CmdLineParamExists('-selfUpdate') then 
+    if ShouldUpdate and CmdLineParamExists('-selfUpdate') then
       // Open the updater page after renaming
       ShellExec('', ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')) + ' true true', '', SW_HIDE, ewNoWait, intErrorCode)
     else
@@ -543,6 +555,13 @@ begin
   // Copy SH2EEsetup.exe to the game's directory if we're not currently running from it
   if not DirExists(ExpandConstant('{src}\') + 'data') and not FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
     FileCopy(ExpandConstant('{tmp}\SH2EEsetup.exe'), ExpandConstant('{app}\SH2EEsetup.exe'), false);
+
+  // Display Wine message
+  if IsWine then
+  begin
+    RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8', 'native,builtin');
+    MsgBox('Wine detected' #13#13 'This installation was ran in Wine.' #13#13 'The "d3d8" DLL has automatically been set to "native, builtin" in the Wine configuration options. For more information, see https://wiki.winehq.org/Wine_User%27s_Guide#DLL_Overrides', mbInformation, MB_OK);
+  end;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -561,10 +580,10 @@ begin
   begin
     if maintenanceMode then
       begin
-        // Hide TypesCombo 
+        // Hide TypesCombo
         WizardForm.TypesCombo.Visible := False;
         WizardForm.IncTopDecHeight(WizardForm.ComponentsList, - (WizardForm.ComponentsList.Top - WizardForm.TypesCombo.Top));
-    
+
         // "Install/Repair" page
         if installRadioBtn.Checked then
         begin
@@ -574,7 +593,7 @@ begin
           WizardForm.SelectComponentsLabel.Height := 40; // Default value
           WizardForm.ComponentsList.Top := 50; // Default value
           WizardForm.ComponentsList.Height := ScaleY(150);
-      
+
           // Update the components title/desc Top pos
           CompTitle.Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(-40);
           CompDescription.Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
@@ -586,7 +605,7 @@ begin
           WizardForm.SelectComponentsLabel.Height := 20;
           WizardForm.ComponentsList.Top := 30;
           WizardForm.ComponentsList.Height := ScaleY(170);
-      
+
           // Gotta update the components title/desc Top pos as well
           CompTitle.Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(-40);
           CompDescription.Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
@@ -601,7 +620,7 @@ begin
               // Unchecked and enabled by default
               Checked[i - 1] := false;
               ItemEnabled[i - 1] := true;
-  
+
               if updateRadioBtn.Checked or updateMode then // "Update" page
               begin
                 Checked[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
@@ -615,7 +634,7 @@ begin
     custom_ComponentsList();
   end;
 
-  // Disable the run checkbox if the sh2pc files were not present when the installation directory was selected, and we're not in maintenance mode 
+  // Disable the run checkbox if the sh2pc files were not present when the installation directory was selected, and we're not in maintenance mode
   if (CurPage = wpFinished) and not maintenanceMode and not sh2pcFilesWerePresent then
   begin
     WizardForm.RunList.ItemEnabled[0] := False;
@@ -623,7 +642,7 @@ begin
     WizardForm.RunList.ItemCaption[0] := 'Start Silent Hill 2 after exiting the Setup Tool (Unavailable)';
   end;
 
-  // Check the run checkbox if the sh2pc files were present when the installation directory was selected, and we're not in maintenance mode 
+  // Check the run checkbox if the sh2pc files were present when the installation directory was selected, and we're not in maintenance mode
   if (CurPage = wpFinished) and not maintenanceMode and sh2pcFilesWerePresent then
   begin
     WizardForm.RunList.Checked[0] := true;
@@ -631,7 +650,7 @@ begin
   end;
 
   // maintenanceMode's wpFinished tweaks
-  if (CurPage = wpFinished) and maintenanceMode then 
+  if (CurPage = wpFinished) and maintenanceMode then
   begin
     sh2pcFilesExist := DirExists(AddBackslash(WizardDirValue) + 'data');
 
@@ -651,7 +670,7 @@ begin
       WizardForm.RunList.Visible              := true;
       WizardForm.RunList.Checked[0]           := true;
       RunListLastChecked := 0;
-    end else 
+    end else
     if uninstallRadioBtn.Checked then
     begin
       // Change default labels to fit the uninstaller action
