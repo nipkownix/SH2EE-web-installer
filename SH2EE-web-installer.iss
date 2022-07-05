@@ -1,6 +1,6 @@
 ; -- SH2EE Web Installer --
 
-#define INSTALLER_VER  "1.0.4"
+#define INSTALLER_VER  "1.0.5"
 #define DEBUG          "false"
 #define SH2EE_CSV_URL  "http://www.enhanced.townofsilenthill.com/SH2/files/_sh2ee.csv"
 #define HELP_URL       "https://github.com/elishacloud/Silent-Hill-2-Enhancements/issues"
