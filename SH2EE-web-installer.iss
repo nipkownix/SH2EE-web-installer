@@ -107,11 +107,12 @@ type
   end;
 
 var
-  maintenanceMode : Boolean;
-  updateMode      : Boolean;
-  selfUpdateMode  : Boolean;
-  CurIniArray     : array of TIniArray;
-  FileSizeArray   : array of TSizeArray;
+  userPackageDataDir    : String;
+  maintenanceMode       : Boolean;
+  updateMode            : Boolean;
+  selfUpdateMode        : Boolean;
+  CurIniArray           : array of TIniArray;
+  FileSizeArray         : array of TSizeArray;
   sh2pcFilesWerePresent : Boolean;
 
 // Used to detect if the user is using WINE or not
@@ -131,10 +132,11 @@ end;
 #include "CustomUninstall.iss"
 #include "wpMaintenance.iss"
 #include "CSVparser.iss"
-#include "CustomLabels.iss"
-#include "SelfUpdate.iss"
 #include "wpSelectComponents.iss"
 #include "wpExtract.iss"
+#include "SelfUpdate.iss"
+#include "wpInstallMode.iss"
+#include "CustomLabels.iss"
 
 // Runs before anything else
 function InitializeSetup(): Boolean;
@@ -269,12 +271,15 @@ begin
   if not maintenanceMode then
     create_RTFlabels();
 
+  if not maintenanceMode then
+    PrepareInstallModePage();
+
   // IDP settings
   idpSetOption('AllowContinue',  '1');
   idpSetOption('DetailsVisible', '1');
   idpSetOption('DetailsButton',  '1');
   idpSetOption('RetryButton',    '1');
-  idpSetOption('UserAgent',      'SH2 EE web installer');
+  idpSetOption('UserAgent',      'SH2EE web installer');
   idpSetOption('InvalidCert',    'ignore');
 
   // Get file sizes from host, exit if we fail for some reason
@@ -297,19 +302,14 @@ begin
   WizardForm.RunList.OnClickCheck := @RunListClickCheck;
   RunListLastChecked := -1;
 
-  // Register new ComponentsList OnClick event
-  ComponentsListClickCheckPrev := WizardForm.ComponentsList.OnClickCheck;
-  WizardForm.ComponentsList.OnClickCheck := @NewComponentsListClickCheck;
-
-  // Register new ComponentsList OnChange event
-  TypesComboOnChangePrev := WizardForm.TypesCombo.OnChange;
-  WizardForm.TypesCombo.OnChange := @NewTypesComboOnChange;
+  // Customize the default SelectComponents 
+  customize_wpSelectComponents();
 
   // Start the download after wpReady
   idpDownloadAfter(wpReady);
 
   // "Install/Update/Uninstall", etc
-  if maintenanceMode then
+  if maintenanceMode and (not selfUpdateMode) then
     PrepareMaintenance();
 
   // Updates the setup tool itself
@@ -317,6 +317,7 @@ begin
     PrepareSelfUpdate();
 
   // Create the file extraction page
+  if not selfUpdateMode then
   create_wpExtract();
 
   // Force installation of the SH2E module and EE exe if not in maintenance mode
@@ -370,9 +371,7 @@ begin
   // Skip pages if in selfUpdateMode
   if selfUpdateMode then
   begin
-    if (CurPage = wpMaintenance.ID) or
-       (CurPage = wpSelectComponents) or
-       (CurPage = wpExtract.ID) or
+    if (CurPage = wpSelectComponents) or
        (CurPage = wpFinished) then
     begin
       Result := True;
@@ -456,14 +455,13 @@ begin
       if WizardForm.ComponentsList.Checked[i] then
       begin
         iTotalCompCount := iTotalCompCount + 1;
-        idpAddFile(WebCompsArray[i + 1].URL, tmp(GetURLFilePart(WebCompsArray[i + 1].URL)));
+        idpAddFile(WebCompsArray[i + 1].URL, localDataDir(GetURLFilePart(WebCompsArray[i + 1].URL)));
       end;
     end;
 
     selectedComponents := WizardSelectedComponents(false);
     Log('# The following [' + IntToStr(iTotalCompCount) + '] components are selected: ' + selectedComponents);
   end;
-
 
   // Check for file presence in WizardDirValue
   if CurPage = wpSelectDir then
@@ -489,71 +487,12 @@ begin
 end;
 
 procedure postInstall();
-var
-  intErrorCode: Integer;
-  ShouldUpdate: Boolean;
-  i: Integer;
-  webInstallerChecksum: String;
 begin
-  // Update local CSV file after installation
-  if maintenanceMode then
-  begin
-    if (not uninstallRadioBtn.Checked) and (not adjustRadioBtn.Checked) then
-      UpdateLocalCSV(false)
-    else if updateMode then
-      UpdateLocalCSV(false);
-  end else
-  if not maintenanceMode then
-    UpdateLocalCSV(false);
-
   if selfUpdateMode then
-  begin
-    // Check for the newly downloaded .exe checksum
-    if not (WebCompsArray[0].SHA256 = 'notUsed') then
-    begin
-      webInstallerChecksum := GetSHA256OfFile(tmp(GetURLFilePart(WebCompsArray[0].URL)));
-
-      Log('# ' + WebCompsArray[0].name + ' - Checksum (from .csv): ' + WebCompsArray[i].SHA256);
-      Log('# ' + WebCompsArray[0].name + ' - Checksum (temp file): ' + webInstallerChecksum);
-
-      if not SameText(webInstallerChecksum, WebCompsArray[0].SHA256) then
-      begin
-        MsgBox('Error: Checksum mismatch' #13#13 'The downloaded "SH2EEsetup" is corrupted.' #13#13 'The installation cannot continue. Please try again, and if the issue persists, report it to the developers.', mbInformation, MB_OK);
-        ExitProcess(1);
-      end;
-    end;
-
-    // Check if there's an update available for any component
-    for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
-      if not (WebCompsArray[i].id = 'setup_tool') then
-      begin
-        if isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled) then
-          ShouldUpdate := True;
-      end;
-    end;
-
-    UpdateLocalCSV(false);
-
-    // Schedule SH2EEsetup_new.exe for renaming as soon as possible
-    if not ShouldUpdate and CmdLineParamExists('-selfUpdate') then
-    begin
-      // Don't reopen the setup tool if launched with the -selfUpdate parameter and there's no update available
-      ShellExec('', ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')) + ' false false', '', SW_HIDE, ewNoWait, intErrorCode);
-      // Run launcher
-      if FileExists(ExpandConstant('{src}\') + 'SH2EEconfig.exe') then
-        ShellExec('', ExpandConstant('{src}\') + 'SH2EEconfig.exe', '', '', SW_SHOW, ewNoWait, intErrorCode);
-    end
-    else
-    if ShouldUpdate and CmdLineParamExists('-selfUpdate') then
-      // Open the updater page after renaming
-      ShellExec('', ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')) + ' true true', '', SW_HIDE, ewNoWait, intErrorCode)
-    else
-      // Don't open the updater page after renaming
-      ShellExec('', ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')) + ' true false', '', SW_HIDE, ewNoWait, intErrorCode);
-  end;
+    SelfUpdate_postInstall();
 
   // Copy SH2EEsetup.exe to the game's directory if we're not currently running from it
-  if not DirExists(ExpandConstant('{src}\') + 'data') and not FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
+  if not (DirExists(ExpandConstant('{src}\') + 'data') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat')) then
     FileCopy(ExpandConstant('{tmp}\SH2EEsetup.exe'), ExpandConstant('{app}\SH2EEsetup.exe'), false);
 
   // Display Wine message
@@ -575,9 +514,10 @@ var
   sh2pcFilesExist : Boolean;
   i : Integer;
 begin
-  // Customize wpSelectComponents
+  // Update ComponentsList changes
   if (CurPage = wpSelectComponents) then
   begin
+    // Text adjustments for maintenanceMode
     if maintenanceMode then
       begin
         // Hide TypesCombo
@@ -630,8 +570,7 @@ begin
           end;
         end;
       end;
-    // Customize ComponentsList
-    custom_ComponentsList();
+    update_ComponentsList();
   end;
 
   // Disable the run checkbox if the sh2pc files were not present when the installation directory was selected, and we're not in maintenance mode

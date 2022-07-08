@@ -55,6 +55,7 @@ procedure ExtractFiles();
 var
   i : Integer;
   curFileChecksum : String;
+  filePath : String;
 begin
   if IsWin64 then
     ExtractTemporaryFile('7za_x64.exe')
@@ -71,7 +72,7 @@ begin
       begin
         UpdateCurrentComponentName(WebCompsArray[i].name + ' - Checking file integrity...', true); // Update label
   
-        curFileChecksum := GetSHA256OfFile(tmp(GetURLFilePart(WebCompsArray[i].URL)));
+        curFileChecksum := GetSHA256OfFile(localDataDir(GetURLFilePart(WebCompsArray[i].URL)));
   
         Log('# ' + WebCompsArray[i].name + ' - Checksum (from .csv): ' + WebCompsArray[i].SHA256);
         Log('# ' + WebCompsArray[i].name + ' - Checksum (temp file): ' + curFileChecksum);
@@ -106,10 +107,10 @@ begin
       end;
   
       // Actually extract the files
-      Extractore(tmp(GetURLFilePart(WebCompsArray[i].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+      Extractore(localDataDir(GetURLFilePart(WebCompsArray[i].URL)), WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
 
       // Delete extracted file to save space.
-      DeleteFile(tmp(GetURLFilePart(WebCompsArray[i].URL)));
+      if (Length(userPackageDataDir) = 0) then DeleteFile(tmp(GetURLFilePart(WebCompsArray[i].URL)));
   
       // Restore .ini settings if we are in maintenance mode
       if WebCompsArray[i].id = 'sh2emodule' then
@@ -140,6 +141,8 @@ begin
       UpdateTotalProgressBar();
     end;
   end;
+
+  UpdateLocalCSV(false);
 
   WizardForm.NextButton.OnClick(WizardForm.NextButton);
 end;

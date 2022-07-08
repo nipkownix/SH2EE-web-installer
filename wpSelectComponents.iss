@@ -9,7 +9,7 @@ var
   ComponentsListClickCheckPrev : TNotifyEvent;
 
 // Customize ComponentsList according to our needs 
-procedure custom_ComponentsList();
+procedure update_ComponentsList();
   var
   i: integer;
 begin
@@ -67,7 +67,7 @@ begin
   TypesComboOnChangePrev(Sender);
 
   // Customize ComponentsList
-  custom_ComponentsList();
+  update_ComponentsList();
 end;
 
 // Called when you click somewhere in the components list
@@ -77,7 +77,24 @@ begin
   ComponentsListClickCheckPrev(Sender);
 
   // Customize ComponentsList
-  custom_ComponentsList();
+  update_ComponentsList();
+end;
+
+procedure customize_wpSelectComponents();
+begin
+  // Register new ComponentsList OnClick event
+  with WizardForm.ComponentsList do
+  begin
+      ComponentsListClickCheckPrev := OnClickCheck; 
+      OnClickCheck := @NewComponentsListClickCheck;
+  end;
+
+  // Register new TypesCombo OnChange event
+  with WizardForm.TypesCombo do
+  begin
+      TypesComboOnChangePrev := OnChange; 
+      OnChange := @NewTypesComboOnChange;
+  end;
 end;
 
 // Create new labels for name and descriptions

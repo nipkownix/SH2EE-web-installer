@@ -99,6 +99,15 @@ begin
   Result := ExpandConstant('{tmp}\') + Path;
 end;
 
+// Wrapper function for returning a path to files based on weather or no the user wants to backup the files
+function localDataDir(Path: String): String;
+begin
+  if (Length(userPackageDataDir) = 0) then Result := ExpandConstant('{tmp}\') + Path
+  else Result := userPackageDataDir + '\' + Path; 
+
+  Log(Result);
+end;
+
 // When one checkbox is checked, all others get unchecked
 procedure RunListClickCheck(Sender: TObject);
 var

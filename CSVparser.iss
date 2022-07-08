@@ -90,14 +90,14 @@ begin
     SaveStringToFile(ExpandConstant('{app}\SH2EEsetup.dat')
     ,'# **DO NOT MODIFY THIS FILE!**' + #13#10 +
     'id,isInstalled,version' + #13#10 +
-    'setup_tool,true,' + ExpandConstant('{#INSTALLER_VER}') + #13#10,
+    'setup_tool,true,' + WebCompsArray[0].Version + #13#10,
     False);
   end else
   begin
     SaveStringToFile(ExpandConstant('{src}\SH2EEsetup.dat')
     ,'# **DO NOT MODIFY THIS FILE!**' + #13#10 +
     'id,isInstalled,version' + #13#10 +
-    'setup_tool,true,' + ExpandConstant('{#INSTALLER_VER}') + #13#10,
+    'setup_tool,true,' + WebCompsArray[0].Version + #13#10,
     False);
   end;
 

@@ -14,7 +14,7 @@ begin
   ExtractTemporaryFile('renamefile_util.exe');
 
   // Add file to IDP list
-  idpAddFile(WebCompsArray[0].URL, ExpandConstant('{src}\SH2EEsetup_new.exe'));
+  idpAddFile(WebCompsArray[0].URL, tmp(GetURLFilePart(WebCompsArray[0].URL)));
 
   // The "Retry" button sometimes bugs out in this page, for some reason. Best to just disable it.
   idpSetOption('RetryButton', '0');
@@ -27,4 +27,59 @@ begin
   begin
       OnActivate := @wpSelfUpdateOnActivate;
   end;
+end;
+
+procedure SelfUpdate_postInstall();
+var
+  webInstallerChecksum: String;
+  i: Integer;
+  intErrorCode: Integer;
+  ShouldUpdateComps: Boolean;
+begin
+  // Check for the newly downloaded .exe checksum
+  if not (WebCompsArray[0].SHA256 = 'notUsed') then
+  begin
+    webInstallerChecksum := GetSHA256OfFile(tmp(GetURLFilePart(WebCompsArray[0].URL)));
+
+    Log('# ' + WebCompsArray[0].name + ' - Checksum (from .csv): ' + WebCompsArray[i].SHA256);
+    Log('# ' + WebCompsArray[0].name + ' - Checksum (temp file): ' + webInstallerChecksum);
+
+    if not SameText(webInstallerChecksum, WebCompsArray[0].SHA256) then
+    begin
+      MsgBox('Error: Checksum mismatch' #13#13 'The downloaded "SH2EEsetup" is corrupted.' #13#13 'The installation cannot continue. Please try again, and if the issue persists, report it to the developers.', mbInformation, MB_OK);
+      ExitProcess(1);
+      end;
+  end;
+
+  // Copy installer to game folder
+  if not FileCopy(tmp(GetURLFilePart(WebCompsArray[0].URL)), ExpandConstant('{src}\SH2EEsetup_new.exe'), false) then
+    RaiseException('Failed to copy installer to folder.')
+  else
+    UpdateLocalCSV(false);
+
+  // Check if there's an update available for any component
+  for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+    if not (WebCompsArray[i].id = 'setup_tool') then
+    begin
+      if isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled) then
+        ShouldUpdateComps := True;
+    end;
+  end;
+
+  // Schedule SH2EEsetup_new.exe for renaming as soon as possible
+  if not ShouldUpdateComps and CmdLineParamExists('-selfUpdate') then
+  begin
+    // Don't reopen the setup tool if launched with the -selfUpdate parameter and there's no update available
+    ShellExec('', ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')) + ' false false', '', SW_HIDE, ewNoWait, intErrorCode);
+    // Run launcher
+    if FileExists(ExpandConstant('{src}\') + 'SH2EEconfig.exe') then
+      ShellExec('', ExpandConstant('{src}\') + 'SH2EEconfig.exe', '', '', SW_SHOW, ewNoWait, intErrorCode);
+  end
+  else
+  if ShouldUpdateComps and CmdLineParamExists('-selfUpdate') then
+    // Open the updater page after renaming
+    ShellExec('', ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')) + ' true true', '', SW_HIDE, ewNoWait, intErrorCode)
+  else
+    // Don't open the updater page after renaming
+    ShellExec('', ExpandConstant('{tmp}\') + 'renamefile_util.exe', AddQuotes(ExpandConstant('{srcexe}')) + ' true false', '', SW_HIDE, ewNoWait, intErrorCode);
 end;
