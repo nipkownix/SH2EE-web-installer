@@ -16,7 +16,7 @@ function IsEnoughFreeSpace(const Path: string; MinSpace: Int64): Boolean;
 var
   FreeSpace, TotalSpace: Int64;
 begin
-  if GetSpaceOnDisk64(Path, FreeSpace, TotalSpace) then
+  if GetSpaceOnDisk64(ExtractFileDrive(Path), FreeSpace, TotalSpace) then
   begin
     Log('# FreeSpace = ' + BytesToString(FreeSpace));
     Log('# MinSpace = ' + BytesToString(MinSpace));
