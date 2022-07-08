@@ -55,13 +55,13 @@ begin
   if not FileCopy(tmp(GetURLFilePart(WebCompsArray[0].URL)), ExpandConstant('{src}\SH2EEsetup_new.exe'), false) then
     RaiseException('Failed to copy installer to folder.')
   else
-    UpdateLocalCSV(false);
+    UpdateMaintenanceCSV(false);
 
   // Check if there's an update available for any component
   for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
     if not (WebCompsArray[i].id = 'setup_tool') then
     begin
-      if isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled) then
+      if isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].isInstalled) then
         ShouldUpdateComps := True;
     end;
   end;

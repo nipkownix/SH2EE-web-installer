@@ -51,7 +51,7 @@ begin
 end;
 
 // Called by wpExtract's OnActivate
-procedure ExtractFiles();
+procedure ExtractWebCSVFiles();
 var
   i : Integer;
   curFileChecksum : String;
@@ -142,7 +142,44 @@ begin
     end;
   end;
 
-  UpdateLocalCSV(false);
+  UpdateMaintenanceCSV(false);
+
+  WizardForm.NextButton.OnClick(WizardForm.NextButton);
+end;
+
+// Called by wpExtract's OnActivate
+procedure ExtractLocalCSVFiles();
+var
+  i : Integer;
+begin
+  if IsWin64 then
+    ExtractTemporaryFile('7za_x64.exe')
+  else
+    ExtractTemporaryFile('7za_x86.exe');
+
+  // Extract selected components
+  for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
+  begin
+    if WizardIsComponentSelected(LocalCompsArray[i].id) then
+    begin
+      // Update label
+      UpdateCurrentComponentName(LocalCompsArray[i].name, false);
+  
+      // Backup the original .exe before extracting the new one, if a backup doesn't already exist
+      if LocalCompsArray[i].id = 'ee_exe' then
+      begin
+        if not FileExists(WizardDirValue + '\sh2pc.exe.bak') then
+          RenameFile(WizardDirValue + '\sh2pc.exe', WizardDirValue + '\sh2pc.exe.bak');
+      end;
+  
+      // Actually extract the files
+      Extractore(ExpandConstant('{src}\') + LocalCompsArray[i].fileName, WizardDirValue, '7zip', true, ExtractoreListBox, true, CurrentComponentProgressBar);
+
+      UpdateTotalProgressBar();
+    end;
+  end;
+
+  UpdateMaintenanceCSV(false);
 
   WizardForm.NextButton.OnClick(WizardForm.NextButton);
 end;
@@ -152,7 +189,11 @@ procedure wpExtractOnActivate(Sender: TWizardPage);
 begin
   Wizardform.NextButton.Enabled := false;
   WizardForm.BackButton.Visible := false;
-  ExtractFiles();
+
+  if not localInstallMode then
+    ExtractWebCSVFiles()
+  else
+    ExtractLocalCSVFiles();
 end;
 
 // Kill the extraction tool if we cancel the installation during the extraction process  
@@ -186,8 +227,12 @@ var
   CurrentComponentLabel           : TLabel;
   CurrentComponentStaticText      : TNewStaticText;
 begin
-  // Create wpExtract and show it after the download page
-  wpExtract := CreateCustomPage(IDPForm.Page.ID, 'Extracting compressed components', 'Please wait while Setup extracts components.');
+  if not localInstallMode then
+    // Create wpExtract and show it after the download page
+    wpExtract := CreateCustomPage(IDPForm.Page.ID, 'Extracting compressed components', 'Please wait while Setup extracts components.')
+  else
+    // Create wpExtract and show it after the wpReady page
+    wpExtract := CreateCustomPage(wpReady, 'Extracting compressed components', 'Please wait while Setup extracts components.');
 
   // Progress bars
   TotalProgressStaticText := TNewStaticText.Create(wpExtract);

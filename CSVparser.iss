@@ -1,6 +1,13 @@
 [Code]
 
 type
+  TLocalComponentsInfo  = record
+    ID                  : String;
+    Name                : String;
+    fileName            : String;
+    Version             : String;
+  end;
+
   TWebComponentsInfo    = record
     ID                  : String;
     Name                : String;
@@ -9,7 +16,7 @@ type
     SHA256              : String;
   end;
 
-  TLocalComponentsInfo  = record
+  TMaintenanceComponentsInfo  = record
     ID                  : String;
     isInstalled         : Boolean;
     Version             : String;
@@ -20,6 +27,7 @@ var
 
   LocalCompsArray : array of TLocalComponentsInfo;
   WebCompsArray   : array of TWebComponentsInfo;
+  MaintenanceCompsArray : array of TMaintenanceComponentsInfo;
 
 // Given a .csv file, return an array of information corresponding to
 // the data in the csv file.
@@ -50,7 +58,7 @@ begin
 end;
 
 // Same as above, but tailored to use a different format
-function LocalCSVToInfoArray(Filename: String): array of TLocalComponentsInfo;
+function MaintenanceCSVToInfoArray(Filename: String): array of TMaintenanceComponentsInfo;
 var
   Rows: TArrayOfString;
   RowValues: TStrings;
@@ -69,7 +77,7 @@ begin
           isInstalled := StrToBool(RowValues[1]);
           Version := RowValues[2];
         except
-          Log('user might have edited the local .csv');
+          Log('user might have edited the maintenance .csv');
         end;
       end;
     end;
@@ -78,80 +86,178 @@ begin
   end;
 end;
 
-procedure UpdateLocalCSV(recoverOnly: Boolean);
+// Same as above, but tailored to use a different format(2)
+function LocalCSVToInfoArray(Filename: String): array of TLocalComponentsInfo;
+var
+  Rows: TArrayOfString;
+  RowValues: TStrings;
+  i: Integer;
+begin
+  // Read the file at Filename and store the lines in Rows
+  if LoadStringsFromFile(Filename, Rows) then begin
+    // Match length of return array to number of rows
+    SetArrayLength(Result, GetArrayLength(Rows) - 2);
+    for i := 1 to GetArrayLength(Rows) - 2 do begin
+      // Separate values at commas
+      RowValues := SplitString(Rows[i + 1], ',');
+      with Result[i - 1] do begin
+        ID := RowValues[0];
+        Name := RowValues[1]; 
+        fileName := RowValues[2]; 
+        Version := RowValues[3];
+      end;
+    end;
+  end else begin
+    SetArrayLength(Result, 0);
+  end;
+end;
+
+procedure CreateLocalCSV();
 var
   i: Integer;
 begin
   Log('# updating local csv');
 
+  SaveStringToFile(localDataDir('local_sh2ee.dat')
+  ,'# SH2EE local csv' + #13#10 +
+  'id,name,fileName,version' + #13#10 +
+  'setup_tool,SH2:EE Setup Tool,SH2EEsetup.exe,' + ExpandConstant('{#INSTALLER_VER}') + #13#10,
+  False);
+
+  // Populate entries based on the local csv
+  for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+  begin
+    if not (WebCompsArray[i].id = 'setup_tool') then
+    begin
+      SaveStringToFile(localDataDir('local_sh2ee.dat')
+      ,WebCompsArray[i].ID + ',' + WebCompsArray[i].Name + ',notDownloaded,' + '0.0' + #13#10,
+      True);
+    end;
+  end;
+
+  // Update entries
+  for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+  begin
+    if not (WebCompsArray[i].id = 'setup_tool') then
+    begin
+      if WizardForm.ComponentsList.Checked[i - 1] then
+        FileReplaceString(localDataDir('local_sh2ee.dat'), WebCompsArray[i].ID + ',' + WebCompsArray[i].Name + ',notDownloaded,' + '0.0'
+        ,WebCompsArray[i].ID + ',' + WebCompsArray[i].Name + ',' +  GetURLFilePart(WebCompsArray[i].URL) + ',' + WebCompsArray[i].Version);
+    end;
+  end;
+end;
+
+procedure UpdateMaintenanceCSV(recoverOnly: Boolean);
+var
+  i: Integer;
+begin
+  Log('# updating maintenance csv');
+
   // Create fresh local .csv in the game's directory
-  if not maintenanceMode then
+  if localInstallMode then
   begin
     SaveStringToFile(ExpandConstant('{app}\SH2EEsetup.dat')
     ,'# **DO NOT MODIFY THIS FILE!**' + #13#10 +
     'id,isInstalled,version' + #13#10 +
-    'setup_tool,true,' + WebCompsArray[0].Version + #13#10,
+    'setup_tool,true,' + ExpandConstant('{#INSTALLER_VER}') + #13#10,
     False);
   end else
+  if maintenanceMode then
   begin
     SaveStringToFile(ExpandConstant('{src}\SH2EEsetup.dat')
     ,'# **DO NOT MODIFY THIS FILE!**' + #13#10 +
     'id,isInstalled,version' + #13#10 +
     'setup_tool,true,' + WebCompsArray[0].Version + #13#10,
     False);
+  end else
+  begin
+    SaveStringToFile(ExpandConstant('{app}\SH2EEsetup.dat')
+    ,'# **DO NOT MODIFY THIS FILE!**' + #13#10 +
+    'id,isInstalled,version' + #13#10 +
+    'setup_tool,true,' + WebCompsArray[0].Version + #13#10,
+    False);
   end;
 
-  // Populate entries based on the web csv
-  for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+  // Populate entries based on the local csv
+  if localInstallMode then
   begin
-    if not (WebCompsArray[i].id = 'setup_tool') then
+    for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
     begin
-      if not maintenanceMode then
+      if not (LocalCompsArray[i].id = 'setup_tool') then
       begin
         SaveStringToFile(ExpandConstant('{app}\SH2EEsetup.dat')
-        ,WebCompsArray[i].ID + ',false,' + '0.0' + #13#10,
+        ,LocalCompsArray[i].ID + ',false,' + '0.0' + #13#10,
         True);
-      end else
+      end;
+    end;
+  end else
+  // Populate entries based on the web csv
+  begin
+    for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+    begin
+      if not (WebCompsArray[i].id = 'setup_tool') then
       begin
-        SaveStringToFile(ExpandConstant('{src}\SH2EEsetup.dat')
-        ,WebCompsArray[i].ID + ',false,' + '0.0' + #13#10,
-        True);
+        if not maintenanceMode then
+        begin
+          SaveStringToFile(ExpandConstant('{app}\SH2EEsetup.dat')
+          ,WebCompsArray[i].ID + ',false,' + '0.0' + #13#10,
+          True);
+        end else
+        begin
+          SaveStringToFile(ExpandConstant('{src}\SH2EEsetup.dat')
+          ,WebCompsArray[i].ID + ',false,' + '0.0' + #13#10,
+          True);
+        end;
       end;
     end;
   end;
 
-  // Write version info and installation status
-  for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+  // Write version info and installation status using local csv
+  if localInstallMode then
   begin
-    if not (WebCompsArray[i].id = 'setup_tool') then
+    for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
     begin
-      // Rewrite existing local csv info
-      if maintenanceMode then
+      if not (LocalCompsArray[i].id = 'setup_tool') then
       begin
-        try
-          if LocalCompsArray[i].isInstalled then
-            FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), LocalCompsArray[i].ID + ',false,' + '0.0', LocalCompsArray[i].ID + ',true,' + LocalCompsArray[i].Version);
-        except
-          Log('# Entry is missing from local CSV.');
-        end;
+        if WizardForm.ComponentsList.Checked[i - 1] then
+          FileReplaceString(ExpandConstant('{app}\SH2EEsetup.dat'), LocalCompsArray[i].ID + ',false,0.0', LocalCompsArray[i].ID + ',true,' + LocalCompsArray[i].Version);
       end;
-
-      // If in maintenance mode, check for maintenance page's radio buttons
-      if maintenanceMode and not selfUpdateMode and not recoverOnly then
+    end;
+  end else
+  begin
+    // Write version info and installation status using web csv
+    for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+    begin
+      if not (WebCompsArray[i].id = 'setup_tool') then
       begin
-        // Write info from new selected components using wpSelectComponents' list box
-        if installRadioBtn.Checked or updateRadioBtn.Checked or updateMode then
+        // Rewrite existing local csv info
+        if maintenanceMode then
         begin
-          if WizardForm.ComponentsList.Checked[i - 1] = true then
-            FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), LocalCompsArray[i].ID + ',' + BoolToStr(LocalCompsArray[i].isInstalled) + ',' + LocalCompsArray[i].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+          try
+            if MaintenanceCompsArray[i].isInstalled then
+              FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), MaintenanceCompsArray[i].ID + ',false,' + '0.0', MaintenanceCompsArray[i].ID + ',true,' + MaintenanceCompsArray[i].Version);
+          except
+            Log('# Entry is missing from local CSV.');
+          end;
         end;
-      end;
-
-      // If not in maintenance mode, use the default method
-      if not maintenanceMode then
-      begin
-        if WizardForm.ComponentsList.Checked[i - 1] = true then
-          FileReplaceString(ExpandConstant('{app}\SH2EEsetup.dat'), WebCompsArray[i].ID + ',false,0.0', WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+  
+        // If in maintenance mode, check for maintenance page's radio buttons
+        if maintenanceMode and not selfUpdateMode and not recoverOnly then
+        begin
+          // Write info from new selected components using wpSelectComponents' list box
+          if installRadioBtn.Checked or updateRadioBtn.Checked or updateMode then
+          begin
+            if WizardForm.ComponentsList.Checked[i - 1] then
+              FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), MaintenanceCompsArray[i].ID + ',' + BoolToStr(MaintenanceCompsArray[i].isInstalled) + ',' + MaintenanceCompsArray[i].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+          end;
+        end;
+  
+        // If not in maintenance mode, use the default method
+        if not maintenanceMode then
+        begin
+          if WizardForm.ComponentsList.Checked[i - 1] then
+            FileReplaceString(ExpandConstant('{app}\SH2EEsetup.dat'), WebCompsArray[i].ID + ',false,0.0', WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+        end;
       end;
     end;
   end;

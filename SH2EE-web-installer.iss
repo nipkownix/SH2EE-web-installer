@@ -111,6 +111,7 @@ var
   maintenanceMode       : Boolean;
   updateMode            : Boolean;
   selfUpdateMode        : Boolean;
+  localInstallMode      : Boolean;
   CurIniArray           : array of TIniArray;
   FileSizeArray         : array of TSizeArray;
   sh2pcFilesWerePresent : Boolean;
@@ -140,11 +141,58 @@ end;
 
 // Runs before anything else
 function InitializeSetup(): Boolean;
-var i: integer;
+var 
+  i: integer;
 begin
   Result := True;
 
-  // Store the path to sh2ee.csv in a global variable
+  // Determine weather or not we should be in local installation mode
+  if FileExists(ExpandConstant('{src}\') + 'local_sh2ee.dat') then
+  begin
+
+    // Create an array of TWebComponentsInfo records from sh2ee.csv and store them in a global variable
+    LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\') + 'local_sh2ee.dat');
+    // Check if above didn't work
+    if GetArrayLength(LocalCompsArray) = 0 then
+    begin
+      MsgBox('Error: Parsing Failed' #13#13 'Offline installation detected, but parsing local_sh2ee.dat failed.' #13#13 'The installation cannot continue.', mbCriticalError, MB_OK);
+      Result := False;
+      exit;
+    end;
+
+    // Check if the local files from the local .csv actually exist
+    for i := 0 to GetArrayLength(LocalCompsArray) - 1 do begin
+      if not (LocalCompsArray[i].fileName = 'notDownloaded') and not FileExists(ExpandConstant('{src}\') + LocalCompsArray[i].fileName) then
+      begin
+        MsgBox('Error: Missing Files' #13#13 'Offline installation detected, but one or more files are missing from Setup Tool''s folder.' #13#13 'The installation cannot continue.', mbCriticalError, MB_OK);
+        Result := False;
+        exit;
+      end;
+    end;
+
+    // Check if this version of the installer should work with the local .csv
+    for i := 0 to GetArrayLength(LocalCompsArray) - 1 do begin
+      if LocalCompsArray[i].id = 'setup_tool' then
+      begin
+        if not SameText(LocalCompsArray[i].version, ExpandConstant('{#INSTALLER_VER}')) then
+        begin
+          MsgBox('Error: Incompatible Version' #13#13 'This version of the SH2:EE Setup Tool (' + ExpandConstant('{#INSTALLER_VER}') +
+          ') is not the version expected to work with the local files (' + LocalCompsArray[i].version +
+          ').' #13#13 'The installation cannot continue.', mbCriticalError, MB_OK);
+          Result := False;
+          exit;
+        end;
+      end;
+    end;
+
+    // Guess everything should be fine then
+    localInstallMode := true;
+  end;
+
+  // localInstallMode doesn't need any of this
+  if not localInstallMode then
+  begin
+    // Store the path to web sh2ee.csv in a global variable
   if not {#DEBUG} then
     CSVFilePath := tmp(GetURLFilePart('{#SH2EE_CSV_URL}'))
   else
@@ -185,8 +233,8 @@ begin
   begin
     maintenanceMode := True;
 
-    // Create an array of TLocalComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
-    LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
+      // Create an array of TMaintenanceComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
+      MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
 
     // Check if above didn't work
     if GetArrayLength(WebCompsArray) = 0 then
@@ -197,18 +245,18 @@ begin
     end;
 
     // Update and reload local CSV if array sizes are different
-    if not SamePackedVersion(GetArrayLength(LocalCompsArray), GetArrayLength(WebCompsArray)) then // [2] Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
+      if not SamePackedVersion(GetArrayLength(MaintenanceCompsArray), GetArrayLength(WebCompsArray)) then // [2] Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
     begin
-      UpdateLocalCSV(true);
-      LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
+        UpdateMaintenanceCSV(true);
+        MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
     end;
 
     // Update and reload local CSV if the order of ids don't match
     for i := 0 to GetArrayLength(WebCompsArray) - 1 do
     begin
-      if not SameText(LocalCompsArray[i].id, WebCompsArray[i].id) then
-        UpdateLocalCSV(true);
-        LocalCompsArray := LocalCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
+        if not SameText(MaintenanceCompsArray[i].id, WebCompsArray[i].id) then
+          UpdateMaintenanceCSV(true);
+          MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
     end;
   end;
 
@@ -239,6 +287,7 @@ begin
           begin
             Result := False;
             exit;
+            end;
           end;
         end;
       end;
@@ -260,28 +309,44 @@ var
   DebugLabel : TNewStaticText;
   i: integer;
 begin
+  if not localInstallMode then
+  begin
   // Compare the lenght of the web CSV array with the installer's component list
   if not SamePackedVersion(WizardForm.ComponentsList.Items.Count, GetArrayLength(WebCompsArray) - 1) then // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
   begin
     MsgBox('Error: Invalid Components List Size' #13#13 'The installer should be updated to handle the new components from sh2ee.csv.', mbCriticalError, MB_OK);
     Abort;
+    end;
+  end else
+  begin
+    // Compare the lenght of the local CSV array with the installer's component list
+    if not SamePackedVersion(WizardForm.ComponentsList.Items.Count, GetArrayLength(LocalCompsArray) -1) then 
+    begin
+      MsgBox('Error: Invalid Components List Size' #13#13 'The installer should be updated to handle the new components from sh2ee.csv.', mbCriticalError, MB_OK);
+      Abort;
+    end;
   end;
 
   // Replace some normal labels with RTF equivalents if not in maintenance mode
   if not maintenanceMode then
     create_RTFlabels();
 
-  if not maintenanceMode then
+  if not maintenanceMode and not localInstallMode then
     PrepareInstallModePage();
 
   // IDP settings
+  if not localInstallMode then
+  begin
   idpSetOption('AllowContinue',  '1');
   idpSetOption('DetailsVisible', '1');
   idpSetOption('DetailsButton',  '1');
   idpSetOption('RetryButton',    '1');
   idpSetOption('UserAgent',      'SH2EE web installer');
   idpSetOption('InvalidCert',    'ignore');
+  end;
 
+  if not localInstallMode then
+  begin
   // Get file sizes from host, exit if we fail for some reason
   SetArrayLength(FileSizeArray, GetArrayLength(WebCompsArray) - 1);
   for i := 0 to GetArrayLength(WebCompsArray) - 1 do
@@ -296,6 +361,24 @@ begin
         FileSizeArray[i - 1].String := BytesToString(FileSizeArray[i - 1].Bytes);
         if {#DEBUG} then Log('# ' + WebCompsArray[i].ID + ' size = ' + FileSizeArray[i - 1].String);
       end;
+    end;
+  end else
+  begin
+    // Get sizes from local files, exit if we fail for some reason
+    SetArrayLength(FileSizeArray, GetArrayLength(LocalCompsArray));
+    for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
+    begin
+      if not (LocalCompsArray[i].id = 'setup_tool') then
+      begin
+        if not (LocalCompsArray[i].fileName = 'notDownloaded') and not FileSize64(ExpandConstant('{src}\') + LocalCompsArray[i].fileName, FileSizeArray[i - 1].Bytes) then
+          begin
+            MsgBox('Error: Files unavailable' #13#13 'Failed to query for one or more components.' #13#13 'The installation cannot continue.', mbCriticalError, MB_OK);
+            ExitProcess(1);
+          end;
+        FileSizeArray[i - 1].String := BytesToString(FileSizeArray[i - 1].Bytes);
+        if {#DEBUG} then Log('# ' + LocalCompsArray[i].ID + ' size = ' + FileSizeArray[i - 1].String);
+      end;
+    end;
   end;
 
   // Register new RunList OnClick event
@@ -306,6 +389,7 @@ begin
   customize_wpSelectComponents();
 
   // Start the download after wpReady
+  if not localInstallMode then
   idpDownloadAfter(wpReady);
 
   // "Install/Update/Uninstall", etc
@@ -362,6 +446,22 @@ begin
         Parent     := WizardForm;
     end;
   end;
+
+  // Show "OFFLINE INSTALLATION" text
+  if localInstallMode then
+  begin
+    DebugLabel := TNewStaticText.Create(WizardForm);
+    with DebugLabel do
+    begin
+        Top        := HelpButton.Top + 4;
+        Anchors    := [akLeft, akBottom];
+        Left       := HelpButton.Left + HelpButton.Width + 10;
+        Caption    := ExpandConstant('OFFLINE INSTALLATION');
+        Font.Style := [fsBold];
+        Parent     := WizardForm;
+    end;
+  end;
+
 end;
 
 function ShouldSkipPage(CurPage: Integer): Boolean;
@@ -448,6 +548,8 @@ begin
     end;
 
     // Add files to IDP
+    if not localInstallMode then
+    begin
     iTotalCompCount := 0; // Clear list
     idpClearFiles(); // Make sure idp file list is clean
     for i := 0 to WizardForm.ComponentsList.Items.Count - 1 do
@@ -456,6 +558,7 @@ begin
       begin
         iTotalCompCount := iTotalCompCount + 1;
         idpAddFile(WebCompsArray[i + 1].URL, localDataDir(GetURLFilePart(WebCompsArray[i + 1].URL)));
+        end;
       end;
     end;
 
@@ -490,6 +593,13 @@ procedure postInstall();
 begin
   if selfUpdateMode then
     SelfUpdate_postInstall();
+
+  // User chose to back up installation files
+  if (Length(userPackageDataDir) > 0) then
+  begin
+    CreateLocalCSV();
+    FileCopy(ExpandConstant('{tmp}\SH2EEsetup.exe'), localDataDir('SH2EEsetup.exe'), false);
+  end;
 
   // Copy SH2EEsetup.exe to the game's directory if we're not currently running from it
   if not (DirExists(ExpandConstant('{src}\') + 'data') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat')) then
@@ -563,8 +673,8 @@ begin
 
               if updateRadioBtn.Checked or updateMode then // "Update" page
               begin
-                Checked[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
-                ItemEnabled[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
+              Checked[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].isInstalled);
+              ItemEnabled[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].isInstalled);
               end;
             end;
           end;

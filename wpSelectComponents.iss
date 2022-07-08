@@ -17,6 +17,34 @@ begin
   iTotalCompCount := 0;
   iTotalCompSize  := 0;
 
+  // Update ComponentsList sizes when using localInstallMode
+  if localInstallMode then
+  begin
+    for i := 0 to GetArrayLength(LocalCompsArray) - 1 do begin
+      if not (LocalCompsArray[i].id = 'setup_tool') then
+      begin
+        with Wizardform.ComponentsList do
+        begin
+          ItemSubItem[i - 1] := FileSizeArray[i - 1].String
+  
+          if (LocalCompsArray[i].fileName = 'notDownloaded') then
+          begin
+            Checked[i - 1] := false;
+            ItemEnabled[i - 1] := false;
+            ItemSubItem[i - 1] := 'Package missing';
+          end;
+  
+          // Calculate how many components are selected
+          if Checked[i - 1] then
+          begin
+            iTotalCompCount := iTotalCompCount + 1;
+            iTotalCompSize := iTotalCompSize + FileSizeArray[i - 1].Bytes;
+          end;
+        end;
+      end;
+    end;
+  end;
+
   // Update component SubItem
   for i := 0 to GetArrayLength(WebCompsArray) - 1 do
   begin
@@ -29,17 +57,17 @@ begin
         else
         begin
           // Show custom text if the component is already installed
-          if LocalCompsArray[i].isInstalled then
+          if MaintenanceCompsArray[i].isInstalled then
             ItemSubItem[i - 1] := 'Already installed - ' + FileSizeArray[i - 1].String
           else if installRadioBtn.Checked then // "Install/Repair" page 
             ItemSubItem[i - 1] := FileSizeArray[i - 1].String;
   
           if updateRadioBtn.Checked or updateMode then // "Update" page
-            ItemSubItem[i - 1] := wpUVersionLabel(WebCompsArray[i].Version, LocalCompsArray[i].Version, LocalCompsArray[i].isInstalled);
+            ItemSubItem[i - 1] := wpUVersionLabel(WebCompsArray[i].Version, MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].isInstalled);
         end;
 
         // Calculate how many components are selected
-        if WizardForm.ComponentsList.Checked[i - 1] then
+        if Checked[i - 1] then
         begin
           iTotalCompCount := iTotalCompCount + 1;
           iTotalCompSize := iTotalCompSize + FileSizeArray[i - 1].Bytes;
