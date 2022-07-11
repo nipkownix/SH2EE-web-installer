@@ -31,7 +31,7 @@ begin
           begin
             Checked[i - 1] := false;
             ItemEnabled[i - 1] := false;
-            ItemSubItem[i - 1] := 'Package missing';
+            ItemSubItem[i - 1] := CustomMessage('MissingPackage');
           end;
   
           // Calculate how many components are selected
@@ -58,7 +58,7 @@ begin
         begin
           // Show custom text if the component is already installed
           if MaintenanceCompsArray[i].isInstalled then
-            ItemSubItem[i - 1] := 'Already installed - ' + FileSizeArray[i - 1].String
+            ItemSubItem[i - 1] := CustomMessage('AlreadyInstalled') + ' - ' + FileSizeArray[i - 1].String
           else if installRadioBtn.Checked then // "Install/Repair" page 
             ItemSubItem[i - 1] := FileSizeArray[i - 1].String;
   
@@ -79,7 +79,7 @@ begin
   if {#DEBUG} then Log('# ' + IntToStr(iTotalCompCount) + ' components selected, with a total size of ' + BytesToString(iTotalCompSize));
 
   // Replace DiskSpaceLabel //-> TODO: Maybe create a new label and hide the old one? 
-  WizardForm.ComponentsDiskSpaceLabel.Caption := 'Current selection requires at least ' + BytesToString(iTotalCompSize) + ' of disk space.';
+  WizardForm.ComponentsDiskSpaceLabel.Caption := FmtMessage(CustomMessage('CurrentSelectionSpace'), [BytesToString(iTotalCompSize)]);
 
   // Show disk space label if components are selected
   if not (iTotalCompCount = 0) then
@@ -243,39 +243,39 @@ var
 begin
   case Index of
     0: begin 
-         Title := 'SH2 Enhancements Module';
-         Description := 'The SH2 Enhancements module provides programming-based fixes and enhancements. This is the "brains" of the project and is required to be installed.';
+         Title := '{#eeModuleName}';
+         Description := CustomMessage('eeModuleDescription');
        end;
     1: begin
-         Title := 'Enhanced Executable';
-         Description := 'This executable provides compatibility with newer Windows operating systems and is required to be installed.';
+         Title := '{#ee_exeName}';
+         Description := CustomMessage('eeExeDescription');
        end;
     2: begin
-         Title := 'Enhanced Edition Essential Files';
-         Description := 'The Enhanced Edition Essential Files provides geometry fixes, camera clipping adjustments, high resolution text, and language/textual improvements for the game.';
+         Title := '{#ee_essentialsName}';
+         Description := CustomMessage('eeEssentialsDescription');
        end;
     3: begin
-         Title := 'Image Enhancement Pack';
-         Description := 'The Image Enhancement Pack provides upscaled, remastered, and remade full screen images.';
+         Title := '{#img_packName}';
+         Description := CustomMessage('img_packDescription');
        end;
     4: begin
-         Title := 'FMV Enhancement Pack';
-         Description := 'The FMV Enhancement Pack provides improved quality of the game''s full motion videos.';
+         Title := '{#fmv_packName}';
+         Description := CustomMessage('fmv_packDescription');
        end;
     5: begin
-         Title := 'Audio Enhancement Pack';
-         Description := 'The Audio Enhancement Pack provides restored quality of the game''s audio files.';
+         Title := '{#audio_pack}';
+         Description := CustomMessage('audio_packDescription');
        end;
     6: begin
-         Title := 'DSOAL';
-         Description := 'DSOAL is a DirectSound DLL replacer that enables surround sound, HRTF, and EAX audio support via OpenAL Soft. This enables 3D positional audio, which restores the sound presentation of the game for a more immersive experience.';
+         Title := '{#dsoalName}';
+         Description := CustomMessage('dsoalDescription');
        end;
     7: begin
-         Title := 'XInput Plus';
-         Description := 'Provides compatibility with modern controllers.';
+         Title := '{#xinput_plusName}';
+         Description := CustomMessage('xinput_plusDescription');
        end;
   else
-    Title := 'Move your mouse over a component to see its description.';
+    Title := CustomMessage('DescriptionTip');
   end;
   CompTitle.Caption := Title;
   CompDescription.Caption := Description;

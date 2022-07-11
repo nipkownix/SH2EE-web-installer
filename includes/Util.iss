@@ -5,6 +5,10 @@ var
   RunListLastChecked: Integer;
   GCS_sh2pcPath: string;
 
+function ShellExecute(hwnd: HWND; lpOperation: string; lpFile: string;
+  lpParameters: string; lpDirectory: string; nShowCmd: Integer): THandle;
+  external 'ShellExecuteW@shell32.dll stdcall';
+
 procedure ExitProcess(uExitCode: Integer);
   external 'ExitProcess@kernel32.dll stdcall';
 

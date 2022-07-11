@@ -3,8 +3,23 @@
 #define INSTALLER_VER  "1.0.5"
 #define DEBUG          "false"
 #define SH2EE_CSV_URL  "http://www.enhanced.townofsilenthill.com/SH2/files/_sh2ee.csv"
-#define HELP_URL       "https://github.com/elishacloud/Silent-Hill-2-Enhancements/issues"
 #define LOCAL_REPO     "E:\Porgrams\git_repos\SH2EE-web-installer\"
+
+#define PROJECT_URL      "http://enhanced.townofsilenthill.com/SH2/"
+#define TROUBLESHOOT_URL "http://enhanced.townofsilenthill.com/SH2/troubleshoot.htm"
+#define HELP_URL         "https://github.com/elishacloud/Silent-Hill-2-Enhancements/issues"
+
+#define eeModuleName      "SH2 Enhancements Module"         
+#define ee_exeName        "Enhanced Executable"             
+#define ee_essentialsName "Enhanced Edition Essential Files"
+#define img_packName      "Image Enhancement Pack"          
+#define fmv_packName      "FMV Enhancement Pack"           
+#define audio_pack        "Audio Enhancement Pack"         
+#define dsoalName         "DSOAL"                                 
+#define xinput_plusName   "XInput Plus"                    
+
+#include "languages/English.iss"
+#include "languages/BrazilianPortuguese.iss"
 
 [Setup]
 AppName=Silent Hill 2: Enhanced Edition
@@ -36,20 +51,24 @@ VersionInfoCompany=nipkow
 VersionInfoDescription=Silent Hill 2: Enhanced Edition Web Installer
 VersionInfoTextVersion={#INSTALLER_VER}
 
+[Languages]
+Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "pt_br"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
+
 [Types]
-Name: full; Description: Full installation (Recommended)
-Name: custom; Description: Custom installation; Flags: iscustom
+Name: full; Description: {cm:installTypeFull}
+Name: custom; Description: {cm:installTypeCustom}; Flags: iscustom
 
 [Components]
 ; *** component name MUST match the component "id" in _sh2ee.csv! ***
-Name: sh2emodule;    Description: SH2 Enhancements Module;          Types: full custom
-Name: ee_exe;        Description: Enhanced Executable;              Types: full custom
-Name: ee_essentials; Description: Enhanced Edition Essential Files; Types: full
-Name: img_pack;      Description: Image Enhancement Pack;           Types: full
-Name: fmv_pack;      Description: FMV Enhancement Pack;             Types: full
-Name: audio_pack;    Description: Audio Enhancement Pack;           Types: full
-Name: dsoal;         Description: DSOAL;                            Types: full
-Name: xinput_plus;   Description: XInput Plus;                      Types: full
+Name: sh2emodule;    Description: {#eeModuleName};      Types: full custom
+Name: ee_exe;        Description: {#ee_exeName};        Types: full custom
+Name: ee_essentials; Description: {#ee_essentialsName}; Types: full
+Name: img_pack;      Description: {#img_packName};      Types: full
+Name: fmv_pack;      Description: {#fmv_packName};      Types: full
+Name: audio_pack;    Description: {#audio_pack};        Types: full
+Name: dsoal;         Description: {#dsoalName};         Types: full
+Name: xinput_plus;   Description: {#xinput_plusName};   Types: full
 
 [Files]
 ; Tools below
@@ -59,39 +78,27 @@ Source: "includes\cmdlinerunner\cmdlinerunner.dll"; Flags: dontcopy
 Source: "includes\BytesToString\BytesToString.dll"; Flags: dontcopy
 Source: "includes\deletefile_util\deletefile_util.exe"; Flags: dontcopy
 Source: "includes\renamefile_util\renamefile_util.exe"; Flags: dontcopy
-//Source: "includes\unshield\unshield.exe"; Flags: dontcopy
 Source: "{srcexe}"; DestDir: "{tmp}"; DestName: "SH2EEsetup.exe"; Flags: external
+Source: "resources\top.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_install.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_update.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_adjust.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_uninstall.bmp"; Flags: dontcopy
-[Icons]
-//Name: "{commondesktop}\Silent Hill 2 Enhanced Edition"; Filename: "{app}\sh2pc.exe"; Tasks: add_desktopicon
-
-[Tasks]
-//Name: add_desktopicon; Description: Create a &Desktop shortcut for the game; GroupDescription: Additional Icons:; Components: sh2emodule
 
 [Run]
-Filename: "{app}\sh2pc.exe"; Description: Start Silent Hill 2 after exiting the Setup Tool; Flags: nowait postinstall skipifsilent unchecked
-Filename: "{app}\SH2EEconfig.exe"; Description: Open the Configuration Tool to adjust project settings for the game; Flags: nowait postinstall skipifsilent unchecked
-
-[CustomMessages]
-HelpButton=Help
+Filename: "{app}\sh2pc.exe"; Description: {cm:StartGameAfterExiting}; Flags: nowait postinstall skipifsilent unchecked
+Filename: "{app}\SH2EEconfig.exe"; Description: {cm:OpenCfgToolAfterExiting}; Flags: nowait postinstall skipifsilent unchecked
 
 [Messages]
-SetupAppTitle = Silent Hill 2: Enhanced Edition Setup Tool
-SetupWindowTitle = Silent Hill 2: Enhanced Edition Setup Tool
-WelcomeLabel1=Silent Hill 2: Enhanced Edition Setup Tool
-StatusExtractFiles=Placing files...
-SelectDirLabel3=Silent Hill 2: Enhanced Edition must be installed in the same folder as Silent Hill 2 PC. Please specify the directory where Silent Hill 2 PC is located.
-WizardSelectComponents=Select Enhancement Packages
-SelectComponentsDesc=Please select which enhancement packages you would like to install.
-SelectComponentsLabel2=Silent Hill 2: Enhanced Edition is comprised of several enhancement packages. Select which enhancement packages you wish to install. For the full, intended experience, install all enhancement packages.
-FinishedHeadingLabel=Installation Complete!
-ExitSetupMessage=Are you sure you want to close the Setup Tool?
+SetupAppTitle    =Silent Hill 2: Enhanced Edition Setup Tool
+SetupWindowTitle =Silent Hill 2: Enhanced Edition Setup Tool
+WelcomeLabel1    =Silent Hill 2: Enhanced Edition Setup Tool
 
 // Seems IDP must be included before [Code]
 #include "includes/innosetup-download-plugin/idp.iss"
+
+// IDP langs must be included after idp.iss
+#include "includes/innosetup-download-plugin/source/unicode/idplang/BrazilianPortuguese.iss"
 
 [Code]
 type
@@ -130,19 +137,23 @@ end;
 
 #include "includes/Extractore.iss"
 #include "includes/Util.iss"
+#include "wpInstallMode.iss"
+#include "LanguageDialog.iss"
+#include "CustomLabels.iss"
 #include "CustomUninstall.iss"
 #include "wpMaintenance.iss"
 #include "CSVparser.iss"
 #include "wpSelectComponents.iss"
 #include "wpExtract.iss"
 #include "SelfUpdate.iss"
-#include "wpInstallMode.iss"
-#include "CustomLabels.iss"
 
 // Runs before anything else
 function InitializeSetup(): Boolean;
 var 
   i: integer;
+  Language: string;
+  csvDownloadSuccess: Boolean;
+  localFilesMissing :Boolean;
 begin
   Result := True;
 
@@ -155,142 +166,181 @@ begin
     // Check if above didn't work
     if GetArrayLength(LocalCompsArray) = 0 then
     begin
-      MsgBox('Error: Parsing Failed' #13#13 'Offline installation detected, but parsing local_sh2ee.dat failed.' #13#13 'The installation cannot continue.', mbCriticalError, MB_OK);
-      Result := False;
-      exit;
-    end;
-
-    // Check if the local files from the local .csv actually exist
-    for i := 0 to GetArrayLength(LocalCompsArray) - 1 do begin
-      if not (LocalCompsArray[i].fileName = 'notDownloaded') and not FileExists(ExpandConstant('{src}\') + LocalCompsArray[i].fileName) then
+      if MsgBox(CustomMessage('LocalCSVParseFailed'), mbConfirmation, MB_YESNO) = IDYES then
       begin
-        MsgBox('Error: Missing Files' #13#13 'Offline installation detected, but one or more files are missing from Setup Tool''s folder.' #13#13 'The installation cannot continue.', mbCriticalError, MB_OK);
+        // Remove local files
+        for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
+          DeleteFile(ExpandConstant('{src}\') + LocalCompsArray[i].fileName);
+  
+        DeleteFile(ExpandConstant('{src}\') + 'local_sh2ee.dat')
+  
+        SetArrayLength(LocalCompsArray, 0);
+      end else
+      begin
+        // User pressed No, so we exit
         Result := False;
         exit;
       end;
     end;
 
-    // Check if this version of the installer should work with the local .csv
+    // Check if the local files from the local .csv actually exist
     for i := 0 to GetArrayLength(LocalCompsArray) - 1 do begin
-      if LocalCompsArray[i].id = 'setup_tool' then
-      begin
-        if not SameText(LocalCompsArray[i].version, ExpandConstant('{#INSTALLER_VER}')) then
-        begin
-          MsgBox('Error: Incompatible Version' #13#13 'This version of the SH2:EE Setup Tool (' + ExpandConstant('{#INSTALLER_VER}') +
-          ') is not the version expected to work with the local files (' + LocalCompsArray[i].version +
-          ').' #13#13 'The installation cannot continue.', mbCriticalError, MB_OK);
-          Result := False;
-          exit;
-        end;
-      end;
+      if not (LocalCompsArray[i].fileName = 'notDownloaded') and not FileExists(ExpandConstant('{src}\') + LocalCompsArray[i].fileName) then
+        localFilesMissing := true;
     end;
 
-    // Guess everything should be fine then
-    localInstallMode := true;
+    // Decide what to do if files are missing
+    if localFilesMissing then
+    begin
+      if MsgBox(CustomMessage('LocalCSVMissingFiles'), mbConfirmation, MB_YESNO) = IDYES then
+      begin
+        // Remove local files
+        for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
+          DeleteFile(ExpandConstant('{src}\') + LocalCompsArray[i].fileName);
+  
+        DeleteFile(ExpandConstant('{src}\') + 'local_sh2ee.dat')
+  
+        SetArrayLength(LocalCompsArray, 0);
+      end else
+      begin
+        // User pressed No, so we exit
+        Result := False;
+        exit;
+      end;
+    end else
+    begin
+      // Check if this version of the installer should work with the local .csv
+      for i := 0 to GetArrayLength(LocalCompsArray) - 1 do begin
+        if LocalCompsArray[i].id = 'setup_tool' then
+        begin
+          if not SameText(LocalCompsArray[i].version, ExpandConstant('{#INSTALLER_VER}')) then
+          begin
+            MsgBox(FmtMessage(CustomMessage('LocalCSVIncompatibleVersion'), [ExpandConstant('{#INSTALLER_VER}'), LocalCompsArray[i].version]), mbCriticalError, MB_OK);
+            Result := False;
+            exit;
+          end;
+        end;
+      end;
+  
+      // Guess everything should be fine then
+      localInstallMode := true;
+    end;
   end;
 
   // localInstallMode doesn't need any of this
   if not localInstallMode then
   begin
     // Store the path to web sh2ee.csv in a global variable
-  if not {#DEBUG} then
-    CSVFilePath := tmp(GetURLFilePart('{#SH2EE_CSV_URL}'))
-  else
-    CSVFilePath := '{#LOCAL_REPO}' + 'testfiles\_sh2ee.csv';
-
-  // Download sh2ee.csv; show an error message and exit the installer if downloading fails
-  if not {#DEBUG} and not idpDownloadFile('{#SH2EE_CSV_URL}', CSVFilePath) then
-  begin
-    if MsgBox('Error: Download Failed' #13#13 'Couldn''t download sh2ee.csv.' #13#13 'The installation cannot continue.' #13#13 'Retry download?', mbConfirmation, MB_YESNO) = IDYES then
-    begin
-      // Try again
-      if not idpDownloadFile('{#SH2EE_CSV_URL}', CSVFilePath) then
-      begin
-        MsgBox('Error: Download Failed' #13#13 'Couldn''t download sh2ee.csv.' #13#13 'The installation cannot continue.', mbCriticalError, MB_OK);
-        Result := False;
-        exit;
-      end;
-    end
+    if not {#DEBUG} then
+      CSVFilePath := tmp(GetURLFilePart('{#SH2EE_CSV_URL}'))
     else
-    begin
-      Result := False;
-      exit;
-    end;
-  end;
-
-  // Create an array of TWebComponentsInfo records from sh2ee.csv and store them in a global variable
-  WebCompsArray := WebCSVToInfoArray(CSVFilePath);
-  // Check if above didn't work
-  if GetArrayLength(WebCompsArray) = 0 then
-  begin
-    MsgBox('Error: Parsing Failed' #13#13 'Couldn''t parse sh2ee.csv.' #13#13 'The installation cannot continue.', mbCriticalError, MB_OK);
-    Result := False;
-    exit;
-  end;
-
-  // Determine weather or not we should be in "maintenance mode"
-  if DirExists(ExpandConstant('{src}\') + 'data') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
-  begin
-    maintenanceMode := True;
-
-      // Create an array of TMaintenanceComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
-      MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
-
-    // Check if above didn't work
-    if GetArrayLength(WebCompsArray) = 0 then
-    begin
-      MsgBox('Error: Parsing Failed' #13#13 'Couldn''t parse SH2EEsetup.dat.' #13#13 'The installation cannot continue.', mbCriticalError, MB_OK);
-      Result := False;
-      exit;
-    end;
-
-    // Update and reload local CSV if array sizes are different
-      if not SamePackedVersion(GetArrayLength(MaintenanceCompsArray), GetArrayLength(WebCompsArray)) then // [2] Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
-    begin
-        UpdateMaintenanceCSV(true);
-        MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
-    end;
-
-    // Update and reload local CSV if the order of ids don't match
-    for i := 0 to GetArrayLength(WebCompsArray) - 1 do
-    begin
-        if not SameText(MaintenanceCompsArray[i].id, WebCompsArray[i].id) then
-          UpdateMaintenanceCSV(true);
-          MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
-    end;
-  end;
-
-  // Enable Update if started with argument
-  if CmdLineParamExists('-update') and maintenanceMode then
-  begin
-    updateMode := True;
-  end;
-
-  // Enable selfUpdate if started with argument
-  if CmdLineParamExists('-selfUpdate') and maintenanceMode then
-  begin
-    selfUpdateMode := True;
-  end;
-
-  // Check if the installer should work correctly with with the current server-side files
-  if not selfUpdateMode then
-  begin
-    for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
-      if WebCompsArray[i].id = 'setup_tool' then
-      begin
-        if not SameText(WebCompsArray[i].version, ExpandConstant('{#INSTALLER_VER}')) then
+      CSVFilePath := '{#LOCAL_REPO}' + 'testfiles\_sh2ee.csv';
+  
+    // Download sh2ee.csv; show an error message and exit the installer if downloading fails
+    if not {#DEBUG} then
+    begin 
+      repeat
+        csvDownloadSuccess := idpDownloadFile('{#SH2EE_CSV_URL}', CSVFilePath);
+        if not csvDownloadSuccess then
         begin
-          if MsgBox('Error: Outdated Version' #13#13 'The SH2:EE Setup Tool must be updated in order to use.' #13#13 'Update the Setup Tool?', mbConfirmation, MB_YESNO) = IDYES then
-          begin
-            selfUpdateMode := True;
-          end else
+          if MsgBox(CustomMessage('WebCSVDownloadError'), mbConfirmation, MB_YESNO) = IDNO then
           begin
             Result := False;
             exit;
+          end;
+        end;
+      until csvDownloadSuccess;
+    end;
+  
+    // Create an array of TWebComponentsInfo records from sh2ee.csv and store them in a global variable
+    WebCompsArray := WebCSVToInfoArray(CSVFilePath);
+    // Check if above didn't work
+    if GetArrayLength(WebCompsArray) = 0 then
+    begin
+      MsgBox(CustomMessage('WebCSVParseFailed'), mbCriticalError, MB_OK);
+      Result := False;
+      exit;
+    end;
+  
+    // Determine weather or not we should be in "maintenance mode"
+    if DirExists(ExpandConstant('{src}\') + 'data') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
+    begin
+      maintenanceMode := True;
+  
+      // Create an array of TMaintenanceComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
+      MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
+  
+      // Check if above didn't work
+      if GetArrayLength(WebCompsArray) = 0 then
+      begin
+        MsgBox(CustomMessage('MaintenanceCSVParseFailed'), mbCriticalError, MB_OK);
+        Result := False;
+        exit;
+      end;
+  
+      // Update and reload local CSV if array sizes are different
+      if not SamePackedVersion(GetArrayLength(MaintenanceCompsArray), GetArrayLength(WebCompsArray)) then // [2] Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
+      begin
+        UpdateMaintenanceCSV(true);
+        MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
+      end;
+  
+      // Update and reload local CSV if the order of ids don't match
+      for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+      begin
+        if not SameText(MaintenanceCompsArray[i].id, WebCompsArray[i].id) then
+          UpdateMaintenanceCSV(true);
+          MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
+      end;
+    end;
+  
+    // Enable Update if started with argument
+    if CmdLineParamExists('-update') and maintenanceMode then
+    begin
+      updateMode := True;
+    end;
+  
+    // Enable selfUpdate if started with argument
+    if CmdLineParamExists('-selfUpdate') and maintenanceMode then
+    begin
+      selfUpdateMode := True;
+    end;
+  
+    // Check if the installer should work correctly with with the current server-side files
+    if not selfUpdateMode then
+    begin
+      for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+        if WebCompsArray[i].id = 'setup_tool' then
+        begin
+          if not SameText(WebCompsArray[i].version, ExpandConstant('{#INSTALLER_VER}')) then
+          begin
+            if MsgBox(CustomMessage('OutdatedSetupTool'), mbConfirmation, MB_YESNO) = IDYES then
+            begin
+              selfUpdateMode := True;
+            end else
+            begin
+              Result := False;
+              exit;
             end;
           end;
         end;
       end;
+    end;
+  end;
+
+  // Show language dialog
+  if not maintenanceMode and not {#DEBUG} then
+  begin
+    Language := ExpandConstant('{param:LANG}');
+    if Language = '' then
+    begin
+      Log('No language specified, showing language dialog');
+      SelectLanguage();
+      Result := False;
+      Exit;
+    end else
+    begin
+      Log('Language specified, proceeding with installation');
     end;
   end;
 end;
@@ -303,33 +353,60 @@ begin
   ShellExec('open', '{#HELP_URL}', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
 end;
 
+// What to do if the user presses the language button
+procedure LanguageButtonClick(Sender: TObject);
+var
+  Language: String;
+begin
+  // Show language dialog
+  if SelectLanguage() then
+    ExitProcess(1);
+end;
+
 procedure InitializeWizard();
 var
-  HelpButton : TButton;
-  DebugLabel : TNewStaticText;
+  HelpButton     : TButton;
+  LanguageButton : TButton;
+  DebugLabel     : TNewStaticText;
   i: integer;
 begin
   if not localInstallMode then
   begin
-  // Compare the lenght of the web CSV array with the installer's component list
-  if not SamePackedVersion(WizardForm.ComponentsList.Items.Count, GetArrayLength(WebCompsArray) - 1) then // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
-  begin
-    MsgBox('Error: Invalid Components List Size' #13#13 'The installer should be updated to handle the new components from sh2ee.csv.', mbCriticalError, MB_OK);
-    Abort;
+    // Compare the lenght of the web CSV array with the installer's component list
+    if not SamePackedVersion(WizardForm.ComponentsList.Items.Count, GetArrayLength(WebCompsArray) - 1) then // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
+    begin
+      MsgBox(CustomMessage('InvalidWebComponentsListSize'), mbCriticalError, MB_OK);
+      Abort;
     end;
   end else
   begin
     // Compare the lenght of the local CSV array with the installer's component list
     if not SamePackedVersion(WizardForm.ComponentsList.Items.Count, GetArrayLength(LocalCompsArray) -1) then 
     begin
-      MsgBox('Error: Invalid Components List Size' #13#13 'The installer should be updated to handle the new components from sh2ee.csv.', mbCriticalError, MB_OK);
-      Abort;
+      if MsgBox(CustomMessage('InvalidLocalComponentsListSize'), mbConfirmation, MB_YESNO) = IDYES then
+      begin
+        // Remove local files
+        for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
+          DeleteFile(ExpandConstant('{src}\') + LocalCompsArray[i].fileName);
+  
+        DeleteFile(ExpandConstant('{src}\') + 'local_sh2ee.dat')
+
+        // Run new instance
+        ShellExecute(0, '', ExpandConstant('{srcexe}'), '', '', SW_SHOW);
+        
+        // Close this instance
+        Abort;
+      end else
+      begin
+        // User pressed No, so we just exit
+        Abort;
+      end;
     end;
   end;
 
-  // Replace some normal labels with RTF equivalents if not in maintenance mode
+  // Replace some default labels with customized ones if not in maintenance mode
   if not maintenanceMode then
-    create_RTFlabels();
+    Replace_Labels();
 
   if not maintenanceMode and not localInstallMode then
     PrepareInstallModePage();
@@ -337,25 +414,25 @@ begin
   // IDP settings
   if not localInstallMode then
   begin
-  idpSetOption('AllowContinue',  '1');
-  idpSetOption('DetailsVisible', '1');
-  idpSetOption('DetailsButton',  '1');
-  idpSetOption('RetryButton',    '1');
-  idpSetOption('UserAgent',      'SH2EE web installer');
-  idpSetOption('InvalidCert',    'ignore');
+    idpSetOption('AllowContinue',  '1');
+    idpSetOption('DetailsVisible', '1');
+    idpSetOption('DetailsButton',  '1');
+    idpSetOption('RetryButton',    '1');
+    idpSetOption('UserAgent',      'SH2EE web installer');
+    idpSetOption('InvalidCert',    'ignore');
   end;
 
   if not localInstallMode then
   begin
-  // Get file sizes from host, exit if we fail for some reason
-  SetArrayLength(FileSizeArray, GetArrayLength(WebCompsArray) - 1);
-  for i := 0 to GetArrayLength(WebCompsArray) - 1 do
-  begin
+    // Get file sizes from host, exit if we fail for some reason
+    SetArrayLength(FileSizeArray, GetArrayLength(WebCompsArray) - 1);
+    for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+    begin
       if not (WebCompsArray[i].id = 'setup_tool') then
       begin
         if not idpGetFileSize(WebCompsArray[i].URL, FileSizeArray[i - 1].Bytes) then
           begin
-            MsgBox('Error: Files unavailable' #13#13 'Failed to query for one or more components.' #13#13 'The installation cannot continue. Please try again, and if the issue persists, report it to the developers.', mbCriticalError, MB_OK);
+            MsgBox(CustomMessage('FailedToQueryComponents'), mbCriticalError, MB_OK);
             ExitProcess(1);
           end;
         FileSizeArray[i - 1].String := BytesToString(FileSizeArray[i - 1].Bytes);
@@ -372,7 +449,7 @@ begin
       begin
         if not (LocalCompsArray[i].fileName = 'notDownloaded') and not FileSize64(ExpandConstant('{src}\') + LocalCompsArray[i].fileName, FileSizeArray[i - 1].Bytes) then
           begin
-            MsgBox('Error: Files unavailable' #13#13 'Failed to query for one or more components.' #13#13 'The installation cannot continue.', mbCriticalError, MB_OK);
+            MsgBox(CustomMessage('FailedToQueryComponents2'), mbCriticalError, MB_OK);
             ExitProcess(1);
           end;
         FileSizeArray[i - 1].String := BytesToString(FileSizeArray[i - 1].Bytes);
@@ -390,7 +467,7 @@ begin
 
   // Start the download after wpReady
   if not localInstallMode then
-  idpDownloadAfter(wpReady);
+    idpDownloadAfter(wpReady);
 
   // "Install/Update/Uninstall", etc
   if maintenanceMode and (not selfUpdateMode) then
@@ -402,7 +479,7 @@ begin
 
   // Create the file extraction page
   if not selfUpdateMode then
-  create_wpExtract();
+    create_wpExtract();
 
   // Force installation of the SH2E module and EE exe if not in maintenance mode
   if not maintenanceMode then
@@ -425,11 +502,29 @@ begin
       Left       := WizardForm.ClientWidth - WizardForm.CancelButton.Left - WizardForm.CancelButton.Width;
       Height     := WizardForm.CancelButton.Height;
       Anchors    := [akLeft, akBottom];
-      Caption    := ExpandConstant('{cm:HelpButton}');
+      Caption    := CustomMessage('HelpButton');
       Cursor     := crHelp;
       Font.Color := clHighlight;
       OnClick    := @HelpButtonClick;
       Parent     := WizardForm;
+  end;
+
+  // Show language button in maintenanceMode
+  if maintenanceMode then
+  begin
+    LanguageButton := TButton.Create(WizardForm);
+    with LanguageButton do
+    begin
+        Top        := WizardForm.CancelButton.Top;
+        Left       := HelpButton.Left + HelpButton.Width + ScaleX(10);
+        Height     := WizardForm.CancelButton.Height;
+        Width      := WizardForm.CancelButton.Width + ScaleX(25);
+        Anchors    := [akLeft, akBottom];
+        Caption    := CustomMessage('LanguageButton');
+        Font.Color := clHighlight;
+        OnClick    := @LanguageButtonClick;
+        Parent     := WizardForm;
+    end;
   end;
 
   // Show "DEBUG ON" text
@@ -439,8 +534,8 @@ begin
     with DebugLabel do
     begin
         Top        := HelpButton.Top + 4;
-        Anchors    := [akLeft, akBottom];
-        Left       := HelpButton.Left + HelpButton.Width + 10;
+        Anchors    := [akRight, akBottom];
+        Left       := WizardForm.BackButton.Left - WizardForm.BackButton.Width;
         Caption    := ExpandConstant('DEBUG ON');
         Font.Style := [fsBold];
         Parent     := WizardForm;
@@ -533,7 +628,7 @@ begin
     // Check if componentes are selected
     if iTotalCompCount = 0 then
     begin
-      MsgBox('Error:' #13#13 'No componentes are selected.', mbInformation, MB_OK);
+      MsgBox(CustomMessage('NoComponentsSelected'), mbInformation, MB_OK);
       Result := False;
       exit;
     end;
@@ -543,21 +638,21 @@ begin
     Log(WizardDirValue);
     if not IsEnoughFreeSpace(WizardDirValue, iRequiredSize) then
     begin
-      MsgBox('Error: Not enough free space!' #13#13 'The installation requires at least double the total size of components (' + BytesToString(iRequiredSize) + ') to be completed safely.' #13#13 'Please free some space and try again.', mbCriticalError, MB_OK);
+      MsgBox(FmtMessage(CustomMessage('NoFreeSpace'), [BytesToString(iRequiredSize)]), mbCriticalError, MB_OK);
       ExitProcess(666);
     end;
 
     // Add files to IDP
     if not localInstallMode then
     begin
-    iTotalCompCount := 0; // Clear list
-    idpClearFiles(); // Make sure idp file list is clean
-    for i := 0 to WizardForm.ComponentsList.Items.Count - 1 do
-    begin
-      if WizardForm.ComponentsList.Checked[i] then
+      iTotalCompCount := 0; // Clear list
+      idpClearFiles(); // Make sure idp file list is clean
+      for i := 0 to WizardForm.ComponentsList.Items.Count - 1 do
       begin
-        iTotalCompCount := iTotalCompCount + 1;
-        idpAddFile(WebCompsArray[i + 1].URL, localDataDir(GetURLFilePart(WebCompsArray[i + 1].URL)));
+        if WizardForm.ComponentsList.Checked[i] then
+        begin
+          iTotalCompCount := iTotalCompCount + 1;
+          idpAddFile(WebCompsArray[i + 1].URL, localDataDir(GetURLFilePart(WebCompsArray[i + 1].URL)));
         end;
       end;
     end;
@@ -571,7 +666,7 @@ begin
   begin
     if not FileExists(AddBackslash(WizardDirValue) + 'sh2pc.exe') or not DirExists(AddBackslash(WizardDirValue) + 'data') then
     begin
-      if MsgBox('The selected folder may not be where Silent Hill 2 PC is located.' #13#13 'Proceed anyway?', mbConfirmation, MB_YESNO) = IDYES then
+      if MsgBox(CustomMessage('GameFilesNotFound'), mbConfirmation, MB_YESNO) = IDYES then
       begin
         Result := True;
         sh2pcFilesWerePresent := False;
@@ -583,7 +678,7 @@ begin
     // Check for the presence of a semicolon in the installation path
     if Pos(';', WizardDirValue) > 0 then
     begin
-      MsgBox('Error: Invalid path detected' #13#13 'The chosen directory name contains a semicolon.' #13#13 'This breaks the game. Please rename the game''s directory before continuing.', mbInformation, MB_OK);
+      MsgBox(CustomMessage('SemicolonInPath'), mbInformation, MB_OK);
       Result := False;
     end;
   end;
@@ -606,10 +701,10 @@ begin
     FileCopy(ExpandConstant('{tmp}\SH2EEsetup.exe'), ExpandConstant('{app}\SH2EEsetup.exe'), false);
 
   // Display Wine message
-  if IsWine then
+  if IsWine and not RegValueExists(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8') then
   begin
     RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8', 'native,builtin');
-    MsgBox('Wine detected' #13#13 'This installation was ran in Wine.' #13#13 'The "d3d8" DLL has automatically been set to "native, builtin" in the Wine configuration options. For more information, see https://wiki.winehq.org/Wine_User%27s_Guide#DLL_Overrides', mbInformation, MB_OK);
+    MsgBox(CustomMessage('WineDetected'), mbInformation, MB_OK);
   end;
 end;
 
@@ -629,57 +724,57 @@ begin
   begin
     // Text adjustments for maintenanceMode
     if maintenanceMode then
+    begin
+      // Hide TypesCombo
+      WizardForm.TypesCombo.Visible := False;
+      WizardForm.IncTopDecHeight(WizardForm.ComponentsList, - (WizardForm.ComponentsList.Top - WizardForm.TypesCombo.Top));
+  
+      // "Install/Repair" page
+      if installRadioBtn.Checked then
       begin
-        // Hide TypesCombo
-        WizardForm.TypesCombo.Visible := False;
-        WizardForm.IncTopDecHeight(WizardForm.ComponentsList, - (WizardForm.ComponentsList.Top - WizardForm.TypesCombo.Top));
+        // Text adjustments
+        WizardForm.PageDescriptionLabel.Caption := CustomMessage('installPageDescriptionLabel');
+        WizardForm.SelectComponentsLabel.Caption := CustomMessage('installSelectComponentsLabel');
+        WizardForm.SelectComponentsLabel.Height := 40; // Default value
+        WizardForm.ComponentsList.Top := 50; // Default value
+        WizardForm.ComponentsList.Height := ScaleY(150);
+  
+        // Update the components title/desc Top pos
+        CompTitle.Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(-40);
+        CompDescription.Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
+      end else if updateRadioBtn.Checked or updateMode then // "Update" page
+      begin
+        // Text adjustments
+        WizardForm.PageDescriptionLabel.Caption := CustomMessage('updatePageDescriptionLabel');   
+        WizardForm.SelectComponentsLabel.Caption := CustomMessage('updateSelectComponentsLabel');
+        WizardForm.SelectComponentsLabel.Height := 20;
+        WizardForm.ComponentsList.Top := 30;
+        WizardForm.ComponentsList.Height := ScaleY(170);
+  
+        // Gotta update the components title/desc Top pos as well
+        CompTitle.Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(-40);
+        CompDescription.Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
+      end;
 
-        // "Install/Repair" page
-        if installRadioBtn.Checked then
+      // ComponentsList adjustments
+      for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+        if not (WebCompsArray[i].id = 'setup_tool') then
         begin
-          // Text adjustments
-          WizardForm.PageDescriptionLabel.Caption := 'Please select which enhancement packages you would like to install or repair.';
-          WizardForm.SelectComponentsLabel.Caption := 'Silent Hill 2: Enhanced Edition is comprised of several enhancement packages. Select which enhancement packages you wish to install. For the full, intended experience, install all enhancement packages.'
-          WizardForm.SelectComponentsLabel.Height := 40; // Default value
-          WizardForm.ComponentsList.Top := 50; // Default value
-          WizardForm.ComponentsList.Height := ScaleY(150);
-
-          // Update the components title/desc Top pos
-          CompTitle.Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(-40);
-          CompDescription.Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
-        end else if updateRadioBtn.Checked or updateMode then // "Update" page
-        begin
-          // Text adjustments
-          WizardForm.PageDescriptionLabel.Caption := 'Please select which enhancement packages you would like to update.'
-          WizardForm.SelectComponentsLabel.Caption := 'Updates will be listed below if available.'
-          WizardForm.SelectComponentsLabel.Height := 20;
-          WizardForm.ComponentsList.Top := 30;
-          WizardForm.ComponentsList.Height := ScaleY(170);
-
-          // Gotta update the components title/desc Top pos as well
-          CompTitle.Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(-40);
-          CompDescription.Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
-        end;
-
-        // ComponentsList adjustments
-        for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
-          if not (WebCompsArray[i].id = 'setup_tool') then
+          with Wizardform.ComponentsList do
           begin
-            with Wizardform.ComponentsList do
+            // Unchecked and enabled by default
+            Checked[i - 1] := false;
+            ItemEnabled[i - 1] := true;
+  
+            if updateRadioBtn.Checked or updateMode then // "Update" page
             begin
-              // Unchecked and enabled by default
-              Checked[i - 1] := false;
-              ItemEnabled[i - 1] := true;
-
-              if updateRadioBtn.Checked or updateMode then // "Update" page
-              begin
               Checked[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].isInstalled);
               ItemEnabled[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].isInstalled);
-              end;
             end;
           end;
         end;
       end;
+    end;
     update_ComponentsList();
   end;
 
@@ -688,7 +783,7 @@ begin
   begin
     WizardForm.RunList.ItemEnabled[0] := False;
     WizardForm.RunList.Checked[0] := False;
-    WizardForm.RunList.ItemCaption[0] := 'Start Silent Hill 2 after exiting the Setup Tool (Unavailable)';
+    WizardForm.RunList.ItemCaption[0] := CustomMessage('StartGameAfterExiting') + ' (' + CustomMessage('UnavailableOption') + ')';
   end;
 
   // Check the run checkbox if the sh2pc files were present when the installation directory was selected, and we're not in maintenance mode
@@ -706,7 +801,7 @@ begin
     if installRadioBtn.Checked then
     begin
       // Change default labels to fit the install action
-      WizardForm.FinishedLabel.Caption := 'The Setup Tool has successfully installed the selected enhancement packages.' #13#13 'Click finish to exit the Setup Tool.';
+      WizardForm.FinishedLabel.Caption := CustomMessage('InstallSuccess');
       WizardForm.RunList.Visible       := true;
       WizardForm.RunList.Checked[0]    := true;
       RunListLastChecked := 0;
@@ -714,8 +809,8 @@ begin
     if updateRadioBtn.Checked then
     begin
       // Change default labels to fit the update action
-      WizardForm.FinishedHeadingLabel.Caption := 'Update complete!';
-      WizardForm.FinishedLabel.Caption        := 'The Setup Tool has successfully updated the selected enhancement packages.' #13#13 'Click finish to exit the Setup Tool.';
+      WizardForm.FinishedHeadingLabel.Caption := CustomMessage('updateFinishedHeadingLabel');
+      WizardForm.FinishedLabel.Caption        := CustomMessage('UpdateSuccess');
       WizardForm.RunList.Visible              := true;
       WizardForm.RunList.Checked[0]           := true;
       RunListLastChecked := 0;
@@ -723,8 +818,8 @@ begin
     if uninstallRadioBtn.Checked then
     begin
       // Change default labels to fit the uninstaller action
-      WizardForm.FinishedHeadingLabel.Caption := 'Uninstallation complete.';
-      WizardForm.FinishedLabel.Caption        := 'The Setup Tool has successfully uninstalled the enhancement packages.' #13#13 'Click finish to exit the Setup Tool.';
+      WizardForm.FinishedHeadingLabel.Caption := CustomMessage('uninstallFinishedHeadingLabel');
+      WizardForm.FinishedLabel.Caption        := CustomMessage('UninstallSuccess');
       // Hide and uncheck the run checkbox when uninstalling
       WizardForm.RunList.Visible    := false;
       WizardForm.RunList.Checked[0] := false;
@@ -744,7 +839,7 @@ begin
     begin
       WizardForm.RunList.ItemEnabled[0] := False;
       WizardForm.RunList.Checked[0] := False;
-      WizardForm.RunList.ItemCaption[0] := 'Start Silent Hill 2 after exiting the Setup Tool (Unavailable)';
+      WizardForm.RunList.ItemCaption[0] := CustomMessage('StartGameAfterExiting') + ' (' + CustomMessage('UnavailableOption') + ')';
     end;
   end;
 end;

@@ -197,11 +197,12 @@ begin
     extractParams := ' -d "' + targetdir + '" x "' + source + '"';
   end;
 
-  if not FileExists(extractTool)
-  then MsgBox('extractTool not found: ' + extractTool, mbError, MB_OK)
-  else if not FileExists(source)
-  then MsgBox('File was not found while trying to unzip: ' + source, mbError, MB_OK)
-  else begin
+  if not FileExists(extractTool) then 
+    MsgBox('extractTool not found: ' + extractTool, mbError, MB_OK)
+  else if not FileExists(source) then 
+    MsgBox('File was not found while trying to unzip: ' + source, mbError, MB_OK)
+  else
+  begin
     ExitCode := -1;
     if ({#DEBUG} and logToListBox) then 
        boxName.Items.Add('Running command: ' + extractTool + extractParams);

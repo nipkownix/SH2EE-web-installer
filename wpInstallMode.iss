@@ -30,10 +30,9 @@ begin
 
     if backupInstallRadioBtn.Checked then
     begin
-      wpSelectBackupDir := CreateInputDirPage(wpInstallMode.ID, 'Select Enhancement Packages Backup Location', 'Where should the backup files be stored?',
-      'The Enhancement Packages be stored in the following folder.'#13#10#13#10 +
-      'To continue, click Next. If you would like to select a different folder, click Browse.',
-      True, 'sh2ee_packages');
+      wpSelectBackupDir := CreateInputDirPage(wpInstallMode.ID, CustomMessage('BackupLocationTitle'),
+        CustomMessage('BackupLocationDesc'), CustomMessage('BackupLocationBrowse'),
+        True, 'sh2ee_packages');
 
       wpSelectBackupDir.Add('');
 
@@ -54,13 +53,13 @@ var
 
 begin
 
-  wpInstallMode := CreateCustomPage(wpLicense, 'Select Installation Mode', 'How should Silent Hill 2: Enhanced Edition be installed?');
+  wpInstallMode := CreateCustomPage(wpLicense, CustomMessage('IstallModeTitle'), CustomMessage('IstallModeDesc'));
 
   normalInstallRadioBtn := TRadioButton.Create(wpInstallMode);
   with normalInstallRadioBtn do
   begin
     Parent     := wpInstallMode.Surface;
-    Caption    := 'Install enhancement packages (recommended)';
+    Caption    := CustomMessage('normalInstallBtn');
     Font.Style := [fsBold];
     Checked    := True;
     Left       := ScaleX(16);
@@ -73,7 +72,7 @@ begin
   with backupInstallRadioBtn do
   begin
     Parent     := wpInstallMode.Surface;
-    Caption    := 'Install and backup enhancement packages';
+    Caption    := CustomMessage('backupInstallBtn');
     Font.Style := [fsBold];
     Checked    := False;
     Left       := normalInstallRadioBtn.Left;
@@ -86,7 +85,7 @@ begin
   with normalInstallLabel do
   begin
     Parent     := wpInstallMode.Surface;
-    Caption    := 'Downloads the enhancement packages to a temporary folder for project installation.';
+    Caption    := CustomMessage('normalInstallLabel');
     Left       := normalInstallRadioBtn.Left + ScaleX(17);
     Top        := normalInstallRadioBtn.Top + ScaleX(22);
     Width      := wpInstallMode.SurfaceWidth - ScaleX(70);
@@ -99,7 +98,7 @@ begin
   with backupInstallLabel do
   begin
     Parent     := wpInstallMode.Surface;
-    Caption    := 'Downloads the enhancement packages to a specified folder as a backup and install the project files.';
+    Caption    := CustomMessage('backupInstallLabel');
     Left       := backupInstallRadioBtn.Left + ScaleX(17);
     Top        := backupInstallRadioBtn.Top + ScaleX(22);
     Width      := wpInstallMode.SurfaceWidth - ScaleX(70);

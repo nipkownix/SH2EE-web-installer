@@ -14,11 +14,11 @@ begin
   if isInstalled then
   begin
     if SameText(OnlineVer, ExistVer) then
-      Result := 'No update available'
+      Result := CustomMessage('NoUpdateAvailable')
     else
-      Result := 'New version available: ' + OnlineVer
+      Result := CustomMessage('NewVersionAvailable') + ': ' + OnlineVer
   end else 
-    Result := 'Not installed'
+    Result := CustomMessage('NotInstalled');
 end;
 
 // Decides whether or not there's an update available for the component
@@ -46,14 +46,14 @@ begin
         ShellExec('', ExpandConstant('{src}\') + 'SH2EEconfig.exe', '', '', SW_SHOW, ewNoWait, intErrorCode)
       else
       begin
-        MsgBox('Error: File not found' #13#13 'Couldn''t find SH2EEconfig.exe', mbCriticalError, MB_OK);
+        MsgBox(CustomMessage('SH2EEconfigNotFound'), mbCriticalError, MB_OK);
         Result := False;
       end;
     end;
 
     if uninstallRadioBtn.Checked then
     begin 
-      if MsgBox('Are you sure you want to completely remove all Silent Hill 2: Enhanced Edition project files?', mbConfirmation, MB_YESNO) = IDNO then
+      if MsgBox(CustomMessage('UninstallConfirm'), mbConfirmation, MB_YESNO) = IDNO then
         Result := False
       else
         doCustomUninstall();
@@ -79,7 +79,7 @@ begin
   ExtractTemporaryFile('icon_adjust.bmp');
   ExtractTemporaryFile('icon_uninstall.bmp');
 
-  wpMaintenance := CreateCustomPage(wpWelcome, 'Silent Hill 2: Enhanced Edition Maintenance Wizard', 'Install, repair, update, or uninstall files.');
+  wpMaintenance := CreateCustomPage(wpWelcome, 'Silent Hill 2: Enhanced Edition Maintenance Wizard', CustomMessage('MaintenanceLabel'));
 
   installBmp := TBitmapImage.Create(wpMaintenance);
   with installBmp do
@@ -153,7 +153,7 @@ begin
   with installRadioBtn do
   begin
     Parent     := wpMaintenance.Surface;
-    Caption    := 'Install or Repair Packages';
+    Caption    := CustomMessage('MaintenanceButtonInstall');
     Font.Style := [fsBold];
     Checked    := False;
     Left       := installBmp.Left + ScaleX(54);
@@ -166,7 +166,7 @@ begin
   with updateRadioBtn do
   begin
     Parent     := wpMaintenance.Surface;
-    Caption    := 'Update Packages';
+    Caption    := CustomMessage('MaintenanceButtonUpdate');
     Font.Style := [fsBold];
     Checked    := True;
     Left       := updateBmp.Left + ScaleX(54);
@@ -179,7 +179,7 @@ begin
   with adjustRadioBtn do
   begin
     Parent     := wpMaintenance.Surface;
-    Caption    := 'Adjust Settings';
+    Caption    := CustomMessage('MaintenanceButtonAdjust');
     Font.Style := [fsBold];
     Checked    := True;
     Left       := adjustBmp.Left + ScaleX(54);
@@ -192,7 +192,7 @@ begin
   with uninstallRadioBtn do
   begin
     Parent     := wpMaintenance.Surface;
-    Caption    := 'Uninstall';
+    Caption    := CustomMessage('MaintenanceButtonUninstall');
     Font.Style := [fsBold];
     Checked    := False;
     Left       := uninstallBmp.Left + ScaleX(54);
@@ -205,7 +205,7 @@ begin
   with installLabel do
   begin
     Parent     := wpMaintenance.Surface;
-    Caption    := 'Install enhancement packages that were not previously installed, or repair broken packages.';
+    Caption    := CustomMessage('MaintenanceLabelInstall');
     Left       := installRadioBtn.Left;
     Top        := installRadioBtn.Top + ScaleX(22);
     Width      := wpMaintenance.SurfaceWidth - ScaleX(70);
@@ -218,7 +218,7 @@ begin
   with updateLabel do
   begin
     Parent     := wpMaintenance.Surface;
-    Caption    := 'Check and download updates for installed enhancement packages.';
+    Caption    := CustomMessage('MaintenanceLabelUpdate');
     Left       := updateRadioBtn.Left;
     Top        := updateRadioBtn.Top + ScaleX(22);
     Width      := wpMaintenance.SurfaceWidth - ScaleX(70);
@@ -231,7 +231,7 @@ begin
   with adjustLabel do
   begin
     Parent     := wpMaintenance.Surface;
-    Caption    := 'Open the Silent Hill 2: Enhanced Edition Configuration Tool to adjust project settings for the game.';
+    Caption    := CustomMessage('MaintenanceLabelAdjust');
     Left       := adjustRadioBtn.Left;
     Top        := adjustRadioBtn.Top + ScaleX(22);
     Width      := wpMaintenance.SurfaceWidth - ScaleX(70);
@@ -244,7 +244,7 @@ begin
   with uninstallLabel do
   begin
     Parent     := wpMaintenance.Surface;
-    Caption    := 'Remove all installed enhancement packages. This only removes the Silent Hill 2: Enhanced Edition project files and does not remove Silent Hill 2 PC files.';
+    Caption    := CustomMessage('MaintenanceLabelUninstall');
     Left       := uninstallRadioBtn.Left;
     Top        := uninstallRadioBtn.Top + ScaleX(22);
     Width      := wpMaintenance.SurfaceWidth - ScaleX(70);
