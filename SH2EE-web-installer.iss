@@ -137,16 +137,18 @@ end;
 
 #include "includes/Extractore.iss"
 #include "includes/Util.iss"
-#include "wpInstallMode.iss"
-#include "LanguageDialog.iss"
-#include "CustomLabels.iss"
+
+
+
 #include "CustomUninstall.iss"
 #include "wpMaintenance.iss"
+#include "LanguageDialog.iss"
+#include "wpInstallMode.iss"
 #include "CSVparser.iss"
 #include "wpSelectComponents.iss"
 #include "wpExtract.iss"
 #include "SelfUpdate.iss"
-
+#include "CustomLabels.iss"
 // Runs before anything else
 function InitializeSetup(): Boolean;
 var 
@@ -355,8 +357,6 @@ end;
 
 // What to do if the user presses the language button
 procedure LanguageButtonClick(Sender: TObject);
-var
-  Language: String;
 begin
   // Show language dialog
   if SelectLanguage() then

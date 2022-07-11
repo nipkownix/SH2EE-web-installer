@@ -18,6 +18,12 @@ pt_br.newWelcomeLabel5 =Clique em Continuar para continuar, ou Cancelar para fec
 pt_br.installTypeFull    =Instalação completa (Recomendado)
 pt_br.installTypeCustom  =Instalação customizada
 
+pt_br.wpExtractTitle  =Extraindo componentes compactados
+pt_br.wpExtractDesc   =Aguarde enquanto o Setup Tool extrai os componentes.
+pt_br.ChecksumCheck   =Checando a integridade dos arquivos...
+pt_br.TotalProgress   =Progresso Total
+pt_br.ExtractingComp  =Extraindo Componente
+
 pt_br.newFinishedLabel              =O Setup Tool instalou com sucesso os pacotes de melhorias selecionados.%nSe você selecionou corretamente a pasta Silent Hill 2 PC no início deste Setup Tool, Silent Hill 2: Enhanced Edition será executado automaticamente na próxima vez que você iniciar o jogo.
 pt_br.UsefulLinksLabel              =Links úteis:
 pt_br.ProjectWebsiteLabelTitle      =Website do Projeto
@@ -38,7 +44,7 @@ pt_br.backupInstallLabel   =Salva os pacotes de melhorias em uma pasta especific
 
 pt_br.BackupLocationTitle  =Selecione a Localização do Backup dos Pacotes de Melhorias
 pt_br.BackupLocationDesc   =Onde o backup deve ser salvo?
-pt_br.BackupLocationBrowse =Por favor, escolha a pasta onde o backup deve ser salvo. Para continuar, clique em Próximo.
+pt_br.BackupLocationBrowse =Por favor, escolha a pasta onde o backup deve ser salvo.%n%nPara continuar, clique em Próximo.
 
 pt_br.DescriptionTip                 =Move o seu mouse sobre um componente para ler a sua descrição.
 pt_br.eeModuleDescription            =O SH2 Enhancements Module fornece correções e aprimoramentos baseados em programação. Este é o "cérebro" do projeto e deve ser instalado.
@@ -95,5 +101,6 @@ pt_br.InvalidWebComponentsListSize   =Erro: Tamanho da lista de componentes inv�
 pt_br.InvalidLocalComponentsListSize =Erro: Tamanho da lista de componentes inválido%n%nO arquivo 'local_sh2ee.dat' pode estar corrompido. Usar o modo de instalação online?
 pt_br.FailedToQueryComponents        =Erro: Arquivos indisponíveis%n%Falha ao consultar um ou mais componentes.%n%nA instalação não pode continuar. Por favor, tente novamente e, se o problema persistir, informe aos desenvolvedores.
 pt_br.FailedToQueryComponents2       =Erro: Arquivos indisponíveis%n%Falha ao consultar um ou mais componentes.%n%nA instalação não pode continuar.
+pt_br.ChecksumMismatch               =Error: Problema na verificação%n%nO arquivo '%1' está corrompido.%n%nA instalação não pode continuar. Por favor, tente novamente e, se o problema persistir, informe aos desenvolvedores.
 pt_br.NoComponentsSelected           =Erro: Nenhum componente foi selecionado.
 pt_br.SemicolonInPath                =Erro: Caminho inválido detectado%n%nO nome da pasta escolhida contém um ponto e vírgula.%n%nIsso causa o mal-funcionamento do jogo. Por favor, renomeie a pasta do jogo antes de continuar.

@@ -55,7 +55,6 @@ procedure ExtractWebCSVFiles();
 var
   i : Integer;
   curFileChecksum : String;
-  filePath : String;
 begin
   if IsWin64 then
     ExtractTemporaryFile('7za_x64.exe')
@@ -70,7 +69,7 @@ begin
       // Check for corrupted files
       if not (WebCompsArray[i].SHA256 = 'notUsed') then
       begin
-        UpdateCurrentComponentName(WebCompsArray[i].name + ' - Checking file integrity...', true); // Update label
+        UpdateCurrentComponentName(WebCompsArray[i].name + ' - ' + CustomMessage('ChecksumCheck'), true); // Update label
   
         curFileChecksum := GetSHA256OfFile(localDataDir(GetURLFilePart(WebCompsArray[i].URL)));
   
@@ -79,7 +78,7 @@ begin
   
         if not SameText(curFileChecksum, WebCompsArray[i].SHA256) then
         begin
-          MsgBox('Error: Checksum mismatch' #13#13 'File "' + GetURLFilePart(WebCompsArray[i].URL) + '" is corrupted.' #13#13 'The installation cannot continue. Please try again, and if the issue persists, report it to the developers.', mbInformation, MB_OK);
+          MsgBox(FmtMessage(CustomMessage('ChecksumMismatch'), [GetURLFilePart(WebCompsArray[i].URL)]), mbInformation, MB_OK);
           doCustomUninstall(); // Try to undo the changes done so far
           ExitProcess(1);
         end;
@@ -229,17 +228,17 @@ var
 begin
   if not localInstallMode then
     // Create wpExtract and show it after the download page
-    wpExtract := CreateCustomPage(IDPForm.Page.ID, 'Extracting compressed components', 'Please wait while Setup extracts components.')
+    wpExtract := CreateCustomPage(IDPForm.Page.ID, CustomMessage('wpExtractTitle'), CustomMessage('wpExtractDesc'))
   else
     // Create wpExtract and show it after the wpReady page
-    wpExtract := CreateCustomPage(wpReady, 'Extracting compressed components', 'Please wait while Setup extracts components.');
+    wpExtract := CreateCustomPage(wpReady, CustomMessage('wpExtractTitle'), CustomMessage('wpExtractDesc'));
 
   // Progress bars
   TotalProgressStaticText := TNewStaticText.Create(wpExtract);
   with TotalProgressStaticText do
   begin
       Parent    := wpExtract.Surface;
-      Caption   := 'Total Progress';
+      Caption   := CustomMessage('TotalProgress');
       Left      := ScaleX(0);
       Top       := ScaleY(0);
       AutoSize  := False;
@@ -281,7 +280,7 @@ begin
   with CurrentComponentStaticText do
   begin
       Parent    := wpExtract.Surface;
-      Caption   := 'Extracting Component';
+      Caption   := CustomMessage('ExtractingComp');
       Left      := ScaleX(0);
       Top       := ScaleY(48);
       Width     := ScaleX(200);

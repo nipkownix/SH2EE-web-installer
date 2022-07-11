@@ -18,6 +18,12 @@ newWelcomeLabel5 =Click Next to continue, or Cancel to exit this Setup Tool.
 installTypeFull    =Full installation (Recommended)
 installTypeCustom  =Custom installation
 
+wpExtractTitle  =Extracting compressed components
+wpExtractDesc   =Please wait while the Setup Tool extracts components.
+ChecksumCheck   =Checking file integrity...
+TotalProgress   =Total Progress
+ExtractingComp  =Extracting Component
+
 newFinishedLabel              =The Setup Tool has successfully installed the selected enhancement packages.%nIf you correctly selected the Silent Hill 2 PC folder at the start of this Setup Tool, Silent Hill 2: Enhanced Edition will automatically run the next time you launch the game.
 UsefulLinksLabel              =Useful links:
 ProjectWebsiteLabelTitle      =Project Website
@@ -95,5 +101,6 @@ InvalidWebComponentsListSize   =Error: Invalid components list size%n%nThe insta
 InvalidLocalComponentsListSize =Error: Invalid components list size%n%nThe file 'local_sh2ee.dat' might be corrupted. Use online installation mode instead?
 FailedToQueryComponents        =Error: Files unavailable%n%nFailed to query for one or more components.%n%nThe installation cannot continue. Please try again, and if the issue persists, report it to the developers.
 FailedToQueryComponents2       =Error: Files unavailable%n%nFailed to query for one or more components.%n%nThe installation cannot continue.
+ChecksumMismatch               =Error: Checksum mismatch%n%nFile '%1' is corrupted.%n%nThe installation cannot continue. Please try again, and if the issue persists, report it to the developers.
 NoComponentsSelected           =Error: No componentes are selected.
 SemicolonInPath                =Error: Invalid path detected%n%nThe chosen directory name contains a semicolon.%n%nThis breaks the game. Please rename the game's directory before continuing.

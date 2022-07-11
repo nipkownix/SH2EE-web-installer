@@ -225,10 +225,10 @@ begin
         SetLength(LogTextAnsi, Res);
         LogText := LeftOver + String(LogTextAnsi);
 
-        if logToListBox = true then 
+        if logToListBox then 
            StrSplitAppendToList(LogText, boxName, LeftOver);
 
-        if logPercentageToProgressBar = true then 
+        if logPercentageToProgressBar then 
            updtExtractionProgressBar(LogText, progressBarName);
       end;
       Sleep(10);

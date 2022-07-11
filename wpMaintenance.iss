@@ -92,8 +92,8 @@ begin
     Left              := ScaleX(16);
     Top               := ScaleY(5);
     Anchors           := [akTop, akLeft];
-    Width             := 38;
-    Height            := 38;
+    Width             := ScaleX(38);
+    Height            := ScaleY(38);
     Parent            := wpMaintenance.Surface;
     Bitmap.LoadFromFile(ExpandConstant('{tmp}\icon_install.bmp'));
   end;
@@ -109,8 +109,8 @@ begin
     Left              := installBmp.Left;
     Top               := installBmp.Top + ScaleY(74);
     Anchors           := [akTop, akLeft];
-    Width             := 38;
-    Height            := 38;
+    Width             := ScaleX(38);
+    Height            := ScaleY(38);
     Parent            := wpMaintenance.Surface;
     Bitmap.LoadFromFile(ExpandConstant('{tmp}\icon_update.bmp'));
   end;
@@ -126,8 +126,8 @@ begin
     Left              := updateBmp.Left;
     Top               := updateBmp.Top + ScaleY(74);
     Anchors           := [akTop, akLeft];
-    Width             := 38;
-    Height            := 38;
+    Width             := ScaleX(38);
+    Height            := ScaleY(38);
     Parent            := wpMaintenance.Surface;
     Bitmap.LoadFromFile(ExpandConstant('{tmp}\icon_adjust.bmp'));
   end;
@@ -143,8 +143,8 @@ begin
     Left              := adjustBmp.Left;
     Top               := adjustBmp.Top + ScaleY(74);
     Anchors           := [akTop, akLeft];
-    Width             := 38;
-    Height            := 38;
+    Width             := ScaleX(38);
+    Height            := ScaleY(38);
     Parent            := wpMaintenance.Surface;
     Bitmap.LoadFromFile(ExpandConstant('{tmp}\icon_uninstall.bmp'));
   end;
