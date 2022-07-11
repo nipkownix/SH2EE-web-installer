@@ -123,23 +123,8 @@ var
   FileSizeArray         : array of TSizeArray;
   sh2pcFilesWerePresent : Boolean;
 
-// Used to detect if the user is using WINE or not
-function LoadLibraryA(lpLibFileName: PAnsiChar): THandle;
-external 'LoadLibraryA@kernel32.dll stdcall';
-function GetProcAddress(Module: THandle; ProcName: PAnsiChar): Longword;
-external 'GetProcAddress@kernel32.dll stdcall';
-function IsWine: boolean;
-var  LibHandle  : THandle;
-begin
-  LibHandle := LoadLibraryA('ntdll.dll');
-  Result:= GetProcAddress(LibHandle, 'wine_get_version')<> 0;
-end;
-
 #include "includes/Extractore.iss"
 #include "includes/Util.iss"
-
-
-
 #include "CustomUninstall.iss"
 #include "wpMaintenance.iss"
 #include "LanguageDialog.iss"
@@ -149,6 +134,7 @@ end;
 #include "wpExtract.iss"
 #include "SelfUpdate.iss"
 #include "CustomLabels.iss"
+
 // Runs before anything else
 function InitializeSetup(): Boolean;
 var 
@@ -330,14 +316,14 @@ begin
     end;
   end;
 
-  // Show language dialog
-  if not maintenanceMode and not {#DEBUG} then
+  // Set language
+  if not {#DEBUG} then
   begin
     Language := ExpandConstant('{param:LANG}');
     if Language = '' then
     begin
-      Log('No language specified, showing language dialog');
-      SelectLanguage();
+      Log('No language specified, calling language func');
+      SelectLanguage(false);
       Result := False;
       Exit;
     end else
@@ -359,7 +345,7 @@ end;
 procedure LanguageButtonClick(Sender: TObject);
 begin
   // Show language dialog
-  if SelectLanguage() then
+  if SelectLanguage(true) then
     ExitProcess(1);
 end;
 

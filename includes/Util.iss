@@ -15,6 +15,18 @@ procedure ExitProcess(uExitCode: Integer);
 function BytesToString(size: Int64): PAnsiChar; 
   external 'BytesToString@files:BytesToString.dll cdecl';
 
+// Used to detect if the user is using WINE or not
+function LoadLibraryA(lpLibFileName: PAnsiChar): THandle;
+external 'LoadLibraryA@kernel32.dll stdcall';
+function GetProcAddress(Module: THandle; ProcName: PAnsiChar): Longword;
+external 'GetProcAddress@kernel32.dll stdcall';
+function IsWine: boolean;
+var  LibHandle  : THandle;
+begin
+  LibHandle := LoadLibraryA('ntdll.dll');
+  Result:= GetProcAddress(LibHandle, 'wine_get_version')<> 0;
+end;
+
 // Determines if there is enough free space on a drive of a specific folder
 function IsEnoughFreeSpace(const Path: string; MinSpace: Int64): Boolean;
 var
