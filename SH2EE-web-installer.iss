@@ -114,6 +114,7 @@ type
   end;
 
 var
+  LanguageButton        : TButton;
   userPackageDataDir    : String;
   maintenanceMode       : Boolean;
   updateMode            : Boolean;
@@ -144,6 +145,21 @@ var
   localFilesMissing :Boolean;
 begin
   Result := True;
+
+  // Determine weather or not we should be in "maintenance mode"
+  if DirExists(ExpandConstant('{src}\') + 'data') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
+    maintenanceMode := True;
+
+  // Set language
+  Language := ExpandConstant('{param:LANG}');
+  if Language = '' then
+  begin
+    Log('No language specified, calling language func');
+    SelectLanguage(false);
+    Result := False;
+    Exit;
+  end else
+    Log('Language specified, proceeding with installation');
 
   // Determine weather or not we should be in local installation mode
   if FileExists(ExpandConstant('{src}\') + 'local_sh2ee.dat') then
@@ -189,6 +205,7 @@ begin
         DeleteFile(ExpandConstant('{src}\') + 'local_sh2ee.dat')
   
         SetArrayLength(LocalCompsArray, 0);
+        maintenanceMode := false; // Make sure this is false
       end else
       begin
         // User pressed No, so we exit
@@ -250,11 +267,9 @@ begin
       exit;
     end;
   
-    // Determine weather or not we should be in "maintenance mode"
-    if DirExists(ExpandConstant('{src}\') + 'data') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
+    // If we are in "maintenance mode"
+    if maintenanceMode then
     begin
-      maintenanceMode := True;
-  
       // Create an array of TMaintenanceComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
       MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
   
@@ -315,22 +330,6 @@ begin
       end;
     end;
   end;
-
-  // Set language
-  if not {#DEBUG} then
-  begin
-    Language := ExpandConstant('{param:LANG}');
-    if Language = '' then
-    begin
-      Log('No language specified, calling language func');
-      SelectLanguage(false);
-      Result := False;
-      Exit;
-    end else
-    begin
-      Log('Language specified, proceeding with installation');
-    end;
-  end;
 end;
 
 // What to do if the user presses the help button
@@ -352,7 +351,6 @@ end;
 procedure InitializeWizard();
 var
   HelpButton     : TButton;
-  LanguageButton : TButton;
   DebugLabel     : TNewStaticText;
   i: integer;
 begin
@@ -705,6 +703,15 @@ var
   sh2pcFilesExist : Boolean;
   i : Integer;
 begin
+  // Only enable the lang button if we're in the main maintenance page
+  if maintenanceMode and not selfUpdateMode then
+  begin
+    if (CurPage = wpMaintenance.ID) then
+      LanguageButton.Enabled := true
+    else
+      LanguageButton.Enabled := false;
+  end;
+
   // Update ComponentsList changes
   if (CurPage = wpSelectComponents) then
   begin
@@ -784,6 +791,13 @@ begin
   begin
     sh2pcFilesExist := DirExists(AddBackslash(WizardDirValue) + 'data');
 
+    // Check run box for updateMode
+    if updateMode then
+    begin
+      WizardForm.RunList.Visible       := true;
+      WizardForm.RunList.Checked[0]    := true;
+      RunListLastChecked := 0;
+    end else
     if installRadioBtn.Checked then
     begin
       // Change default labels to fit the install action
