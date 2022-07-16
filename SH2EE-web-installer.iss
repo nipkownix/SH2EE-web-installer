@@ -692,7 +692,7 @@ begin
     RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'Dinput8', 'native,builtin');
     RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'dsound', 'native,builtin');
     RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'XInput1_3', 'native,builtin');
-    MsgBox('Wine detected' #13#13 'This installation was ran in Wine.' #13#13 'The Silent Hill 2: Enhanced Edition DLLs have automatically been set to "native, builtin" in the Wine configuration options. For more information, see https://wiki.winehq.org/Wine_User%27s_Guide#DLL_Overrides', mbInformation, MB_OK);
+    MsgBox(CustomMessage('WineDetected'), mbInformation, MB_OK);
   end;
 end;
 
