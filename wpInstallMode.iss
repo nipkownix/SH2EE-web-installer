@@ -11,7 +11,7 @@ function wpSelectBackupDir_NextClick(Page: TWizardPage): Boolean;
 begin
     Result := True;
 
-    userPackageDataDir := wpSelectBackupDir.Values[0] + '_' + GetDateTimeString('dd-mm_h.n.ss', #0, #0);
+    userPackageDataDir := wpSelectBackupDir.Values[0] + '_' + GetDateTimeString('yyyy-mm-dd_hh.nn.ss', #0, #0);
 	
 	if not CreateDir(userPackageDataDir) then
 		RaiseException('Failed create backup folder.');
