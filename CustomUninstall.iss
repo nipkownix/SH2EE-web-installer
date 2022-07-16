@@ -42,7 +42,7 @@ begin
     RegDeleteValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'Dinput8');
     RegDeleteValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'dsound');
     RegDeleteValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'XInput1_3');
-  end
+  end;
 
   // Restore the .exe backup if it exists
   if FileExists(path + '\sh2pc.exe.bak') then
