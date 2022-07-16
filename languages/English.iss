@@ -40,11 +40,11 @@ normalInstallBtn     =Install enhancement packages (recommended)
 normalInstallLabel   =Downloads the enhancement packages to a temporary folder for project installation.
 
 backupInstallBtn     =Install and backup enhancement packages
-backupInstallLabel   =Downloads the enhancement packages to a specified folder as a backup and install the project files.%n%nThe backup created will work as an offline installer.
+backupInstallLabel   =Downloads the enhancement packages to a specified folder as a backup and installs the project files.%n%nThe backup created will work as an offline installer.
 
 BackupLocationTitle  =Select Enhancement Packages Backup Location
 BackupLocationDesc   =Where should the backup files be stored?
-BackupLocationBrowse =Please specify the directory where the backup should be stored.%n%nTo continue, click Next.
+BackupLocationBrowse =Please specify the directory where the backup should be stored. It is recommended to choose a directory outside of Silent Hill 2 PC's folder.%n%nTo continue, click Next.
 
 DescriptionTip                 =Move your mouse over a component to see its description.
 eeModuleDescription            =The SH2 Enhancements module provides programming-based fixes and enhancements. This is the "brains" of the project and is required to be installed.
@@ -90,8 +90,8 @@ uninstallFinishedHeadingLabel  =Uninstallation complete.
 UninstallSuccess               =The Setup Tool has successfully uninstalled the enhancement packages.%n%nClick finish to exit the Setup Tool.
 StartGameAfterExiting          =Start Silent Hill 2 after exiting the Setup Tool
 OpenCfgToolAfterExiting        =Open the Configuration Tool to adjust project settings for the game
-LocalCSVParseFailed            =Error: Parsing Failed%n%nOffline installation detected, but parsing 'local_sh2ee.dat' failed.%n%nUse online installation mode instead?.
-LocalCSVMissingFiles           =Error: Missing Files%n%nOffline installation detected, but one or more files are missing from Setup Tool's folder.%n%nUse online installation mode instead?.
+LocalCSVParseFailed            =Error: Parsing Failed%n%nOffline installation detected, but parsing 'local_sh2ee.dat' failed. Offline installation cannot proceed.%n%nUse online installation mode instead?
+LocalCSVMissingFiles           =Error: Missing Files%n%nOffline installation detected, but one or more files are missing from Setup Tool's folder. Offline installation cannot proceed.%n%nUse online installation mode instead?
 LocalCSVIncompatibleVersion    =Error: Incompatible Version%n%nThis version of the SH2:EE Setup Tool (%1) is not the version expected to work with the local files (%2).%n%nThe installation cannot continue.
 WebCSVDownloadError            =Error: Download Failed%n%nCouldn't download 'sh2ee.csv'.%n%nThe installation cannot continue.%n%nRetry download?
 WebCSVParseFailed              =Error: Parsing Failed%n%nCouldn't parse 'sh2ee.csv'.%n%nThe installation cannot continue.

@@ -44,7 +44,7 @@ pt_br.backupInstallLabel   =Salva os pacotes de melhorias em uma pasta especific
 
 pt_br.BackupLocationTitle  =Selecione a Localização do Backup dos Pacotes de Melhorias
 pt_br.BackupLocationDesc   =Onde o backup deve ser salvo?
-pt_br.BackupLocationBrowse =Por favor, escolha a pasta onde o backup deve ser salvo.%n%nPara continuar, clique em Próximo.
+pt_br.BackupLocationBrowse =Por favor, escolha a pasta onde o backup deve ser salvo. É recomendado usar uma pasta que esteja fora da pasta do Silent Hill 2 PC.%n%nPara continuar, clique em Próximo.
 
 pt_br.DescriptionTip                 =Move o seu mouse sobre um componente para ler a sua descrição.
 pt_br.eeModuleDescription            =O SH2 Enhancements Module fornece correções e aprimoramentos baseados em programação. Este é o "cérebro" do projeto e deve ser instalado.
@@ -90,8 +90,8 @@ pt_br.uninstallFinishedHeadingLabel  =Desinstalação completa.
 pt_br.UninstallSuccess               =O Setup Tool desinstalou com êxito os pacotes de melhorias.%n%nClique em Concluir para sair do Setup Tool.
 pt_br.StartGameAfterExiting          =Iniciar Silent Hill 2 depois de fechar o Setup Tool
 pt_br.OpenCfgToolAfterExiting        =Abrir a Ferramenta de Configuração para ajustar as configurações do projeto para o jogo
-pt_br.LocalCSVParseFailed            =Erro: Falha na leitura%n%nInstalação offline detectada, mas houve uma falha na leitura do 'local_sh2ee.dat'.%n%nUsar modo de instalação online?.
-pt_br.LocalCSVMissingFiles           =Erro: Arquivos ausentes%n%nnInstalação off-line detectada, mas um ou mais arquivos estão ausentes na pasta do Setup Tool.%in%nUsar o modo de instalação online?.
+pt_br.LocalCSVParseFailed            =Erro: Falha na leitura%n%nInstalação offline detectada, mas houve uma falha na leitura do 'local_sh2ee.dat'. A instalação cffline não pode continuar.%n%nUsar modo de instalação online?
+pt_br.LocalCSVMissingFiles           =Erro: Arquivos ausentes%n%nnInstalação off-line detectada, mas um ou mais arquivos estão ausentes na pasta do Setup Tool. A instalação cffline não pode continuar.%n%nUsar o modo de instalação online?
 pt_br.LocalCSVIncompatibleVersion    =Erro: Versão incompatível%n%nEsta versão da SH2:EE Setup Tool (%1) não é a versão que se espera que funcione com os arquivos locais (%2).%n%nA instalação não pode continuar.
 pt_br.WebCSVDownloadError            =Erro: Falha no download%n%nNão foi possível baixar 'sh2ee.csv'.%n%nA instalação não pode continuar.%n%nRepetir tentativa de download?
 pt_br.WebCSVParseFailed              =Erro: Falha na leitura%n%nNão foi possível ler 'sh2ee.csv'.%n%nA instalação não pode continuar.
