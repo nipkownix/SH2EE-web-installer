@@ -20,6 +20,7 @@
 
 #include "languages/English.iss"
 #include "languages/BrazilianPortuguese.iss"
+#include "languages/Spanish.iss"
 
 [Setup]
 AppName=Silent Hill 2: Enhanced Edition
@@ -54,6 +55,7 @@ VersionInfoTextVersion={#INSTALLER_VER}
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "pt_br"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
+Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
 
 [Types]
 Name: full; Description: {cm:installTypeFull}
@@ -99,6 +101,7 @@ WelcomeLabel1    =Silent Hill 2: Enhanced Edition Setup Tool
 
 // IDP langs must be included after idp.iss
 #include "includes/innosetup-download-plugin/source/unicode/idplang/BrazilianPortuguese.iss"
+#include "includes/innosetup-download-plugin/source/unicode/idplang/Spanish.iss"
 
 [Code]
 type
