@@ -25,7 +25,7 @@ pt_br.TotalProgress   =Progresso Total
 pt_br.ExtractingComp  =Extraindo Componente
 
 pt_br.newFinishedLabel              =O Setup Tool instalou com sucesso os pacotes de melhorias selecionados.%nSe você selecionou corretamente a pasta Silent Hill 2 PC no início deste Setup Tool, Silent Hill 2: Enhanced Edition será executado automaticamente na próxima vez que você iniciar o jogo.
-pt_br.UsefulLinksLabel              =Links úteis:
+pt_br.UsefulLinksLabel              =Links úteis (em inglês):
 pt_br.ProjectWebsiteLabelTitle      =Website do Projeto
 pt_br.ProjectWebsiteLabelDesc       =Website do projeto Silent Hill 2: Enhanced Edition
 pt_br.TroubleshootingPageLabelTitle =Página de Resolução de Problemas
