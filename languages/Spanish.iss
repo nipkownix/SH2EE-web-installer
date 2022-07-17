@@ -67,6 +67,7 @@ es.NewVersionAvailable            =Versión nueva disponible
 es.NotInstalled                   =Sin instalar
 es.UnavailableOption              =No disponible
 es.SH2EEconfigNotFound            =Error: archivo no encontrado%n%nNo se ha podido encontrar el archivo «SH2EEconfig.exe».
+es.MaintenanceTitle               =placeholder
 es.MaintenanceLabel               =Instala, repara, actualiza o desinstala archivos.
 es.MaintenanceButtonInstall       =Instalar o reparar paquetes
 es.MaintenanceButtonUpdate        =Actualizar paquetes

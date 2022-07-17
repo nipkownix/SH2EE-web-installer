@@ -67,6 +67,7 @@ pt_br.NewVersionAvailable            =Nova versão disponível
 pt_br.NotInstalled                   =Não está instalado
 pt_br.UnavailableOption              =Não disponível
 pt_br.SH2EEconfigNotFound            =Erro: Arquivo não encontrado%n%nNão foi possível encontrar SH2EEconfig.exe
+pt_br.MaintenanceTitle               =Assistente de Manutenção do Silent Hill 2: Enhanced Edition
 pt_br.MaintenanceLabel               =Instale, repare, atualize ou desinstale arquivos.
 pt_br.MaintenanceButtonInstall       =Instalar ou Reparar Pacotes
 pt_br.MaintenanceButtonUpdate        =Atualizar Pacotes

@@ -70,6 +70,7 @@ NewVersionAvailable            =New version available
 NotInstalled                   =Not installed
 UnavailableOption              =Unavailable
 SH2EEconfigNotFound            =Error: File not found%n%nCouldn't find 'SH2EEconfig.exe'
+MaintenanceTitle               =Silent Hill 2: Enhanced Edition Maintenance Wizard
 MaintenanceLabel               =Install, repair, update, or uninstall files.
 MaintenanceButtonInstall       =Install or Repair Packages
 MaintenanceButtonUpdate        =Update Packages
