@@ -43,7 +43,6 @@ DisableDirPage=no
 ShowLanguageDialog=no
 WizardResizable=yes
 SetupIconFile=resources\icon_xp.ico
-LicenseFile=resources\license.rtf
 WizardImageFile=resources\side.bmp
 WizardSmallImageFile=resources\top.bmp
 WizardImageAlphaFormat=premultiplied
@@ -53,9 +52,9 @@ VersionInfoDescription=Silent Hill 2: Enhanced Edition Web Installer
 VersionInfoTextVersion={#INSTALLER_VER}
 
 [Languages]
-Name: "en"; MessagesFile: "compiler:Default.isl"
-Name: "pt_br"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
-Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
+Name: "en"; MessagesFile: "compiler:Default.isl"; LicenseFile: "languages\English-license.rtf"
+Name: "pt_br"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"; LicenseFile: "languages\BrazilianPortuguese-license.rtf"
+Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"; LicenseFile: "languages\Spanish-license.rtf"
 
 [Types]
 Name: full; Description: {cm:installTypeFull}
