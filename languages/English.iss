@@ -6,6 +6,8 @@ SelectDirLabel3         =Silent Hill 2: Enhanced Edition must be installed in th
 WizardSelectComponents  =Select Enhancement Packages
 SelectComponentsDesc    =Please select which enhancement packages you would like to install.
 FinishedHeadingLabel    =Installation Complete!
+; For translators: try to avoid using the same translated word for "Setup" and "Config" tools, as they're the same or nearly the same.
+; Alternative: "Installation Tool".
 ExitSetupMessage        =Are you sure you want to close the Setup Tool?
 
 [CustomMessages]
@@ -49,6 +51,7 @@ BackupLocationBrowse =Please specify the directory where the backup should be st
 DescriptionTip                 =Move your mouse over a component to see its description.
 eeModuleDescription            =The SH2 Enhancements module provides programming-based fixes and enhancements. This is the "brains" of the project and is required to be installed.
 eeExeDescription               =This executable provides compatibility with newer Windows operating systems and is required to be installed.
+; For translators: if your language is French, German, Italian or Spanish, here you can replace "language/textual improvements" with "translation improvements".
 eeEssentialsDescription        =The Enhanced Edition Essential Files provides geometry fixes, camera clipping adjustments, high resolution text, and language/textual improvements for the game.
 img_packDescription            =The Image Enhancement Pack provides upscaled, remastered, and remade full screen images.
 fmv_packDescription            =The FMV Enhancement Pack provides improved quality of the game's full motion videos.
@@ -76,18 +79,19 @@ MaintenanceLabelInstall        =Install enhancement packages that were not previ
 MaintenanceLabelUpdate         =Check and download updates for installed enhancement packages.
 MaintenanceLabelAdjust         =Open the Silent Hill 2: Enhanced Edition Configuration Tool to adjust project settings for the game.
 MaintenanceLabelUninstall      =Remove all installed enhancement packages. This only removes the Silent Hill 2: Enhanced Edition project files and does not remove Silent Hill 2 PC files.
+; For translators: you can find Wine's official translations here: https://gitlab.winehq.org/wine/wine/-/tree/master/po
 WineDetected                   =Wine detected%n%nThis installation was ran in Wine.%n%nThe Silent Hill 2: Enhanced Edition DLLs have automatically been set to "native, builtin" in the Wine configuration options.%n%nFor more information, see https://wiki.winehq.org/Wine_User%27s_Guide#DLL_Overrides
 GameFilesNotFound              =The selected folder may not be where Silent Hill 2 PC is located.%n%nProceed anyway?
 installPageDescriptionLabel    =Please select which enhancement packages you would like to install or repair.
 installSelectComponentsLabel   =Silent Hill 2: Enhanced Edition is comprised of several enhancement packages. Select which enhancement packages you wish to install. For the full, intended experience, install all enhancement packages.
 updatePageDescriptionLabel     =Please select which enhancement packages you would like to update.
 updateSelectComponentsLabel    =Updates will be listed below if available.
-InstallSuccess                 =The Setup Tool has successfully installed the selected enhancement packages.%n%nClick finish to exit the Setup Tool.
+InstallSuccess                 =The Setup Tool has successfully installed the selected enhancement packages.%n%nClick Finish to exit the Setup Tool.
 updateFinishedHeadingLabel     =Update complete!
-UpdateSuccess                  =The Setup Tool has successfully updated the selected enhancement packages.%n%nClick finish to exit the Setup Tool.
+UpdateSuccess                  =The Setup Tool has successfully updated the selected enhancement packages.%n%nClick Finish to exit the Setup Tool.
 UninstallConfirm               =Are you sure you want to completely remove all Silent Hill 2: Enhanced Edition project files?
 uninstallFinishedHeadingLabel  =Uninstallation complete.
-UninstallSuccess               =The Setup Tool has successfully uninstalled the enhancement packages.%n%nClick finish to exit the Setup Tool.
+UninstallSuccess               =The Setup Tool has successfully uninstalled the enhancement packages.%n%nClick Finish to exit the Setup Tool.
 StartGameAfterExiting          =Start Silent Hill 2 after exiting the Setup Tool
 OpenCfgToolAfterExiting        =Open the Configuration Tool to adjust project settings for the game
 LocalCSVParseFailed            =Error: Parsing Failed%n%nOffline installation detected, but parsing 'local_sh2ee.dat' failed. Offline installation cannot proceed.%n%nUse online installation mode instead?
@@ -102,5 +106,5 @@ InvalidLocalComponentsListSize =Error: Invalid components list size%n%nThe file 
 FailedToQueryComponents        =Error: Files unavailable%n%nFailed to query for one or more components.%n%nThe installation cannot continue. Please try again, and if the issue persists, report it to the developers.
 FailedToQueryComponents2       =Error: Files unavailable%n%nFailed to query for one or more components.%n%nThe installation cannot continue.
 ChecksumMismatch               =Error: Checksum mismatch%n%nFile '%1' is corrupted.%n%nThe installation cannot continue. Please try again, and if the issue persists, report it to the developers.
-NoComponentsSelected           =Error: No componentes are selected.
+NoComponentsSelected           =Error: No components were selected.
 SemicolonInPath                =Error: Invalid path detected%n%nThe chosen directory name contains a semicolon.%n%nThis breaks the game. Please rename the game's directory before continuing.
