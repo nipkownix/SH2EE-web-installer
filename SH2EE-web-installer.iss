@@ -650,7 +650,7 @@ begin
   // Check for file presence in WizardDirValue
   if CurPage = wpSelectDir then
   begin
-    if not FileExists(AddBackslash(WizardDirValue) + 'sh2pc.exe') or not DirExists(AddBackslash(WizardDirValue) + 'data') then
+    if not FileExists(AddBackslash(WizardDirValue) + 'data\pic\etc\konami.tex') then
     begin
       if MsgBox(CustomMessage('GameFilesNotFound'), mbConfirmation, MB_YESNO) = IDYES then
       begin
@@ -795,7 +795,7 @@ begin
   // maintenanceMode's wpFinished tweaks
   if (CurPage = wpFinished) and maintenanceMode then
   begin
-    sh2pcFilesExist := DirExists(AddBackslash(WizardDirValue) + 'data');
+    sh2pcFilesExist := FileExists(AddBackslash(WizardDirValue) + 'data\pic\etc\konami.tex');
 
     // Check run box for updateMode
     if updateMode then

@@ -221,7 +221,7 @@ begin
       RegSearch(HKEY_CURRENT_USER, 'System\GameConfigStore');
 
     // Actually choose a path
-    if maintenanceMode then
+    if maintenanceMode or FileExists(ExpandConstant('{src}\') + 'data\pic\etc\konami.tex') then
       InstallationPath := ExpandConstant('{src}\')
     else
     if RegQueryStringValue(HKLM32, 'Software\Konami\Silent Hill 2', 'INSTALLDIR', RetailInstallDir) and FileExists(RetailInstallDir + '\sh2pc.exe') then 
