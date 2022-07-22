@@ -9,14 +9,14 @@
 #define TROUBLESHOOT_URL "http://enhanced.townofsilenthill.com/SH2/troubleshoot.htm"
 #define HELP_URL         "https://github.com/elishacloud/Silent-Hill-2-Enhancements/issues"
 
-#define eeModuleName      "SH2 Enhancements Module"         
-#define ee_exeName        "Enhanced Executable"             
+#define eeModuleName      "SH2 Enhancements Module"
+#define ee_exeName        "Enhanced Executable"
 #define ee_essentialsName "Enhanced Edition Essential Files"
-#define img_packName      "Image Enhancement Pack"          
-#define fmv_packName      "FMV Enhancement Pack"           
-#define audio_pack        "Audio Enhancement Pack"         
-#define dsoalName         "DSOAL"                                 
-#define xinput_plusName   "XInput Plus"                    
+#define img_packName      "Image Enhancement Pack"
+#define fmv_packName      "FMV Enhancement Pack"
+#define audio_pack        "Audio Enhancement Pack"
+#define dsoalName         "DSOAL"
+#define xinput_plusName   "XInput Plus"
 
 #include "languages/English.iss"
 #include "languages/BrazilianPortuguese.iss"
@@ -122,6 +122,7 @@ var
   updateMode            : Boolean;
   selfUpdateMode        : Boolean;
   localInstallMode      : Boolean;
+  Uninstalling          : Boolean;
   CurIniArray           : array of TIniArray;
   FileSizeArray         : array of TSizeArray;
   sh2pcFilesWerePresent : Boolean;
@@ -140,7 +141,7 @@ var
 
 // Runs before anything else
 function InitializeSetup(): Boolean;
-var 
+var
   i: integer;
   Language: string;
   csvDownloadSuccess: Boolean;
@@ -177,9 +178,9 @@ begin
         // Remove local files
         for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
           DeleteFile(ExpandConstant('{src}\') + LocalCompsArray[i].fileName);
-  
+
         DeleteFile(ExpandConstant('{src}\') + 'local_sh2ee.dat')
-  
+
         SetArrayLength(LocalCompsArray, 0);
       end else
       begin
@@ -203,9 +204,9 @@ begin
         // Remove local files
         for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
           DeleteFile(ExpandConstant('{src}\') + LocalCompsArray[i].fileName);
-  
+
         DeleteFile(ExpandConstant('{src}\') + 'local_sh2ee.dat')
-  
+
         SetArrayLength(LocalCompsArray, 0);
         maintenanceMode := false; // Make sure this is false
       end else
@@ -228,7 +229,7 @@ begin
           end;
         end;
       end;
-  
+
       // Guess everything should be fine then
       localInstallMode := true;
     end;
@@ -242,10 +243,10 @@ begin
       CSVFilePath := tmp(GetURLFilePart('{#SH2EE_CSV_URL}'))
     else
       CSVFilePath := '{#LOCAL_REPO}' + 'testfiles\_sh2ee.csv';
-  
+
     // Download sh2ee.csv; show an error message and exit the installer if downloading fails
     if not {#DEBUG} then
-    begin 
+    begin
       repeat
         csvDownloadSuccess := idpDownloadFile('{#SH2EE_CSV_URL}', CSVFilePath);
         if not csvDownloadSuccess then
@@ -258,7 +259,7 @@ begin
         end;
       until csvDownloadSuccess;
     end;
-  
+
     // Create an array of TWebComponentsInfo records from sh2ee.csv and store them in a global variable
     WebCompsArray := WebCSVToInfoArray(CSVFilePath);
     // Check if above didn't work
@@ -268,13 +269,13 @@ begin
       Result := False;
       exit;
     end;
-  
+
     // If we are in "maintenance mode"
     if maintenanceMode then
     begin
       // Create an array of TMaintenanceComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
       MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
-  
+
       // Check if above didn't work
       if GetArrayLength(WebCompsArray) = 0 then
       begin
@@ -282,14 +283,14 @@ begin
         Result := False;
         exit;
       end;
-  
+
       // Update and reload local CSV if array sizes are different
       if not SamePackedVersion(GetArrayLength(MaintenanceCompsArray), GetArrayLength(WebCompsArray)) then // [2] Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
       begin
         UpdateMaintenanceCSV(true);
         MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
       end;
-  
+
       // Update and reload local CSV if the order of ids don't match
       for i := 0 to GetArrayLength(WebCompsArray) - 1 do
       begin
@@ -298,19 +299,19 @@ begin
           MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
       end;
     end;
-  
+
     // Enable Update if started with argument
     if CmdLineParamExists('-update') and maintenanceMode then
     begin
       updateMode := True;
     end;
-  
+
     // Enable selfUpdate if started with argument
     if CmdLineParamExists('-selfUpdate') and maintenanceMode then
     begin
       selfUpdateMode := True;
     end;
-  
+
     // Check if the installer should work correctly with with the current server-side files
     if not selfUpdateMode then
     begin
@@ -367,19 +368,19 @@ begin
   end else
   begin
     // Compare the lenght of the local CSV array with the installer's component list
-    if not SamePackedVersion(WizardForm.ComponentsList.Items.Count, GetArrayLength(LocalCompsArray) -1) then 
+    if not SamePackedVersion(WizardForm.ComponentsList.Items.Count, GetArrayLength(LocalCompsArray) -1) then
     begin
       if MsgBox(CustomMessage('InvalidLocalComponentsListSize'), mbConfirmation, MB_YESNO) = IDYES then
       begin
         // Remove local files
         for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
           DeleteFile(ExpandConstant('{src}\') + LocalCompsArray[i].fileName);
-  
+
         DeleteFile(ExpandConstant('{src}\') + 'local_sh2ee.dat')
 
         // Run new instance
         ShellExecute(0, '', ExpandConstant('{srcexe}'), '', '', SW_SHOW);
-        
+
         // Close this instance
         Abort;
       end else
@@ -448,7 +449,7 @@ begin
   WizardForm.RunList.OnClickCheck := @RunListClickCheck;
   RunListLastChecked := -1;
 
-  // Customize the default SelectComponents 
+  // Customize the default SelectComponents
   customize_wpSelectComponents();
 
   // Start the download after wpReady
@@ -686,8 +687,12 @@ begin
   if not (DirExists(ExpandConstant('{src}\') + 'data') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat')) then
     FileCopy(ExpandConstant('{tmp}\SH2EEsetup.exe'), ExpandConstant('{app}\SH2EEsetup.exe'), false);
 
-  // Display Wine message
-  if IsWine and not RegValueExists(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8') then
+  // Display Wine message when not uninstalling
+  if maintenanceMode and not selfUpdateMode then
+  begin
+    Uninstalling := True;
+  end;
+  if (IsWine) and not (Uninstalling) and not (RegValueExists(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8')) then
   begin
     RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8', 'native,builtin');
     RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'Dinput', 'native,builtin');
@@ -727,7 +732,7 @@ begin
       // Hide TypesCombo
       WizardForm.TypesCombo.Visible := False;
       WizardForm.IncTopDecHeight(WizardForm.ComponentsList, - (WizardForm.ComponentsList.Top - WizardForm.TypesCombo.Top));
-  
+
       // "Install/Repair" page
       if installRadioBtn.Checked then
       begin
@@ -737,19 +742,19 @@ begin
         WizardForm.SelectComponentsLabel.Height := 40; // Default value
         WizardForm.ComponentsList.Top := 50; // Default value
         WizardForm.ComponentsList.Height := ScaleY(150);
-  
+
         // Update the components title/desc Top pos
         CompTitle.Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(-40);
         CompDescription.Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
       end else if updateRadioBtn.Checked or updateMode then // "Update" page
       begin
         // Text adjustments
-        WizardForm.PageDescriptionLabel.Caption := CustomMessage('updatePageDescriptionLabel');   
+        WizardForm.PageDescriptionLabel.Caption := CustomMessage('updatePageDescriptionLabel');
         WizardForm.SelectComponentsLabel.Caption := CustomMessage('updateSelectComponentsLabel');
         WizardForm.SelectComponentsLabel.Height := 20;
         WizardForm.ComponentsList.Top := 30;
         WizardForm.ComponentsList.Height := ScaleY(170);
-  
+
         // Gotta update the components title/desc Top pos as well
         CompTitle.Top := WizardForm.ComponentsList.Top + WizardForm.ComponentsList.Height - CompTitle.Height - ScaleY(-40);
         CompDescription.Top := CompTitle.Top + CompTitle.Height - ScaleY(20);
@@ -764,7 +769,7 @@ begin
             // Unchecked and enabled by default
             Checked[i - 1] := false;
             ItemEnabled[i - 1] := true;
-  
+
             if updateRadioBtn.Checked or updateMode then // "Update" page
             begin
               Checked[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].isInstalled);
