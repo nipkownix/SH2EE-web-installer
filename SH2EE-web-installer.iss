@@ -689,9 +689,9 @@ begin
 
   // Display Wine message when not uninstalling
   if maintenanceMode and not selfUpdateMode then
-  begin
+    if uninstallRadioBtn.Checked then
     Uninstalling := True;
-  end;
+
   if (IsWine) and not (Uninstalling) and not (RegValueExists(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8')) then
   begin
     RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8', 'native,builtin');
