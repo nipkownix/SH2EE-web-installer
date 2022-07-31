@@ -1,5 +1,5 @@
 
-This is a web installer for [Silent Hill 2: Enhanced Edition](http://www.enhanced.townofsilenthill.com/SH2/), originally created for learning purposes only, and later becoming an actual component of the project.
+This is a web installer for [Silent Hill 2: Enhanced Edition](http://enhanced.townofsilenthill.com/SH2/), originally created for learning purposes only, and later becoming an actual component of the project.
 
 The source code is here for archival and reference purposes.
 

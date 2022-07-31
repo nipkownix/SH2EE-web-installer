@@ -25,8 +25,6 @@ begin
   DeleteFile(path + '\Dinput8.dll');
   DeleteFile(path + '\dsoal-aldrv.dll');
   DeleteFile(path + '\dsound.dll');
-  DeleteFile(path + '\keyconf.dat');
-  DeleteFile(path + '\local.fix');
   DeleteFile(path + '\SH2EEsetup.dat');
   DeleteFile(path + '\SH2EEconfig.exe');
   DeleteFile(path + '\SH2EEconfig.xml');
