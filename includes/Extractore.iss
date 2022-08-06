@@ -185,19 +185,19 @@ begin
   if extractTool = '7zip' then 
   begin
     if IsWin64 then
-      extractTool := ExpandConstant('{tmp}\7za_x64.exe')
+      extractTool := '"' + ExpandConstant('{tmp}\7za_x64.exe') + '"'
     else
-      extractTool := ExpandConstant('{tmp}\7za_x86.exe');
+      extractTool := '"' + ExpandConstant('{tmp}\7za_x86.exe') + '"';
     extractParams := ' x -sopg -ba "' + source + '" -o"' + targetdir + '" -y'; // -sopg isn't part of the official 7za.exe build. See: https://stackoverflow.com/a/40931992/16421617
   end
   else
   if extractTool = 'unshield' then
   begin
-    extractTool := ExpandConstant('{tmp}\unshield.exe');
+    extractTool := '"' + ExpandConstant('{tmp}\unshield.exe') + '"';
     extractParams := ' -d "' + targetdir + '" x "' + source + '"';
   end;
 
-  if not FileExists(extractTool) then 
+  if not FileExists(RemoveQuotes(extractTool)) then 
     MsgBox('extractTool not found: ' + extractTool, mbError, MB_OK)
   else if not FileExists(source) then 
     MsgBox('File was not found while trying to unzip: ' + source, mbError, MB_OK)
