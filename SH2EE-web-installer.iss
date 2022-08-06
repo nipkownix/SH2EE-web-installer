@@ -127,9 +127,9 @@ var
   FileSizeArray         : array of TSizeArray;
   sh2pcFilesWerePresent : Boolean;
 
-#include "includes/Extractore.iss"
 #include "includes/Util.iss"
 #include "CustomUninstall.iss"
+#include "includes/Extractore.iss"
 #include "wpMaintenance.iss"
 #include "LanguageDialog.iss"
 #include "wpInstallMode.iss"

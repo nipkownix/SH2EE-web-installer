@@ -127,7 +127,7 @@ end;
 procedure StrSplitAppendToList(Text: AnsiString; boxName: TNewListBox; var LastLine: String);
 var
   pCR, pLF, Len: Integer;
-  Tmp: String;
+  Tempr: String;
   ReplaceLastLine: Boolean;
 begin
   if Length(LastLine) > 0 then
@@ -142,10 +142,10 @@ begin
     if (pLF > 0) and ((pCR = 0) or (pLF < pCR) or (pLF = pCR + 1)) then
     begin
       if pLF < pCR then
-        Tmp := Copy(Text, 1, pLF - 1)
+        Tempr := Copy(Text, 1, pLF - 1)
       else
-        Tmp := Copy(Text, 1, pLF - 2);
-      StringsAddLine(boxName, Tmp, ReplaceLastLine);
+        Tempr := Copy(Text, 1, pLF - 2);
+      StringsAddLine(boxName, Tempr, ReplaceLastLine);
       Text := Copy(Text, pLF + 1, Len)
     end else begin
       if (pCR = Len) or (pCR = 0) then
@@ -211,7 +211,11 @@ begin
     if extProcHandle = 0 then
     begin
       Log('ProcStart failed');
+
+      MsgBox(CustomMessage('ExtractionFailed'), mbInformation, MB_OK);
+      doCustomUninstall(); // Try to undo the changes done so far
       ExitCode := -2;
+      ExitProcess(1);
     end;
     while (ExitCode = -1) do
     begin
