@@ -107,5 +107,6 @@ InvalidLocalComponentsListSize =Errore: Dimensione lista componenti non valida%n
 FailedToQueryComponents        =Errore: File non disponibili%n%nLa richiesta di uno o più componenti è fallita.%n%nImpossibile continuare con l'installazione. Vi preghiamo di riprovare e, se il problema persiste, di segnalarlo agli sviluppatori.
 FailedToQueryComponents2       =Errore: File non disponibili%n%nLa richiesta di uno o più componenti è fallita.%n%nImpossibile continuare con l'installazione.
 ChecksumMismatch               =Errore: Il checksum non corrisponde%n%nIl file '%1' è danneggiato.%n%nImpossibile continuare con l'installazione. Vi preghiamo di riprovare e, se il problema persiste, di segnalarlo agli sviluppatori.
+ExtractionFailed               =Errore: Avvio dell'estrazione non riuscito.%n%nImpossibile continuare con l'installazione.
 NoComponentsSelected           =Errore: Nessun componente selezionato.
 SemicolonInPath                =Errore: Rilevato percorso errato%n%nIl percorso selezionato contiene un punto e virgola.%n%nCiò crea problemi al gioco. Per favore, rinomina il percorso del gioco prima di continuare.
