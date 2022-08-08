@@ -107,5 +107,6 @@ InvalidLocalComponentsListSize =Error: Invalid components list size%n%nThe file 
 FailedToQueryComponents        =Error: Files unavailable%n%nFailed to query for one or more components.%n%nThe installation cannot continue. Please try again, and if the issue persists, report it to the developers.
 FailedToQueryComponents2       =Error: Files unavailable%n%nFailed to query for one or more components.%n%nThe installation cannot continue.
 ChecksumMismatch               =Error: Checksum mismatch%n%nFile '%1' is corrupted.%n%nThe installation cannot continue. Please try again, and if the issue persists, report it to the developers.
+ExtractionFailed               =Error: Failed to start the extraction.%n%nThe installation cannot continue.
 NoComponentsSelected           =Error: No components were selected.
 SemicolonInPath                =Error: Invalid path detected%n%nThe chosen directory name contains a semicolon.%n%nThis breaks the game. Please rename the game's directory before continuing.

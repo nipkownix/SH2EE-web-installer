@@ -127,7 +127,7 @@ end;
 procedure StrSplitAppendToList(Text: AnsiString; boxName: TNewListBox; var LastLine: String);
 var
   pCR, pLF, Len: Integer;
-  Tmp: String;
+  Tempr: String;
   ReplaceLastLine: Boolean;
 begin
   if Length(LastLine) > 0 then
@@ -142,10 +142,10 @@ begin
     if (pLF > 0) and ((pCR = 0) or (pLF < pCR) or (pLF = pCR + 1)) then
     begin
       if pLF < pCR then
-        Tmp := Copy(Text, 1, pLF - 1)
+        Tempr := Copy(Text, 1, pLF - 1)
       else
-        Tmp := Copy(Text, 1, pLF - 2);
-      StringsAddLine(boxName, Tmp, ReplaceLastLine);
+        Tempr := Copy(Text, 1, pLF - 2);
+      StringsAddLine(boxName, Tempr, ReplaceLastLine);
       Text := Copy(Text, pLF + 1, Len)
     end else begin
       if (pCR = Len) or (pCR = 0) then
@@ -185,19 +185,19 @@ begin
   if extractTool = '7zip' then 
   begin
     if IsWin64 then
-      extractTool := ExpandConstant('{tmp}\7za_x64.exe')
+      extractTool := '"' + ExpandConstant('{tmp}\7za_x64.exe') + '"'
     else
-      extractTool := ExpandConstant('{tmp}\7za_x86.exe');
+      extractTool := '"' + ExpandConstant('{tmp}\7za_x86.exe') + '"';
     extractParams := ' x -sopg -ba "' + source + '" -o"' + targetdir + '" -y'; // -sopg isn't part of the official 7za.exe build. See: https://stackoverflow.com/a/40931992/16421617
   end
   else
   if extractTool = 'unshield' then
   begin
-    extractTool := ExpandConstant('{tmp}\unshield.exe');
+    extractTool := '"' + ExpandConstant('{tmp}\unshield.exe') + '"';
     extractParams := ' -d "' + targetdir + '" x "' + source + '"';
   end;
 
-  if not FileExists(extractTool) then 
+  if not FileExists(RemoveQuotes(extractTool)) then 
     MsgBox('extractTool not found: ' + extractTool, mbError, MB_OK)
   else if not FileExists(source) then 
     MsgBox('File was not found while trying to unzip: ' + source, mbError, MB_OK)
@@ -211,7 +211,11 @@ begin
     if extProcHandle = 0 then
     begin
       Log('ProcStart failed');
+
+      MsgBox(CustomMessage('ExtractionFailed'), mbInformation, MB_OK);
+      doCustomUninstall(); // Try to undo the changes done so far
       ExitCode := -2;
+      ExitProcess(1);
     end;
     while (ExitCode = -1) do
     begin
