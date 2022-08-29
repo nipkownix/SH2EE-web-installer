@@ -2,11 +2,11 @@
 
 #define INSTALLER_VER  "1.0.5"
 #define DEBUG          "false"
-#define SH2EE_CSV_URL  "http://files.townofsilenthill.com/SH2EE/_sh2ee.csv"
+#define SH2EE_CSV_URL  "https://files.townofsilenthill.com/SH2EE/_sh2ee.csv"
 #define LOCAL_REPO     "E:\Porgrams\git_repos\SH2EE-web-installer\"
 
-#define PROJECT_URL      "http://enhanced.townofsilenthill.com/SH2/"
-#define TROUBLESHOOT_URL "http://enhanced.townofsilenthill.com/SH2/troubleshoot.htm"
+#define PROJECT_URL      "https://enhanced.townofsilenthill.com/SH2/"
+#define TROUBLESHOOT_URL "https://enhanced.townofsilenthill.com/SH2/troubleshoot.htm"
 #define HELP_URL         "https://github.com/elishacloud/Silent-Hill-2-Enhancements/issues"
 
 #define eeModuleName      "SH2 Enhancements Module"
