@@ -104,6 +104,6 @@ es.InvalidLocalComponentsListSize =Error: tamaño no válido de la lista de comp
 es.FailedToQueryComponents        =Error: archivos no disponibles%n%nError al solicitar uno o más componentes.%n%nLa instalación no puede continuar. Vuelve a intentarlo y, si el problema persiste, avisa a los desarrolladores.
 es.FailedToQueryComponents2       =Error: archivos no disponibles%n%nError al solicitar uno o más componentes.%n%nLa instalación no puede continuar.
 es.ChecksumMismatch               =Error: suma de comprobación incorrecta%n%nEl archivo «%1» está dañado.%n%nLa instalación no puede continuar. Vuelve a intentarlo y, si el problema persiste, avisa a los desarrolladores.
-es.ExtractionFailed               =Error: Error al iniciar la extracción.%n%nLa instalación no puede continuar.
+es.ExtractionFailed               =Error: error al iniciar la extracción.%n%nLa instalación no puede continuar.
 es.NoComponentsSelected           =Error: no se seleccionó ningún componente.
 es.SemicolonInPath                =Error: ruta no válida detectada%n%nEl nombre del directorio seleccionado contiene un punto y coma (;).%n%nEsto inutilizará el juego. Cambia el nombre del directorio del juego antes de continuar.
