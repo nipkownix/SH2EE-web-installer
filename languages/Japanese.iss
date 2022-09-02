@@ -1,4 +1,4 @@
-; Spanish translation by toraMeeKay
+﻿; Japanese translation by toraMeeKay
 #define japanese_lang_name  "Japanese (日本語)"
 
 [Messages]

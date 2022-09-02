@@ -22,6 +22,7 @@
 #include "languages/BrazilianPortuguese.iss"
 #include "languages/Spanish.iss"
 #include "languages/Italian.iss"
+#include "languages/Japanese.iss"
 
 [Setup]
 AppName=Silent Hill 2: Enhanced Edition
