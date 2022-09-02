@@ -63,6 +63,7 @@ begin
     Languages.Add('pt_br={#brazilianPortuguese_lang_name}');
     Languages.Add('es={#spanish_lang_name}');
     Languages.Add('it={#italian_lang_name}');
+    Languages.Add('jp={#japanese_lang_name}');
   
     LanguageForm := CreateCustomForm;
     with LanguageForm do

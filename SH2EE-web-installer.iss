@@ -57,6 +57,7 @@ Name: "en"; MessagesFile: "compiler:Default.isl"; LicenseFile: "languages\Englis
 Name: "pt_br"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"; LicenseFile: "languages\BrazilianPortuguese-license.rtf"
 Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"; LicenseFile: "languages\Spanish-license.rtf"
 Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"; LicenseFile: "languages\Italian-license.rtf"
+Name: "jp"; MessagesFile: "compiler:Languages\Japanese.isl"; LicenseFile: "languages\Japanese-license.rtf"
 
 [Types]
 Name: full; Description: {cm:installTypeFull}
