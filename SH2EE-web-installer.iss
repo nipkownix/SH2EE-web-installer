@@ -312,9 +312,10 @@ begin
     end;
 
     // Enable selfUpdate if started with argument
-    if CmdLineParamExists('-selfUpdate') and maintenanceMode then
+    if CmdLineParamExists('-selfUpdate') then
     begin
       selfUpdateMode := True;
+      maintenanceMode := True;
     end;
 
     // Check if the installer should work correctly with with the current server-side files
@@ -328,6 +329,7 @@ begin
             if MsgBox(CustomMessage('OutdatedSetupTool'), mbConfirmation, MB_YESNO) = IDYES then
             begin
               selfUpdateMode := True;
+              maintenanceMode := True;
             end else
             begin
               Result := False;

@@ -14,7 +14,7 @@ begin
   ExtractTemporaryFile('renamefile_util.exe');
 
   // Add file to IDP list
-  idpAddFile(WebCompsArray[0].URL, tmp(GetURLFilePart(WebCompsArray[0].URL)));
+  idpAddFile(WebCompsArray[0].URL, tmp('SH2EEsetup_new.exe'));
 
   // The "Retry" button sometimes bugs out in this page, for some reason. Best to just disable it.
   idpSetOption('RetryButton', '0');
@@ -51,18 +51,22 @@ begin
       end;
   end;
 
-  // Copy installer to game folder
-  if not FileCopy(tmp(GetURLFilePart(WebCompsArray[0].URL)), ExpandConstant('{src}\SH2EEsetup_new.exe'), false) then
-    RaiseException('Failed to copy installer to folder.')
-  else
-    UpdateMaintenanceCSV(false);
+  // Copy installer to orig folder
+  if not FileCopy(tmp('SH2EEsetup_new.exe'), ExpandConstant('{src}\SH2EEsetup_new.exe'), false) then
+    RaiseException('Failed to copy installer to folder.');
 
-  // Check if there's an update available for any component
-  for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
-    if not (WebCompsArray[i].id = 'setup_tool') then
-    begin
-      if isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].isInstalled) then
-        ShouldUpdateComps := True;
+  // Do stuff if we're selfUpdating from an existing install
+  if DirExists(ExpandConstant('{src}\') + 'data') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
+  begin
+    UpdateMaintenanceCSV(false);
+  
+    // Check if there's an update available for any component
+    for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+      if not (WebCompsArray[i].id = 'setup_tool') then
+      begin
+        if isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].isInstalled) then
+          ShouldUpdateComps := True;
+      end;
     end;
   end;
 
