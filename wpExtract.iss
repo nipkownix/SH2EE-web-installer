@@ -87,14 +87,20 @@ begin
       // Update label after integrity check
       UpdateCurrentComponentName(WebCompsArray[i].name, false);
 
-      // Backup custom .ini settings if we are in maintenance mode
+      // Custom actions for sh2emodule before extraction
       if WebCompsArray[i].id = 'sh2emodule' then
       begin
         if maintenanceMode and FileExists(WizardDirValue + '\d3d8.ini') then
         begin 
-          // Store current .ini settings into an array
+          // Backup current .ini settings into an array
           CurIniArray := IniToSettingsArray(WizardDirValue + '\d3d8.ini');
           if {#DEBUG} then Log('# Backed up d3d8.ini settings');
+
+          // Try to delete old/unused sh2ee project files
+          DeleteFile(WizardDirValue + '\d3d8.res');
+          DeleteFile(WizardDirValue + '\d3d8.dat');
+          DeleteFile(WizardDirValue + '\D3DCompiler_43.dll');
+          DeleteFile(WizardDirValue + '\D3DX9_43.dll');
         end;
       end;
   
