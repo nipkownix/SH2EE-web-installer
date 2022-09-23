@@ -1,6 +1,6 @@
 ; -- SH2EE Web Installer --
 
-#define INSTALLER_VER  "1.0.5"
+#define INSTALLER_VER  "1.1.0"
 #define DEBUG          "false"
 #define SH2EE_CSV_URL  "https://files.townofsilenthill.com/SH2EE/_sh2ee.csv"
 #define LOCAL_REPO     "E:\Porgrams\git_repos\SH2EE-web-installer\"
