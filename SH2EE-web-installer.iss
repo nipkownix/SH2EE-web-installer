@@ -1,9 +1,10 @@
 ; -- SH2EE Web Installer --
 
 #define INSTALLER_VER  "1.1.0"
-#define DEBUG          "false"
+#define DEBUG          "true"
 #define SH2EE_CSV_URL  "https://files.townofsilenthill.com/SH2EE/_sh2ee.csv"
-#define LOCAL_REPO     "E:\Porgrams\git_repos\SH2EE-web-installer\"
+
+//#define LOCAL_CSV      "E:\Porgrams\git_repos\SH2EE-web-installer\test\_sh2ee.csv"
 
 #define PROJECT_URL      "https://enhanced.townofsilenthill.com/SH2/"
 #define TROUBLESHOOT_URL "https://enhanced.townofsilenthill.com/SH2/troubleshoot.htm"
@@ -246,13 +247,14 @@ begin
   if not localInstallMode then
   begin
     // Store the path to web sh2ee.csv in a global variable
-    if not {#DEBUG} then
       CSVFilePath := tmp(GetURLFilePart('{#SH2EE_CSV_URL}'))
-    else
-      CSVFilePath := '{#LOCAL_REPO}' + 'testfiles\_sh2ee.csv';
+
+    #ifdef LOCAL_CSV
+      CSVFilePath := '{#LOCAL_CSV}';
+    #endif
 
     // Download sh2ee.csv; show an error message and exit the installer if downloading fails
-    if not {#DEBUG} then
+    #ifndef LOCAL_CSV
     begin
       repeat
         csvDownloadSuccess := idpDownloadFile('{#SH2EE_CSV_URL}', CSVFilePath);
@@ -266,6 +268,7 @@ begin
         end;
       until csvDownloadSuccess;
     end;
+    #endif
 
     // Create an array of TWebComponentsInfo records from sh2ee.csv and store them in a global variable
     WebCompsArray := WebCSVToInfoArray(CSVFilePath);
