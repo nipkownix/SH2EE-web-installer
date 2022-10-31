@@ -104,6 +104,20 @@ begin
         end;
       end;
   
+      // Custom actions for Xidi before extraction
+      if WebCompsArray[i].id = 'xidi' then
+      begin
+        if maintenanceMode then
+        begin 
+          // Try to delete old XInput Plus files
+          DeleteFile(WizardDirValue + '\Dinput.dll');
+          DeleteFile(WizardDirValue + '\Dinput8.dll');
+          DeleteFile(WizardDirValue + '\XInput1_3.dll');
+          DeleteFile(WizardDirValue + '\XInput1_4.dll');
+          DeleteFile(WizardDirValue + '\XInputPlus.ini');
+        end;
+      end;
+
       // Backup the original .exe before extracting the new one, if a backup doesn't already exist
       if WebCompsArray[i].id = 'ee_exe' then
       begin
