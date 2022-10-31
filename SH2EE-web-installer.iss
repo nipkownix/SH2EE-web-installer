@@ -335,6 +335,11 @@ begin
               Result := False;
               exit;
             end;
+          end else
+          begin
+            // Make sure the local .csv has the current Setup Tool's version, as there is
+            // a chance the user might have manually updated the setup tool.
+            UpdateMaintenanceCSV_SetupToolOnly();
           end;
         end;
       end;

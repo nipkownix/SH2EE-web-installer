@@ -262,3 +262,24 @@ begin
     end;
   end;
 end;
+
+procedure UpdateMaintenanceCSV_SetupToolOnly();
+var
+  i: Integer;
+begin
+    for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+    begin
+      if (WebCompsArray[i].id = 'setup_tool') then
+      begin
+        if maintenanceMode then
+        begin
+          try
+            Log('Updating Setup Tool''s version');
+            FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), MaintenanceCompsArray[i].ID + ',true,' + MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].ID + ',true,' + ExpandConstant('{#INSTALLER_VER}'));
+          except
+            Log('# Entry is missing from local CSV.');
+          end;
+        end;
+      end;
+    end;
+end;
