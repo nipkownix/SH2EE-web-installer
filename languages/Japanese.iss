@@ -54,7 +54,7 @@ jp.img_packDescription            =Image Enhancement Packはアップスケー�
 jp.fmv_packDescription            =FMV Enhancement Packでは、ゲーム内で使用されているムービーの画質を向上させる事が可能です。
 jp.audio_packDescription          =Audio Enhancement Packはゲームで使用されている音源の音質を復元いたします。
 jp.dsoalDescription               =DSOALとは、OpenALを介してサラウンドサウンド、HRTF、EAXのサポートを可能にするDirectSound DLL交換機能です。これによって3Dポジショナルオーディオが可能になり、ゲームのサウンド表現が復元され、より没入感のある体験ができるようになります。
-jp.xinput_plusDescription         =Xinput対応のゲームパッドとの互換性を提供します。
+jp.xidiDescription                =Xinput対応のゲームパッドとの互換性を提供します。
 jp.creditsDescription             =Placeholder
 
 jp.CurrentSelectionSpace          =選択された機能をインストールするには、最低 %1 の空き容量が必要です。

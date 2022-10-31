@@ -17,7 +17,7 @@
 #define fmv_packName      "FMV Enhancement Pack"
 #define audio_pack        "Audio Enhancement Pack"
 #define dsoalName         "DSOAL"
-#define xinput_plusName   "XInput Plus"
+#define xidiName          "Xidi"
 #define CreditsName       "Credits"
 
 #include "languages/English.iss"
@@ -75,7 +75,7 @@ Name: img_pack;      Description: {#img_packName};      Types: full
 Name: fmv_pack;      Description: {#fmv_packName};      Types: full
 Name: audio_pack;    Description: {#audio_pack};        Types: full
 Name: dsoal;         Description: {#dsoalName};         Types: full
-Name: xinput_plus;   Description: {#xinput_plusName};   Types: full
+Name: xidi;          Description: {#xidiName};          Types: full
 Name: credits;       Description: {#creditsName};       Types: full custom
 
 [Files]

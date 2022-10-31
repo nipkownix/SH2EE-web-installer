@@ -57,7 +57,7 @@ img_packDescription            =The Image Enhancement Pack provides upscaled, re
 fmv_packDescription            =The FMV Enhancement Pack provides improved quality of the game's full motion videos.
 audio_packDescription          =The Audio Enhancement Pack provides restored quality of the game's audio files.
 dsoalDescription               =DSOAL is a DirectSound DLL replacer that enables surround sound, HRTF, and EAX audio support via OpenAL Soft. This enables 3D positional audio, which restores the sound presentation of the game for a more immersive experience.
-xinput_plusDescription         =Provides compatibility with modern controllers.
+xidiDescription                =Provides compatibility with modern controllers.
 creditsDescription             =Acknowledging and showing love to those who have made this project possible! This is the Silent Hill 2 PC credits video that includes Silent Hill 2: Enhanced Edition credits. (This is a supplementary video, separate from the original game credits video.)
 
 CurrentSelectionSpace          =Current selection requires at least %1 of disk space.

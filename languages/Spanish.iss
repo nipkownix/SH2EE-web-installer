@@ -55,7 +55,7 @@ es.img_packDescription            =El paquete de mejora de imágenes ofrece imá
 es.fmv_packDescription            =El paquete de mejora de vídeos ofrece los vídeos prerenderizados del juego con una mayor calidad.
 es.audio_packDescription          =El paquete de mejora de audio ofrece los archivos de audio del juego con su calidad original restaurada.
 es.dsoalDescription               =DSOAL es un reemplazo de la DLL de DirectSound que ofrece soporte para sonido envolvente, HRTF (función de transferencia relacionada con la cabeza) y sonido EAX a través de OpenAL Soft. Esto activará el audio posicional en 3D, restaurando la presentación sonora del juego y dando una experiencia más envolvente.
-es.xinput_plusDescription         =Ofrece compatibilidad con mandos modernos.
+es.xidiDescription                =Ofrece compatibilidad con mandos modernos.
 es.creditsDescription             =Placeholder
 
 es.CurrentSelectionSpace          =La selección actual necesita al menos %1 de espacio en disco.

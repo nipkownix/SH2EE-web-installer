@@ -271,8 +271,8 @@ begin
          Description := CustomMessage('dsoalDescription');
        end;
     7: begin
-         Title := '{#xinput_plusName}';
-         Description := CustomMessage('xinput_plusDescription');
+         Title := '{#xidiName}';
+         Description := CustomMessage('xidiDescription');
        end;
     8: begin
          Title := '{#creditsName}';
