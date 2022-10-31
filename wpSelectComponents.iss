@@ -274,11 +274,16 @@ begin
          Title := '{#xinput_plusName}';
          Description := CustomMessage('xinput_plusDescription');
        end;
+    8: begin
+         Title := '{#creditsName}';
+         Description := CustomMessage('creditsDescription');
+       end;
   else
     Title := CustomMessage('DescriptionTip');
   end;
   CompTitle.Caption := Title;
   CompDescription.Caption := Description;
+  CompDescription.Width   := WizardForm.ComponentsList.Width;
 end;
 
 procedure HoverTimerProc(

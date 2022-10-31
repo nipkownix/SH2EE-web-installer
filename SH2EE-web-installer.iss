@@ -17,6 +17,7 @@
 #define audio_pack        "Audio Enhancement Pack"
 #define dsoalName         "DSOAL"
 #define xinput_plusName   "XInput Plus"
+#define CreditsName       "Credits"
 
 #include "languages/English.iss"
 #include "languages/BrazilianPortuguese.iss"
@@ -74,6 +75,7 @@ Name: fmv_pack;      Description: {#fmv_packName};      Types: full
 Name: audio_pack;    Description: {#audio_pack};        Types: full
 Name: dsoal;         Description: {#dsoalName};         Types: full
 Name: xinput_plus;   Description: {#xinput_plusName};   Types: full
+Name: credits;       Description: {#creditsName};       Types: full custom
 
 [Files]
 ; Tools below
@@ -154,7 +156,7 @@ var
 begin
   Result := True;
 
-  // Determine weather or not we should be in "maintenance mode"
+  // Determine whether or not we should be in "maintenance mode"
   if DirExists(ExpandConstant('{src}\') + 'data') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
     maintenanceMode := True;
 
@@ -480,13 +482,15 @@ begin
   if not selfUpdateMode then
     create_wpExtract();
 
-  // Force installation of the SH2E module and EE exe if not in maintenance mode
+  // Force installation of the SH2E module, EE exe and credits if not in maintenance mode
   if not maintenanceMode then
   begin
     WizardForm.ComponentsList.Checked[0] := true;
     WizardForm.ComponentsList.Checked[1] := true;
+    WizardForm.ComponentsList.Checked[8] := true;
     WizardForm.ComponentsList.ItemEnabled[0] := false;
     WizardForm.ComponentsList.ItemEnabled[1] := false;
+    WizardForm.ComponentsList.ItemEnabled[8] := false;
   end;
 
   // Items names and descriptions on wpSelectComponents

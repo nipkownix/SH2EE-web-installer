@@ -55,6 +55,7 @@ pt_br.fmv_packDescription            =O FMV Enhancement Pack fornece vídeos do 
 pt_br.audio_packDescription          =O Audio Enhancement Pack fornece arquivos de áudio do jogo com sua qualidade restaurada.
 pt_br.dsoalDescription               =DSOAL é um substituto para a DLL original do DirectSound que habilita o som surround, HRTF e o suporte de áudio EAX via OpenAL Soft. Isso habilita o áudio posicional 3D, que restaura a apresentação sonora do jogo para uma experiência mais imersiva.
 pt_br.xinput_plusDescription         =Fornece compatibilidade com controlas modernos.
+pt_br.creditsDescription             =Reconhecendo e mostrando amor a quem tornou este projeto possível! Este é o vídeo de créditos do Silent Hill 2 PC que inclui os créditos do Silent Hill 2: Enhanced Edition. (Este é um vídeo suplementar, separado do vídeo original dos créditos do jogo.)
 
 pt_br.CurrentSelectionSpace          =A seleção atual requer pelo menos %1 de espaço em disco.
 pt_br.NoFreeSpace                    =Erro: Não há espaço livre suficiente!%n%nA instalação requer pelo menos o dobro do tamanho total dos componentes (%1) para ser concluída com segurança.%n%nLibere algum espaço e tente novamente.
