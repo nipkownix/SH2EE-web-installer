@@ -13,6 +13,7 @@ begin
   ExtractTemporaryFile('deletefile_util.exe');
 
   DelTree(path + '\sh2e', True, True, True);
+  DelTree(path + '\lang', True, True, True);
   DeleteFile(path + '\alsoft.ini');
   DeleteFile(path + '\d3d8.cfg');
   DeleteFile(path + '\d3d8.dll');
