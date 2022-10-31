@@ -1,5 +1,5 @@
 build/*
-testfiles/*
+test/*
 includes/BytesToString/src/Release/*
 includes/BytesToString/src/BytesToString/Release/*
 includes/BytesToString/src/.vs/*
