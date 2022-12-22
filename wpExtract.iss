@@ -115,6 +115,40 @@ begin
         DeleteFile(WizardDirValue + '\XInputPlus.ini');
       end;
 
+      // Custom actions for the FMV Enhancement Pack before extraction
+      if WebCompsArray[i].id = 'fmv_pack' then
+      begin
+        // Try to delete old Bink FMV files
+        DeleteFile(WizardDirValue + '\sh2e\movie\credits.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\deai.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\end.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\end_dog.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\end_wish.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\flash.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\gero.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\hakaba.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\hei.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\knife.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\korosu_a.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\korosu_b.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\murder.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\open.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\rouya.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\saikai.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\sh2e3.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\sh3e3.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\sh3tgs.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\toilet.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\water.bik');
+      end;
+
+      // Custom actions for Xidi before extraction
+      if WebCompsArray[i].id = 'credits' then
+      begin
+        // Try to delete old Bink FMV files
+        DeleteFile(WizardDirValue + '\sh2e\movie\credits.bik');
+      end;
+
       // Backup the original .exe before extracting the new one, if a backup doesn't already exist
       if WebCompsArray[i].id = 'ee_exe' then
       begin
