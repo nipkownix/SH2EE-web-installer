@@ -90,7 +90,7 @@ begin
       // Custom actions for sh2emodule before extraction
       if WebCompsArray[i].id = 'sh2emodule' then
       begin
-        if maintenanceMode and FileExists(WizardDirValue + '\d3d8.ini') then
+        if FileExists(WizardDirValue + '\d3d8.ini') then
         begin 
           // Backup current .ini settings into an array
           CurIniArray := IniToSettingsArray(WizardDirValue + '\d3d8.ini');
@@ -107,15 +107,12 @@ begin
       // Custom actions for Xidi before extraction
       if WebCompsArray[i].id = 'xidi' then
       begin
-        if maintenanceMode then
-        begin 
-          // Try to delete old XInput Plus files
-          DeleteFile(WizardDirValue + '\Dinput.dll');
-          DeleteFile(WizardDirValue + '\Dinput8.dll');
-          DeleteFile(WizardDirValue + '\XInput1_3.dll');
-          DeleteFile(WizardDirValue + '\XInput1_4.dll');
-          DeleteFile(WizardDirValue + '\XInputPlus.ini');
-        end;
+        // Try to delete old XInput Plus files
+        DeleteFile(WizardDirValue + '\Dinput.dll');
+        DeleteFile(WizardDirValue + '\Dinput8.dll');
+        DeleteFile(WizardDirValue + '\XInput1_3.dll');
+        DeleteFile(WizardDirValue + '\XInput1_4.dll');
+        DeleteFile(WizardDirValue + '\XInputPlus.ini');
       end;
 
       // Backup the original .exe before extracting the new one, if a backup doesn't already exist
