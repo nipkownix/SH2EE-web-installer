@@ -58,7 +58,7 @@ it.fmv_packDescription            =Il Pacchetto Miglioramento FMV offre video a 
 it.audio_packDescription          =Il Pacchetto Miglioramento Audio ripristina la qualità dei file audio del gioco.
 it.dsoalDescription               =DSOAL è una sostituzione della DLL DirectSound che abilita il supporto audio del suono surround, HRTF, ed EAX tramite OpenAL Soft. Questo abilita l'audio posizionale 3D, ripristinando la presentazione sonora del gioco per una esperienza più immersiva.
 it.xidiDescription                =Offre compatibilità con i controller moderni.
-it.creditsDescription             =Placeholder
+it.creditsDescription             =Un riconoscimento e una dimostrazione d'affetto a tutti coloro che hanno reso possibile questo progetto! Questo è il video dei titoli di coda della versione PC di Silent Hill 2 che include i crediti di Silent Hill 2: Enhanced Edition. (si tratta di un video aggiuntivo, indipendente dai titoli di coda originali del gioco).
 
 it.CurrentSelectionSpace          =La selezione corrente richiede almeno %1 di spazio su disco.
 it.NoFreeSpace                    =Errore: Spazio disponibile insufficiente!%n%nL'installazione richiede almeno il doppio dello spazio totale dei componenti (%1) affinché sia completata correttamente.%n%nPer favore, libera dello spazio e riprova.

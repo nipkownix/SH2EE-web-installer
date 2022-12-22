@@ -55,7 +55,7 @@ jp.fmv_packDescription            =FMV Enhancement Packでは、ゲーム内で�
 jp.audio_packDescription          =Audio Enhancement Packはゲームで使用されている音源の音質を復元いたします。
 jp.dsoalDescription               =DSOALとは、OpenALを介してサラウンドサウンド、HRTF、EAXのサポートを可能にするDirectSound DLL交換機能です。これによって3Dポジショナルオーディオが可能になり、ゲームのサウンド表現が復元され、より没入感のある体験ができるようになります。
 jp.xidiDescription                =Xinput対応のゲームパッドとの互換性を提供します。
-jp.creditsDescription             =Placeholder
+jp.creditsDescription             =このプロジェクトの達成に御尽力くださった方々に、心よりお礼を申し上げます。これは、サイレントヒル・エンハンスト・エディションのクレジットを含む、サイレントヒル2　ＰＣビデオのクレジットビデオです。（これは、オリジナルのゲーム・クレジットビデオとは別の補足ビデオです。）
 
 jp.CurrentSelectionSpace          =選択された機能をインストールするには、最低 %1 の空き容量が必要です。
 jp.NoFreeSpace                    =エラー: ストレージの空き容量が不足しています!%n%nインストールを安全に行うには、少なくともコンポーネント(%1)合計サイズの2倍は必要です。
