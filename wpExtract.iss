@@ -122,6 +122,7 @@ begin
         DeleteFile(WizardDirValue + '\sh2e\movie\credits.bik');
         DeleteFile(WizardDirValue + '\sh2e\movie\deai.bik');
         DeleteFile(WizardDirValue + '\sh2e\movie\end.bik');
+        DeleteFile(WizardDirValue + '\sh2e\movie\ending.bik');
         DeleteFile(WizardDirValue + '\sh2e\movie\end_dog.bik');
         DeleteFile(WizardDirValue + '\sh2e\movie\end_wish.bik');
         DeleteFile(WizardDirValue + '\sh2e\movie\flash.bik');
