@@ -99,6 +99,7 @@ it.OpenCfgToolAfterExiting        =Apri lo Strumento di Configurazione per regol
 it.LocalCSVParseFailed            =Errore: Analisi Fallita%n%nRilevata installazione non in linea, ma l'analisi del file 'local_sh2ee.dat' è fallita. Impossibile continuare con l'installazione non in linea.%n%nUsare al suo posto la modalità di installazione in linea?
 it.LocalCSVMissingFiles           =Errore: File Mancanti%n%nRilevata installazione non in linea, ma manca uno o più file dalla cartella dello Strumento di Installazione. Impossibile continuare con l'installazione non in linea.%n%nUsare al suo posto la modalità di installazione in linea?
 it.LocalCSVIncompatibleVersion    =Errore: Versione non compatibile%n%nQuesta versione dello Strumento di Installazione di SH2:EE (%1) non è la versione prevista per i file locali (%2).%n%nImpossibile continuare con l'installazione.
+it.WebURLDownloadError            =Errore: Scaricamento Fallito%n%nNon sono riuscito a scaricare 'webcsv.url'.%n%nImpossibile continuare con l'installazione.%n%nRiprovare?
 it.WebCSVDownloadError            =Errore: Scaricamento Fallito%n%nNon sono riuscito a scaricare 'sh2ee.csv'.%n%nImpossibile continuare con l'installazione.%n%nRiprovare?
 it.WebCSVParseFailed              =Errore: Analisi Fallita%n%nNon sono riuscito ad analizzare 'sh2ee.csv'.%n%nImpossibile continuare con l'installazione.
 it.MaintenanceCSVParseFailed      =Errore: Analisi Fallita%n%nNon sono riuscito ad analizzare 'SH2EEsetup.dat'.%n%nImpossibile continuare con l'installazione.

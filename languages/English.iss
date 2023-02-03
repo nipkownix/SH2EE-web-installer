@@ -99,6 +99,7 @@ OpenCfgToolAfterExiting        =Open the Configuration Tool to adjust project se
 LocalCSVParseFailed            =Error: Parsing Failed%n%nOffline installation detected, but parsing 'local_sh2ee.dat' failed. Offline installation cannot proceed.%n%nUse online installation mode instead?
 LocalCSVMissingFiles           =Error: Missing Files%n%nOffline installation detected, but one or more files are missing from Setup Tool's folder. Offline installation cannot proceed.%n%nUse online installation mode instead?
 LocalCSVIncompatibleVersion    =Error: Incompatible Version%n%nThis version of the SH2:EE Setup Tool (%1) is not the version expected to work with the local files (%2).%n%nThe installation cannot continue.
+WebURLDownloadError            =Error: Download Failed%n%nCouldn't download 'webcsv.url'.%n%nThe installation cannot continue.%n%nRetry download?
 WebCSVDownloadError            =Error: Download Failed%n%nCouldn't download 'sh2ee.csv'.%n%nThe installation cannot continue.%n%nRetry download?
 WebCSVParseFailed              =Error: Parsing Failed%n%nCouldn't parse 'sh2ee.csv'.%n%nThe installation cannot continue.
 MaintenanceCSVParseFailed      =Error: Parsing Failed%n%nCouldn't parse 'SH2EEsetup.dat'.%n%nThe installation cannot continue.

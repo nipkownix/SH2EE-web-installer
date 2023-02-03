@@ -97,6 +97,7 @@ jp.OpenCfgToolAfterExiting        =設定ツールを開いて、ゲームのプ
 jp.LocalCSVParseFailed            =エラー: ファイル構成エラー%n%nオフライン モードが検出されましたが、'local_sh2ee.dat' の展開に失敗しました。オフライン インストールを続行できません。%n%nオンライン モードに切り替えますか？
 jp.LocalCSVMissingFiles           =エラー: ファイル欠如%n%nオフライン モードが検出されましたが、セットアップ ツールに必要なファイルが欠けているため、オフライン インストールを続行できません。%n%nオンライン モードに切り替えますか？
 jp.LocalCSVIncompatibleVersion    =エラー: 互換性なし%n%nこのバージョンのSH2:EEセットアップツール(%1)は、ローカルファイル(%2)で動作可能なバージョンではありません。
+jp.WebURLDownloadError            =エラー: ダウンロード失敗%n%n'webcsv.url'をダウンロードできませんでした。%n%nインストールを続行できません。%n%nダウンロードを再試行しますか？
 jp.WebCSVDownloadError            =エラー: ダウンロード失敗%n%n'sh2ee.csv'をダウンロードできませんでした。%n%nインストールを続行できません。%n%nダウンロードを再試行しますか？
 jp.WebCSVParseFailed              =エラー: 構成エラー%n%n'sh2ee.csv'の読み込みに失敗しました。%n%nインストールを続行できません。
 jp.MaintenanceCSVParseFailed      =エラー: 構成エラー%n%n'SH2EEsetup.dat'の読み込みに失敗しました。%n%nインストールを続行できません。

@@ -95,6 +95,7 @@ pt_br.OpenCfgToolAfterExiting        =Abrir a Ferramenta de Configuração para 
 pt_br.LocalCSVParseFailed            =Erro: Falha na leitura%n%nInstalação offline detectada, mas houve uma falha na leitura do 'local_sh2ee.dat'. A instalação cffline não pode continuar.%n%nUsar modo de instalação online?
 pt_br.LocalCSVMissingFiles           =Erro: Arquivos ausentes%n%nnInstalação off-line detectada, mas um ou mais arquivos estão ausentes na pasta do Setup Tool. A instalação cffline não pode continuar.%n%nUsar o modo de instalação online?
 pt_br.LocalCSVIncompatibleVersion    =Erro: Versão incompatível%n%nEsta versão da SH2:EE Setup Tool (%1) não é a versão que se espera que funcione com os arquivos locais (%2).%n%nA instalação não pode continuar.
+pt_br.WebURLDownloadError            =Erro: Falha no download%n%nNão foi possível baixar 'webcsv.url'.%n%nA instalação não pode continuar.%n%nRepetir tentativa de download?
 pt_br.WebCSVDownloadError            =Erro: Falha no download%n%nNão foi possível baixar 'sh2ee.csv'.%n%nA instalação não pode continuar.%n%nRepetir tentativa de download?
 pt_br.WebCSVParseFailed              =Erro: Falha na leitura%n%nNão foi possível ler 'sh2ee.csv'.%n%nA instalação não pode continuar.
 pt_br.MaintenanceCSVParseFailed      =Erro: Falha na leitura%n%nNão foi possível ler 'SH2EEsetup.dat'.%n%nA instalação não pode continuar.

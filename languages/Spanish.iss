@@ -96,6 +96,7 @@ es.OpenCfgToolAfterExiting        =Abrir la herramienta de configuración para c
 es.LocalCSVParseFailed            =Error: análisis fallido%n%nSe ha detectado una instlación offline pero hubo un error al analizar el archivo «local_sh2ee.dat». La instalación offline no puede continuar.%n%nSe recomienda utilizar el modo de instalación online.
 es.LocalCSVMissingFiles           =Error: faltan archivos%n%nSe ha detectado una instlación offline pero faltan uno o más archivos en la carpeta del instalador. La instalación offline no puede continuar.%n%nSe recomienda utilizar el modo de instalación online.
 es.LocalCSVIncompatibleVersion    =Error: versión incompatible%n%nEsta versión del instalador de SH2:EE (%1) no es compatible con la versión de los archivos locales (%2).%n%nLa instalación no puede continuar.
+es.WebURLDownloadError            =Error: descarga fallida%n%nNo se pudo descargar el archivo «webcsv.url».%n%nLa instalación no puede continuar.%n%nRetry download?
 es.WebCSVDownloadError            =Error: descarga fallida%n%nNo se pudo descargar el archivo «sh2ee.csv».%n%nLa instalación no puede continuar.%n%nRetry download?
 es.WebCSVParseFailed              =Error: análisis fallido%n%nNo se pudo analizar el archivo «sh2ee.csv».%n%nLa instalación no puede continuar.
 es.MaintenanceCSVParseFailed      =Error: análisis fallido%n%nNo se pudo analizar el archivo «SH2EEsetup.dat».%n%nLa instalación no puede continuar.

@@ -2,7 +2,7 @@
 
 #define INSTALLER_VER  "1.1.0"
 #define DEBUG          "true"
-#define SH2EE_CSV_URL  "https://files.townofsilenthill.com/SH2EE/_sh2ee.csv"
+#define SH2EE_CSV_URL  "https://raw.githubusercontent.com/elishacloud/Silent-Hill-2-Enhancements/master/Resources/webcsv.url"
 
 //#define LOCAL_CSV      "E:\Porgrams\git_repos\SH2EE-web-installer\test\_sh2ee.csv"
 
@@ -124,6 +124,7 @@ type
   end;
 
 var
+  webcsv_url            : String;
   LanguageButton        : TButton;
   userPackageDataDir    : String;
   maintenanceMode       : Boolean;
@@ -153,7 +154,9 @@ var
   i: integer;
   Language: string;
   csvDownloadSuccess: Boolean;
+  urlDownloadSuccess: Boolean;
   localFilesMissing :Boolean;
+  Lines: TStringList;
 begin
   Result := True;
 
@@ -246,8 +249,30 @@ begin
   // localInstallMode doesn't need any of this
   if not localInstallMode then
   begin
+    // Get web .csv URL from git repo's .url file
+    #ifndef LOCAL_CSV
+    begin
+      repeat
+        urlDownloadSuccess := idpDownloadFile('{#SH2EE_CSV_URL}', ExpandConstant('{tmp}\webcsv.url'));
+        if not urlDownloadSuccess then
+        begin
+          if MsgBox(CustomMessage('WebURLDownloadError'), mbConfirmation, MB_YESNO) = IDNO then
+          begin
+            Result := False;
+            exit;
+          end;
+        end;
+      until urlDownloadSuccess;
+    end;
+
+    Lines := TStringList.Create;
+    Lines.LoadFromFile(ExpandConstant('{tmp}\webcsv.url'));
+  
+    webcsv_url := Lines[0];
+
     // Store the path to web sh2ee.csv in a global variable
-      CSVFilePath := tmp(GetURLFilePart('{#SH2EE_CSV_URL}'))
+    CSVFilePath := tmp(GetURLFilePart(webcsv_url))
+    #endif
 
     #ifdef LOCAL_CSV
       CSVFilePath := '{#LOCAL_CSV}';
@@ -257,7 +282,7 @@ begin
     #ifndef LOCAL_CSV
     begin
       repeat
-        csvDownloadSuccess := idpDownloadFile('{#SH2EE_CSV_URL}', CSVFilePath);
+        csvDownloadSuccess := idpDownloadFile(webcsv_url, CSVFilePath);
         if not csvDownloadSuccess then
         begin
           if MsgBox(CustomMessage('WebCSVDownloadError'), mbConfirmation, MB_YESNO) = IDNO then
