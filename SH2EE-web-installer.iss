@@ -4,8 +4,6 @@
 #define DEBUG          "true"
 #define SH2EE_CSV_URL  "https://raw.githubusercontent.com/elishacloud/Silent-Hill-2-Enhancements/master/Resources/webcsv.url"
 
-//#define LOCAL_CSV      "E:\Porgrams\git_repos\SH2EE-web-installer\test\_sh2ee.csv"
-
 #define PROJECT_URL      "https://enhanced.townofsilenthill.com/SH2/"
 #define TROUBLESHOOT_URL "https://enhanced.townofsilenthill.com/SH2/troubleshoot.htm"
 #define HELP_URL         "https://github.com/elishacloud/Silent-Hill-2-Enhancements/issues"
@@ -152,6 +150,7 @@ var
 function InitializeSetup(): Boolean;
 var
   i: integer;
+  CSVFilePath : String;
   Language: string;
   csvDownloadSuccess: Boolean;
   urlDownloadSuccess: Boolean;
@@ -240,7 +239,6 @@ begin
           end;
         end;
       end;
-
       // Guess everything should be fine then
       localInstallMode := true;
     end;
@@ -249,54 +247,54 @@ begin
   // localInstallMode doesn't need any of this
   if not localInstallMode then
   begin
-    // Get web .csv URL from git repo's .url file
-    #ifndef LOCAL_CSV
+    // Use local/debug .csv if it exist and "-sandbox" was used as a launch parameter
+    if FileExists(ExpandConstant('{src}\') + '_sh2ee.csv') and CmdLineParamExists('-sandbox') then
     begin
-      repeat
-        urlDownloadSuccess := idpDownloadFile('{#SH2EE_CSV_URL}', ExpandConstant('{tmp}\webcsv.url'));
-        if not urlDownloadSuccess then
-        begin
-          if MsgBox(CustomMessage('WebURLDownloadError'), mbConfirmation, MB_YESNO) = IDNO then
+      Log('Using _sh2ee.csv from .exe dir!');
+      CSVFilePath := ExpandConstant('{src}\') + '_sh2ee.csv';
+    end else // Criteria not met, download .csv from web
+    begin
+      // Get web .csv URL from git repo's .url file
+      begin
+        repeat
+          urlDownloadSuccess := idpDownloadFile('{#SH2EE_CSV_URL}', ExpandConstant('{tmp}\webcsv.url'));
+          if not urlDownloadSuccess then
           begin
-            Result := False;
-            exit;
+            if MsgBox(CustomMessage('WebURLDownloadError'), mbConfirmation, MB_YESNO) = IDNO then
+            begin
+              Result := False;
+              exit;
+            end;
           end;
-        end;
-      until urlDownloadSuccess;
-    end;
-
-    Lines := TStringList.Create;
-    Lines.LoadFromFile(ExpandConstant('{tmp}\webcsv.url'));
+        until urlDownloadSuccess;
+      end;
   
-    webcsv_url := Lines[0];
-
-    // Store the path to web sh2ee.csv in a global variable
-    CSVFilePath := tmp(GetURLFilePart(webcsv_url))
-    #endif
-
-    #ifdef LOCAL_CSV
-      CSVFilePath := '{#LOCAL_CSV}';
-    #endif
-
-    // Download sh2ee.csv; show an error message and exit the installer if downloading fails
-    #ifndef LOCAL_CSV
-    begin
-      repeat
-        csvDownloadSuccess := idpDownloadFile(webcsv_url, CSVFilePath);
-        if not csvDownloadSuccess then
-        begin
-          if MsgBox(CustomMessage('WebCSVDownloadError'), mbConfirmation, MB_YESNO) = IDNO then
+      Lines := TStringList.Create;
+      Lines.LoadFromFile(ExpandConstant('{tmp}\webcsv.url'));
+      webcsv_url := Lines[0];
+  
+      // Store the temp path to web sh2ee.csv
+      CSVFilePath := tmp(GetURLFilePart(webcsv_url));
+  
+      // Download sh2ee.csv; show an error message and exit the installer if downloading fails
+      begin
+        repeat
+          csvDownloadSuccess := idpDownloadFile(webcsv_url, CSVFilePath);
+          if not csvDownloadSuccess then
           begin
-            Result := False;
-            exit;
+            if MsgBox(CustomMessage('WebCSVDownloadError'), mbConfirmation, MB_YESNO) = IDNO then
+            begin
+              Result := False;
+              exit;
+            end;
           end;
-        end;
-      until csvDownloadSuccess;
+        until csvDownloadSuccess;
+      end;
     end;
-    #endif
 
     // Create an array of TWebComponentsInfo records from sh2ee.csv and store them in a global variable
     WebCompsArray := WebCSVToInfoArray(CSVFilePath);
+
     // Check if above didn't work
     if GetArrayLength(WebCompsArray) = 0 then
     begin

@@ -23,8 +23,6 @@ type
   end;
 
 var
-  CSVFilePath : String;
-
   LocalCompsArray : array of TLocalComponentsInfo;
   WebCompsArray   : array of TWebComponentsInfo;
   MaintenanceCompsArray : array of TMaintenanceComponentsInfo;
