@@ -391,6 +391,47 @@ begin
     ExitProcess(1);
 end;
 
+procedure GetComponentSizes();
+var
+  i: integer;
+begin
+  if not localInstallMode then
+  begin
+    // Get file sizes from host, exit if we fail for some reason
+    SetArrayLength(FileSizeArray, GetArrayLength(WebCompsArray) - 1);
+    for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+    begin
+      if not (WebCompsArray[i].id = 'setup_tool') then
+      begin
+        if not idpGetFileSize(WebCompsArray[i].URL, FileSizeArray[i - 1].Bytes) then
+          begin
+            MsgBox(CustomMessage('FailedToQueryComponents'), mbCriticalError, MB_OK);
+            ExitProcess(1);
+          end;
+        FileSizeArray[i - 1].String := BytesToString(FileSizeArray[i - 1].Bytes);
+        if {#DEBUG} then Log('# ' + WebCompsArray[i].ID + ' size = ' + FileSizeArray[i - 1].String);
+      end;
+    end;
+  end else
+  begin
+    // Get sizes from local files, exit if we fail for some reason
+    SetArrayLength(FileSizeArray, GetArrayLength(LocalCompsArray));
+    for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
+    begin
+      if not (LocalCompsArray[i].id = 'setup_tool') then
+      begin
+        if not (LocalCompsArray[i].fileName = 'notDownloaded') and not FileSize64(ExpandConstant('{src}\') + LocalCompsArray[i].fileName, FileSizeArray[i - 1].Bytes) then
+          begin
+            MsgBox(CustomMessage('FailedToQueryComponents2'), mbCriticalError, MB_OK);
+            ExitProcess(1);
+          end;
+        FileSizeArray[i - 1].String := BytesToString(FileSizeArray[i - 1].Bytes);
+        if {#DEBUG} then Log('# ' + LocalCompsArray[i].ID + ' size = ' + FileSizeArray[i - 1].String);
+      end;
+    end;
+  end;
+end;
+
 procedure InitializeWizard();
 var
   HelpButton     : TButton;
@@ -449,45 +490,13 @@ begin
     idpSetOption('InvalidCert',    'ignore');
   end;
 
-  if not localInstallMode then
-  begin
-    // Get file sizes from host, exit if we fail for some reason
-    SetArrayLength(FileSizeArray, GetArrayLength(WebCompsArray) - 1);
-    for i := 0 to GetArrayLength(WebCompsArray) - 1 do
-    begin
-      if not (WebCompsArray[i].id = 'setup_tool') then
-      begin
-        if not idpGetFileSize(WebCompsArray[i].URL, FileSizeArray[i - 1].Bytes) then
-          begin
-            MsgBox(CustomMessage('FailedToQueryComponents'), mbCriticalError, MB_OK);
-            ExitProcess(1);
-          end;
-        FileSizeArray[i - 1].String := BytesToString(FileSizeArray[i - 1].Bytes);
-        if {#DEBUG} then Log('# ' + WebCompsArray[i].ID + ' size = ' + FileSizeArray[i - 1].String);
-      end;
-    end;
-  end else
-  begin
-    // Get sizes from local files, exit if we fail for some reason
-    SetArrayLength(FileSizeArray, GetArrayLength(LocalCompsArray));
-    for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
-    begin
-      if not (LocalCompsArray[i].id = 'setup_tool') then
-      begin
-        if not (LocalCompsArray[i].fileName = 'notDownloaded') and not FileSize64(ExpandConstant('{src}\') + LocalCompsArray[i].fileName, FileSizeArray[i - 1].Bytes) then
-          begin
-            MsgBox(CustomMessage('FailedToQueryComponents2'), mbCriticalError, MB_OK);
-            ExitProcess(1);
-          end;
-        FileSizeArray[i - 1].String := BytesToString(FileSizeArray[i - 1].Bytes);
-        if {#DEBUG} then Log('# ' + LocalCompsArray[i].ID + ' size = ' + FileSizeArray[i - 1].String);
-      end;
-    end;
-  end;
-
   // Register new RunList OnClick event
   WizardForm.RunList.OnClickCheck := @RunListClickCheck;
   RunListLastChecked := -1;
+
+  // Get component sizes on startup for maintenanceMode
+  if maintenanceMode then
+    GetComponentSizes();
 
   // Customize the default SelectComponents
   customize_wpSelectComponents();
@@ -585,7 +594,6 @@ begin
         Parent     := WizardForm;
     end;
   end;
-
 end;
 
 function ShouldSkipPage(CurPage: Integer): Boolean;
@@ -651,6 +659,11 @@ var
   iRequiredSize : Int64;
 begin
   Result := True;
+
+  if CurPage = wpWelcome then
+  begin
+    GetComponentSizes();
+  end;
 
   if CurPage = wpSelectComponents then
   begin
