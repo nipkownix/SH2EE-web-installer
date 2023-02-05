@@ -2,8 +2,9 @@
 
 [Code]
 var
-  RunListLastChecked: Integer;
-  GCS_sh2pcPath: string;
+  isCompSizesFilled  : Boolean;
+  RunListLastChecked : Integer;
+  GCS_sh2pcPath      : string;
 
 function ShellExecute(hwnd: HWND; lpOperation: string; lpFile: string;
   lpParameters: string; lpDirectory: string; nShowCmd: Integer): THandle;
@@ -25,6 +26,55 @@ var  LibHandle  : THandle;
 begin
   LibHandle := LoadLibraryA('ntdll.dll');
   Result:= GetProcAddress(LibHandle, 'wine_get_version')<> 0;
+end;
+
+procedure GetComponentSizes();
+var
+  i: integer;
+begin
+  if isCompSizesFilled then
+  begin
+    Log('GetComponentSizes: Sizes already filled, returning');
+    Exit;
+  end;
+
+  if not localInstallMode then
+  begin
+    // Get file sizes from host, exit if we fail for some reason
+    SetArrayLength(FileSizeArray, GetArrayLength(WebCompsArray) - 1);
+    for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+    begin
+      if not (WebCompsArray[i].id = 'setup_tool') then
+      begin
+        if not idpGetFileSize(WebCompsArray[i].URL, FileSizeArray[i - 1].Bytes) then
+          begin
+            MsgBox(CustomMessage('FailedToQueryComponents'), mbCriticalError, MB_OK);
+            ExitProcess(1);
+          end;
+        FileSizeArray[i - 1].String := BytesToString(FileSizeArray[i - 1].Bytes);
+        if {#DEBUG} then Log('# ' + WebCompsArray[i].ID + ' size = ' + FileSizeArray[i - 1].String);
+      end;
+    end;
+  end else
+  begin
+    // Get sizes from local files, exit if we fail for some reason
+    SetArrayLength(FileSizeArray, GetArrayLength(LocalCompsArray));
+    for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
+    begin
+      if not (LocalCompsArray[i].id = 'setup_tool') then
+      begin
+        if not (LocalCompsArray[i].fileName = 'notDownloaded') and not FileSize64(ExpandConstant('{src}\') + LocalCompsArray[i].fileName, FileSizeArray[i - 1].Bytes) then
+          begin
+            MsgBox(CustomMessage('FailedToQueryComponents2'), mbCriticalError, MB_OK);
+            ExitProcess(1);
+          end;
+        FileSizeArray[i - 1].String := BytesToString(FileSizeArray[i - 1].Bytes);
+        if {#DEBUG} then Log('# ' + LocalCompsArray[i].ID + ' size = ' + FileSizeArray[i - 1].String);
+      end;
+    end;
+  end;
+
+  isCompSizesFilled := True;
 end;
 
 // Determines if there is enough free space on a drive of a specific folder

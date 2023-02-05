@@ -121,6 +121,27 @@ type
     String  : String;
   end;
 
+  TLocalComponentsInfo = record
+    ID       : String;
+    Name     : String;
+    fileName : String;
+    Version  : String;
+  end;
+
+  TWebComponentsInfo = record
+    ID      : String;
+    Name    : String;
+    Version : String;
+    URL     : String;
+    SHA256  : String;
+  end;
+
+  TMaintenanceComponentsInfo = record
+    ID          : String;
+    isInstalled : Boolean;
+    Version     : String;
+  end;
+
 var
   webcsv_url            : String;
   LanguageButton        : TButton;
@@ -133,6 +154,9 @@ var
   CurIniArray           : array of TIniArray;
   FileSizeArray         : array of TSizeArray;
   sh2pcFilesWerePresent : Boolean;
+  LocalCompsArray       : array of TLocalComponentsInfo;
+  WebCompsArray         : array of TWebComponentsInfo;
+  MaintenanceCompsArray : array of TMaintenanceComponentsInfo;
 
 #include "includes/Util.iss"
 #include "CustomUninstall.iss"
@@ -391,51 +415,11 @@ begin
     ExitProcess(1);
 end;
 
-procedure GetComponentSizes();
-var
-  i: integer;
-begin
-  if not localInstallMode then
-  begin
-    // Get file sizes from host, exit if we fail for some reason
-    SetArrayLength(FileSizeArray, GetArrayLength(WebCompsArray) - 1);
-    for i := 0 to GetArrayLength(WebCompsArray) - 1 do
-    begin
-      if not (WebCompsArray[i].id = 'setup_tool') then
-      begin
-        if not idpGetFileSize(WebCompsArray[i].URL, FileSizeArray[i - 1].Bytes) then
-          begin
-            MsgBox(CustomMessage('FailedToQueryComponents'), mbCriticalError, MB_OK);
-            ExitProcess(1);
-          end;
-        FileSizeArray[i - 1].String := BytesToString(FileSizeArray[i - 1].Bytes);
-        if {#DEBUG} then Log('# ' + WebCompsArray[i].ID + ' size = ' + FileSizeArray[i - 1].String);
-      end;
-    end;
-  end else
-  begin
-    // Get sizes from local files, exit if we fail for some reason
-    SetArrayLength(FileSizeArray, GetArrayLength(LocalCompsArray));
-    for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
-    begin
-      if not (LocalCompsArray[i].id = 'setup_tool') then
-      begin
-        if not (LocalCompsArray[i].fileName = 'notDownloaded') and not FileSize64(ExpandConstant('{src}\') + LocalCompsArray[i].fileName, FileSizeArray[i - 1].Bytes) then
-          begin
-            MsgBox(CustomMessage('FailedToQueryComponents2'), mbCriticalError, MB_OK);
-            ExitProcess(1);
-          end;
-        FileSizeArray[i - 1].String := BytesToString(FileSizeArray[i - 1].Bytes);
-        if {#DEBUG} then Log('# ' + LocalCompsArray[i].ID + ' size = ' + FileSizeArray[i - 1].String);
-      end;
-    end;
-  end;
-end;
-
 procedure InitializeWizard();
 var
-  HelpButton     : TButton;
-  DebugLabel     : TNewStaticText;
+  HelpButton  : TButton;
+  DebugLabel  : TNewStaticText;
+  labelOffset : integer;
   i: integer;
 begin
   if not localInstallMode then
@@ -493,10 +477,6 @@ begin
   // Register new RunList OnClick event
   WizardForm.RunList.OnClickCheck := @RunListClickCheck;
   RunListLastChecked := -1;
-
-  // Get component sizes on startup for maintenanceMode
-  if maintenanceMode then
-    GetComponentSizes();
 
   // Customize the default SelectComponents
   customize_wpSelectComponents();
@@ -594,6 +574,26 @@ begin
         Parent     := WizardForm;
     end;
   end;
+
+  // Show "SANDBOX MODE" text
+  if FileExists(ExpandConstant('{src}\') + '_sh2ee.csv') and CmdLineParamExists('-sandbox') then
+  begin
+    if maintenanceMode then
+      labelOffset := ScaleX(120)
+    else
+      labelOffset := ScaleX(10);
+
+    DebugLabel := TNewStaticText.Create(WizardForm);
+    with DebugLabel do
+    begin
+        Top        := HelpButton.Top + 4;
+        Anchors    := [akLeft, akBottom];
+        Left       := HelpButton.Left + HelpButton.Width + labelOffset;
+        Caption    := ExpandConstant('SANDBOX MODE');
+        Font.Style := [fsBold];
+        Parent     := WizardForm;
+    end;
+  end;
 end;
 
 function ShouldSkipPage(CurPage: Integer): Boolean;
@@ -660,7 +660,7 @@ var
 begin
   Result := True;
 
-  if CurPage = wpWelcome then
+  if (CurPage = wpWelcome) and not maintenanceMode then
   begin
     GetComponentSizes();
   end;

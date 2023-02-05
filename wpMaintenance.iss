@@ -40,6 +40,9 @@ var
 begin
     Result := True;
 
+    if installRadioBtn.Checked or updateRadioBtn.Checked then
+      GetComponentSizes();
+
     if adjustRadioBtn.Checked then
     begin
       if FileExists(ExpandConstant('{src}\') + 'SH2EEconfig.exe') then

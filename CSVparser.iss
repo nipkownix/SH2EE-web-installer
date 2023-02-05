@@ -1,32 +1,5 @@
 [Code]
 
-type
-  TLocalComponentsInfo  = record
-    ID                  : String;
-    Name                : String;
-    fileName            : String;
-    Version             : String;
-  end;
-
-  TWebComponentsInfo    = record
-    ID                  : String;
-    Name                : String;
-    Version             : String;
-    URL                 : String;
-    SHA256              : String;
-  end;
-
-  TMaintenanceComponentsInfo  = record
-    ID                  : String;
-    isInstalled         : Boolean;
-    Version             : String;
-  end;
-
-var
-  LocalCompsArray : array of TLocalComponentsInfo;
-  WebCompsArray   : array of TWebComponentsInfo;
-  MaintenanceCompsArray : array of TMaintenanceComponentsInfo;
-
 // Given a .csv file, return an array of information corresponding to
 // the data in the csv file.
 function WebCSVToInfoArray(Filename: String): array of TWebComponentsInfo;
