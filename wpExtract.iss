@@ -78,12 +78,31 @@ begin
   
         if not SameText(curFileChecksum, WebCompsArray[i].SHA256) then
         begin
-          MsgBox(FmtMessage(CustomMessage('ChecksumMismatch'), [GetURLFilePart(WebCompsArray[i].URL)]), mbInformation, MB_OK);
-
           if not maintenanceMode then
-            doCustomUninstall(); // Try to undo the changes done so far
+          begin
+            if MsgBox(FmtMessage(CustomMessage('ChecksumMismatchFirstTime'), [GetURLFilePart(WebCompsArray[i].URL)]), mbConfirmation, MB_YESNO) = IDYES then
+            begin
+              // "Uncheck" the component so the CSV parser doesn't write its info when the intallation finishes
+              WizardForm.ComponentsList.Checked[i - 1] := False;
+  
+              // Move on to the next component, don't extract the current broken one
+              Continue;
+            end else
+            begin
+              // User pressed No, undo stuff and exit
+              doCustomUninstall(); // Try to undo the changes done so far
+              ExitProcess(1);
+            end;
+          end else 
+          begin
+            MsgBox(FmtMessage(CustomMessage('ChecksumMismatchMaintenance'), [GetURLFilePart(WebCompsArray[i].URL)]), mbInformation, MB_OK);
 
-          ExitProcess(1);
+            // "Uncheck" the component so the CSV parser doesn't write its info when the intallation finishes
+            WizardForm.ComponentsList.Checked[i - 1] := False;
+
+            // Move on to the next component, don't extract the current broken one
+            Continue;
+          end;
         end;
       end;
 
