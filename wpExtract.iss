@@ -79,7 +79,10 @@ begin
         if not SameText(curFileChecksum, WebCompsArray[i].SHA256) then
         begin
           MsgBox(FmtMessage(CustomMessage('ChecksumMismatch'), [GetURLFilePart(WebCompsArray[i].URL)]), mbInformation, MB_OK);
-          doCustomUninstall(); // Try to undo the changes done so far
+
+          if not maintenanceMode then
+            doCustomUninstall(); // Try to undo the changes done so far
+
           ExitProcess(1);
         end;
       end;
