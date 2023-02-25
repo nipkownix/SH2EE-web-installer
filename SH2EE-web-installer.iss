@@ -1,6 +1,6 @@
 ; -- SH2EE Web Installer --
 
-#define INSTALLER_VER  "1.1.1"
+#define INSTALLER_VER  "1.1.2"
 #define DEBUG          "true"
 #define SH2EE_CSV_URL  "https://raw.githubusercontent.com/elishacloud/Silent-Hill-2-Enhancements/master/Resources/webcsv.url"
 
@@ -425,7 +425,7 @@ begin
   if not localInstallMode then
   begin
     // Compare the lenght of the web CSV array with the installer's component list
-    if not SamePackedVersion(WizardForm.ComponentsList.Items.Count, GetArrayLength(WebCompsArray) - 1) then // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
+    if not selfUpdateMode and not SamePackedVersion(WizardForm.ComponentsList.Items.Count, GetArrayLength(WebCompsArray) - 1) then // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
     begin
       MsgBox(CustomMessage('InvalidWebComponentsListSize'), mbCriticalError, MB_OK);
       Abort;
