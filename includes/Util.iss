@@ -38,6 +38,12 @@ begin
     Exit;
   end;
 
+  if selfUpdateMode then
+  begin
+    Log('GetComponentSizes: selfUpdateMode, no need to get sizes, returning');
+    Exit;
+  end;
+
   if not localInstallMode then
   begin
     // Get file sizes from host, exit if we fail for some reason
