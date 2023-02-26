@@ -109,4 +109,4 @@ pt_br.ChecksumMismatchFirstTime      =Error: Checksum mismatch%n%nFile '%1' is c
 pt_br.ChecksumMismatchMaintenance    =Erro: Problema na verificação%n%nO arquivo '%1' está corrompido.%n%nA instalação não pode continuar. Por favor, tente novamente e, se o problema persistir, informe aos desenvolvedores.
 pt_br.ExtractionFailed               =Erro: Falha ao iniciar a extração.%n%nA instalação não pode continuar.
 pt_br.NoComponentsSelected           =Erro: Nenhum componente foi selecionado.
-pt_br.SemicolonInPath                =Erro: Caminho inválido detectado%n%nO nome da pasta escolhida contém um ponto e vírgula.%n%nIsso causa o mal-funcionamento do jogo. Por favor, renomeie a pasta do jogo antes de continuar.
+pt_br.SemicolonInPath                =Erro: Caminho inválido detectado%n%nO nome da pasta escolhida contém um ponto e vírgula.%n%nIsso causa o mau-funcionamento do jogo. Por favor, renomeie a pasta do jogo antes de continuar.
