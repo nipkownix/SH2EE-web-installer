@@ -70,6 +70,7 @@ var
   updateBmp          : TBitmapImage;
   adjustBmp          : TBitmapImage;
   uninstallBmp       : TBitmapImage;
+  nointernetBmp      : TBitmapImage;
 
   installLabel       : TLabel;
   updateLabel        : TLabel;
@@ -81,12 +82,33 @@ begin
   ExtractTemporaryFile('icon_update.bmp');
   ExtractTemporaryFile('icon_adjust.bmp');
   ExtractTemporaryFile('icon_uninstall.bmp');
+  ExtractTemporaryFile('icon_nointernet.bmp');
 
   wpMaintenance := CreateCustomPage(wpWelcome, CustomMessage('MaintenanceTitle'), CustomMessage('MaintenanceLabel'));
 
+  if uninstallOnly then
+  begin
+    nointernetBmp := TBitmapImage.Create(WizardForm);
+    with nointernetBmp do
+    begin
+      AutoSize          := False;
+      Stretch           := True;
+      BackColor         := WizardForm.Color;
+      ReplaceColor      := $FFFFFF;
+      ReplaceWithColor  := WizardForm.Color;
+      Left              := WizardForm.NextButton.Left - ScaleX(35);
+      Top               := WizardForm.NextButton.Top - ScaleY(3);
+      Anchors           := [akBottom, akRight];
+      Width             := ScaleX(25);
+      Height            := ScaleY(25);
+      Parent            := WizardForm;
+      Bitmap.LoadFromFile(ExpandConstant('{tmp}\icon_nointernet.bmp'));
+    end;
+  end;
+
   installBmp := TBitmapImage.Create(wpMaintenance);
   with installBmp do
-  begin;
+  begin
     AutoSize          := False;
     Stretch           := True;
     BackColor         := wpMaintenance.Surface.Color;
@@ -103,7 +125,7 @@ begin
 
   updateBmp := TBitmapImage.Create(wpMaintenance);
   with updateBmp do
-  begin;
+  begin
     AutoSize          := False;
     Stretch           := True;
     BackColor         := wpMaintenance.Surface.Color;
@@ -120,7 +142,7 @@ begin
   
   adjustBmp := TBitmapImage.Create(wpMaintenance);
   with adjustBmp do
-  begin;
+  begin
     AutoSize          := False;
     Stretch           := True;
     BackColor         := wpMaintenance.Surface.Color;
@@ -137,7 +159,7 @@ begin
 
   uninstallBmp := TBitmapImage.Create(wpMaintenance);
   with uninstallBmp do
-  begin;
+  begin
     AutoSize          := False;
     Stretch           := True;
     BackColor         := wpMaintenance.Surface.Color;
@@ -155,6 +177,7 @@ begin
   installRadioBtn := TRadioButton.Create(wpMaintenance);
   with installRadioBtn do
   begin
+    Enabled    := not uninstallOnly;
     Parent     := wpMaintenance.Surface;
     Caption    := CustomMessage('MaintenanceButtonInstall');
     Font.Style := [fsBold];
@@ -168,6 +191,7 @@ begin
   updateRadioBtn := TRadioButton.Create(wpMaintenance);
   with updateRadioBtn do
   begin
+    Enabled    := not uninstallOnly;
     Parent     := wpMaintenance.Surface;
     Caption    := CustomMessage('MaintenanceButtonUpdate');
     Font.Style := [fsBold];
@@ -207,6 +231,7 @@ begin
   installLabel := TLabel.Create(wpMaintenance);
   with installLabel do
   begin
+    Enabled    := not uninstallOnly;
     Parent     := wpMaintenance.Surface;
     Caption    := CustomMessage('MaintenanceLabelInstall');
     Left       := installRadioBtn.Left;
@@ -220,6 +245,7 @@ begin
   updateLabel := TLabel.Create(wpMaintenance);
   with updateLabel do
   begin
+    Enabled    := not uninstallOnly;
     Parent     := wpMaintenance.Surface;
     Caption    := CustomMessage('MaintenanceLabelUpdate');
     Left       := updateRadioBtn.Left;

@@ -90,6 +90,7 @@ Source: "resources\maintenance\icon_install.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_update.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_adjust.bmp"; Flags: dontcopy
 Source: "resources\maintenance\icon_uninstall.bmp"; Flags: dontcopy
+Source: "resources\maintenance\icon_nointernet.bmp"; Flags: dontcopy
 
 [Run]
 Filename: "{app}\sh2pc.exe"; Description: {cm:StartGameAfterExiting}; Flags: nowait postinstall skipifsilent unchecked
@@ -149,6 +150,7 @@ var
   maintenanceMode       : Boolean;
   updateMode            : Boolean;
   selfUpdateMode        : Boolean;
+  uninstallOnly         : Boolean;
   localInstallMode      : Boolean;
   Uninstalling          : Boolean;
   CurIniArray           : array of TIniArray;
@@ -279,119 +281,142 @@ begin
     end else // Criteria not met, download .csv from web
     begin
       // Get web .csv URL from git repo's .url file
-      begin
-        repeat
-          urlDownloadSuccess := idpDownloadFile('{#SH2EE_CSV_URL}', ExpandConstant('{tmp}\webcsv.url'));
-          if not urlDownloadSuccess then
+      repeat
+        urlDownloadSuccess := idpDownloadFile('{#SH2EE_CSV_URL}', ExpandConstant('{tmp}\webcsv.url'));
+
+        // We'll allow the installer to "work" without the .csv in maintenance mode, so the
+        // user can uninstall the project without an internet connection.
+        if maintenanceMode and not urlDownloadSuccess then
+        begin
+          uninstallOnly := True;
+          Continue;
+        end;
+
+        if not urlDownloadSuccess then
+        begin
+          if MsgBox(CustomMessage('WebURLDownloadError'), mbConfirmation, MB_YESNO) = IDNO then
           begin
-            if MsgBox(CustomMessage('WebURLDownloadError'), mbConfirmation, MB_YESNO) = IDNO then
-            begin
-              Result := False;
-              exit;
-            end;
+            Result := False;
+            exit;
           end;
-        until urlDownloadSuccess;
-      end;
+        end;
+      until urlDownloadSuccess or uninstallOnly;
   
-      Lines := TStringList.Create;
-      Lines.LoadFromFile(ExpandConstant('{tmp}\webcsv.url'));
-      webcsv_url := Lines[0];
-  
-      // Store the temp path to web sh2ee.csv
-      CSVFilePath := tmp(GetURLFilePart(webcsv_url));
-  
-      // Download sh2ee.csv; show an error message and exit the installer if downloading fails
+      if not uninstallOnly then
       begin
-        repeat
-          csvDownloadSuccess := idpDownloadFile(webcsv_url, CSVFilePath);
-          if not csvDownloadSuccess then
-          begin
-            if MsgBox(CustomMessage('WebCSVDownloadError'), mbConfirmation, MB_YESNO) = IDNO then
+        Lines := TStringList.Create;
+        Lines.LoadFromFile(ExpandConstant('{tmp}\webcsv.url'));
+        webcsv_url := Lines[0];
+    
+        // Store the temp path to web sh2ee.csv
+        CSVFilePath := tmp(GetURLFilePart(webcsv_url));
+    
+        // Download sh2ee.csv; show an error message and exit the installer if downloading fails
+        begin
+          repeat
+            csvDownloadSuccess := idpDownloadFile(webcsv_url, CSVFilePath);
+
+            // We'll allow the installer to "work" without the .csv in maintenance mode, so the
+            // user can uninstall the project without an internet connection.
+            if maintenanceMode and not urlDownloadSuccess then
             begin
-              Result := False;
-              exit;
+              uninstallOnly := True;
+              Continue;
             end;
-          end;
-        until csvDownloadSuccess;
+
+            if not csvDownloadSuccess then
+            begin
+              if MsgBox(CustomMessage('WebCSVDownloadError'), mbConfirmation, MB_YESNO) = IDNO then
+              begin
+                Result := False;
+                exit;
+              end;
+            end;
+          until csvDownloadSuccess or uninstallOnly;
+        end;
       end;
     end;
 
-    // Create an array of TWebComponentsInfo records from sh2ee.csv and store them in a global variable
-    WebCompsArray := WebCSVToInfoArray(CSVFilePath);
-
-    // Check if above didn't work
-    if GetArrayLength(WebCompsArray) = 0 then
+    if not uninstallOnly then
     begin
-      MsgBox(CustomMessage('WebCSVParseFailed'), mbCriticalError, MB_OK);
-      Result := False;
-      exit;
-    end;
-
-    // If we are in "maintenance mode"
-    if maintenanceMode then
-    begin
-      // Create an array of TMaintenanceComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
-      MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
-
+      // Create an array of TWebComponentsInfo records from sh2ee.csv and store them in a global variable
+      WebCompsArray := WebCSVToInfoArray(CSVFilePath);
+  
       // Check if above didn't work
       if GetArrayLength(WebCompsArray) = 0 then
       begin
-        MsgBox(CustomMessage('MaintenanceCSVParseFailed'), mbCriticalError, MB_OK);
+        MsgBox(CustomMessage('WebCSVParseFailed'), mbCriticalError, MB_OK);
         Result := False;
         exit;
       end;
-
-      // Update and reload local CSV if array sizes are different
-      if not SamePackedVersion(GetArrayLength(MaintenanceCompsArray), GetArrayLength(WebCompsArray)) then // [2] Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
+  
+      // If we are in "maintenance mode"
+      if maintenanceMode then
       begin
-        UpdateMaintenanceCSV(true);
+        // Create an array of TMaintenanceComponentsInfo records from the existing SH2EEsetup.dat and store it in a global variable
         MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
-      end;
-
-      // Update and reload local CSV if the order of ids don't match
-      for i := 0 to GetArrayLength(WebCompsArray) - 1 do
-      begin
-        if not SameText(MaintenanceCompsArray[i].id, WebCompsArray[i].id) then
+  
+        // Check if above didn't work
+        if GetArrayLength(WebCompsArray) = 0 then
+        begin
+          MsgBox(CustomMessage('MaintenanceCSVParseFailed'), mbCriticalError, MB_OK);
+          Result := False;
+          exit;
+        end;
+  
+        // Update and reload local CSV if array sizes are different
+        if not SamePackedVersion(GetArrayLength(MaintenanceCompsArray), GetArrayLength(WebCompsArray)) then // [2] Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
+        begin
           UpdateMaintenanceCSV(true);
           MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
-      end;
-    end;
-
-    // Enable Update if started with argument
-    if CmdLineParamExists('-update') and maintenanceMode then
-    begin
-      updateMode := True;
-    end;
-
-    // Enable selfUpdate if started with argument
-    if CmdLineParamExists('-selfUpdate') then
-    begin
-      selfUpdateMode := True;
-      maintenanceMode := True;
-    end;
-
-    // Check if the installer should work correctly with with the current server-side files
-    if not selfUpdateMode then
-    begin
-      for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
-        if WebCompsArray[i].id = 'setup_tool' then
+        end;
+  
+        // Update and reload local CSV if the order of ids don't match
+        for i := 0 to GetArrayLength(WebCompsArray) - 1 do
         begin
-          if not SameText(WebCompsArray[i].version, ExpandConstant('{#INSTALLER_VER}')) then
+          if not SameText(MaintenanceCompsArray[i].id, WebCompsArray[i].id) then
+            UpdateMaintenanceCSV(true);
+            MaintenanceCompsArray := MaintenanceCSVToInfoArray(ExpandConstant('{src}\SH2EEsetup.dat'));
+        end;
+      end;
+  
+      // Enable Update if started with argument
+      if CmdLineParamExists('-update') and maintenanceMode and not uninstallOnly then
+      begin
+        GetComponentSizes();
+        updateMode := True;
+      end;
+  
+      // Enable selfUpdate if started with argument
+      if CmdLineParamExists('-selfUpdate') and not uninstallOnly then
+      begin
+        selfUpdateMode := True;
+        maintenanceMode := True;
+      end;
+  
+      // Check if the installer should work correctly with with the current server-side files
+      if not selfUpdateMode then
+      begin
+        for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
+          if WebCompsArray[i].id = 'setup_tool' then
           begin
-            if MsgBox(CustomMessage('OutdatedSetupTool'), mbConfirmation, MB_YESNO) = IDYES then
+            if not SameText(WebCompsArray[i].version, ExpandConstant('{#INSTALLER_VER}')) then
             begin
-              selfUpdateMode := True;
-              maintenanceMode := True;
+              if MsgBox(CustomMessage('OutdatedSetupTool'), mbConfirmation, MB_YESNO) = IDYES then
+              begin
+                selfUpdateMode := True;
+                maintenanceMode := True;
+              end else
+              begin
+                Result := False;
+                exit;
+              end;
             end else
             begin
-              Result := False;
-              exit;
+              // Make sure the local .csv has the current Setup Tool's version, as there is
+              // a chance the user might have manually updated the setup tool.
+              UpdateMaintenanceCSV_SetupToolOnly();
             end;
-          end else
-          begin
-            // Make sure the local .csv has the current Setup Tool's version, as there is
-            // a chance the user might have manually updated the setup tool.
-            UpdateMaintenanceCSV_SetupToolOnly();
           end;
         end;
       end;
@@ -425,7 +450,7 @@ begin
   if not localInstallMode then
   begin
     // Compare the lenght of the web CSV array with the installer's component list
-    if not selfUpdateMode and not SamePackedVersion(WizardForm.ComponentsList.Items.Count, GetArrayLength(WebCompsArray) - 1) then // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
+    if not uninstallOnly and not selfUpdateMode and not SamePackedVersion(WizardForm.ComponentsList.Items.Count, GetArrayLength(WebCompsArray) - 1) then // Using SamePackedVersion() to compare lengths isn't the fanciest approach, but it works
     begin
       MsgBox(CustomMessage('InvalidWebComponentsListSize'), mbCriticalError, MB_OK);
       Abort;
@@ -632,7 +657,7 @@ begin
   end;
 
   // Skip to updater page if started with argument
-  if CmdLineParamExists('-update') and maintenanceMode then
+  if CmdLineParamExists('-update') and maintenanceMode and not uninstallOnly then
   begin
     if (CurPage = wpMaintenance.ID) then
     begin
