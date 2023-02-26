@@ -32,6 +32,7 @@ begin
   DeleteFile(path + '\sh2pc.exe');
   DeleteFile(path + '\XInput1_3.dll');
   DeleteFile(path + '\XInputPlus.ini');
+  DeleteFile(path + '\Xidi.ini');
 
   // Remove Wine DLL overrides
   if RegValueExists(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8') then
