@@ -37,7 +37,7 @@ pt_br.IstallModeTitle      =Selecione o Modo de Instalação
 pt_br.IstallModeDesc       =Como o Silent Hill 2: Enhanced Edition deve ser instalado?
 
 pt_br.normalInstallBtn     =Instalar pacotes de melhorias (recomendado)
-pt_br.normalInstallLabel   =Salva os pacotes de melhorias em uma pasta temporária para a instalação do projeto.
+pt_br.normalInstallLabel   =Salva os pacotes de melhorias em uma pasta temporária do Windows AppData para a instalação do projeto.
 
 pt_br.backupInstallBtn     =Instalar e fazer o backup dos pacotes de melhorias
 pt_br.backupInstallLabel   =Salva os pacotes de melhorias em uma pasta especificada como um backup, e instala o projeto.%n%nO backup criado funcionará como um instalador offline.
