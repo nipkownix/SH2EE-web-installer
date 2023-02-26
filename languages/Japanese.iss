@@ -75,6 +75,7 @@ jp.MaintenanceButtonInstall       =パッケージのインストール　また
 jp.MaintenanceButtonUpdate        =パッケージのアップデート
 jp.MaintenanceButtonAdjust        =設定の変更
 jp.MaintenanceButtonUninstall     =アンインストール
+jp.MaintenanceLabelUnavailable    =Feature unavailable. Cannot contact server. Please try again later.
 jp.MaintenanceLabelInstall        =まだ導入されていない拡張パッケージのインストールや、破損したパッケージの修復を行います。
 jp.MaintenanceLabelUpdate         =インストールされている拡張パッケージのアップデートを確認し、更新データをダウンロードします。
 jp.MaintenanceLabelAdjust         =Silent Hill 2: Enhanced Edition の設定ツールを起動し、ゲームのプロジェクト設定を調整します。

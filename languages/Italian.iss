@@ -77,6 +77,7 @@ it.MaintenanceButtonInstall       =Installa o Ripara Pacchetti
 it.MaintenanceButtonUpdate        =Aggiorna Pacchetti
 it.MaintenanceButtonAdjust        =Regola Impostazioni
 it.MaintenanceButtonUninstall     =Disinstalla
+it.MaintenanceLabelUnavailable    =Feature unavailable. Cannot contact server. Please try again later.
 it.MaintenanceLabelInstall        =Installa i pacchetti di miglioramento che non sono ancora stati installati, o ripara i pacchetti danneggiati.
 it.MaintenanceLabelUpdate         =Verifica e scarica gli aggiornamenti per i pacchetti di miglioramento installati.
 it.MaintenanceLabelAdjust         =Apri lo Strumento di Configurazione di Silent Hill 2: Enhanced Edition per regolare le impostazioni del progetto.

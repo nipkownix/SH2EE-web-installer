@@ -240,6 +240,9 @@ begin
     Anchors    := [akTop, akLeft, akRight];
     WordWrap   := True;
     AutoSize   := True;
+
+    if uninstallOnly then
+      Caption := Caption + #13#10 + '(' + CustomMessage('MaintenanceLabelUnavailable') + ')'; 
   end;
 
   updateLabel := TLabel.Create(wpMaintenance);
@@ -254,6 +257,9 @@ begin
     Anchors    := [akTop, akLeft, akRight];
     WordWrap   := True;
     AutoSize   := True;
+
+    if uninstallOnly then
+      Caption := Caption + #13#10 + '(' + CustomMessage('MaintenanceLabelUnavailable') + ')'; 
   end;
   
   adjustLabel := TLabel.Create(wpMaintenance);
