@@ -37,7 +37,7 @@ pt_br.IstallModeTitle      =Selecione o Modo de Instalação
 pt_br.IstallModeDesc       =Como o Silent Hill 2: Enhanced Edition deve ser instalado?
 
 pt_br.normalInstallBtn     =Instalar pacotes de melhorias (recomendado)
-pt_br.normalInstallLabel   =Salva os pacotes de melhorias em uma pasta temporária para a instalação do projeto.
+pt_br.normalInstallLabel   =Salva os pacotes de melhorias em uma pasta temporária do Windows AppData para a instalação do projeto.
 
 pt_br.backupInstallBtn     =Instalar e fazer o backup dos pacotes de melhorias
 pt_br.backupInstallLabel   =Salva os pacotes de melhorias em uma pasta especificada como um backup, e instala o projeto.%n%nO backup criado funcionará como um instalador offline.
@@ -105,8 +105,8 @@ pt_br.InvalidWebComponentsListSize   =Erro: Tamanho da lista de componentes inv�
 pt_br.InvalidLocalComponentsListSize =Erro: Tamanho da lista de componentes inválido%n%nO arquivo 'local_sh2ee.dat' pode estar corrompido. Usar o modo de instalação online?
 pt_br.FailedToQueryComponents        =Erro: Arquivos indisponíveis%n%Falha ao consultar um ou mais componentes.%n%nA instalação não pode continuar. Por favor, tente novamente e, se o problema persistir, informe aos desenvolvedores.
 pt_br.FailedToQueryComponents2       =Erro: Arquivos indisponíveis%n%Falha ao consultar um ou mais componentes.%n%nA instalação não pode continuar.
-pt_br.ChecksumMismatchFirstTime      =Error: Checksum mismatch%n%nFile '%1' is corrupted.%n%nDo you wish to skip the installation of this component and move to the next one?%n%nNOTE: You can try installing this component again after the installation has been completed by opening the Setup Tool (SH2EEsetup.exe) in the game's folder, and choosing "Install or Repair Packages". It is strongly recommended you do so in order to fully experience Silent Hill 2: Enhanced Edition.
-pt_br.ChecksumMismatchMaintenance    =Erro: Problema na verificação%n%nO arquivo '%1' está corrompido.%n%nA instalação não pode continuar. Por favor, tente novamente e, se o problema persistir, informe aos desenvolvedores.
+pt_br.ChecksumMismatchFirstTime      =Erro: Soma de verificação incompatível%n%nO Arquivo '%1' está corrompido.%n%nDeseja pular a instalação deste componente e passar para o próximo?%n%nNOTA: Você pode tentar instalar este componente novamente após a instalação concluída, abrindo a ferramenta de configuração (SH2EEsetup.exe) na pasta do jogo e escolhendo "Instalar ou Reparar Pacotes". É altamente recomendável que você faça isso para experimentar Silent Hill 2: Enhanced Edition.
+pt_br.ChecksumMismatchMaintenance    =Erro: Problema na verificação%n%nO arquivo '%1' está corrompido.%n%nA instalação deste componente será ignorada. Tente novamente e, se o problema persistir, informe aos desenvolvedores.
 pt_br.ExtractionFailed               =Erro: Falha ao iniciar a extração.%n%nA instalação não pode continuar.
 pt_br.NoComponentsSelected           =Erro: Nenhum componente foi selecionado.
 pt_br.SemicolonInPath                =Erro: Caminho inválido detectado%n%nO nome da pasta escolhida contém um ponto e vírgula.%n%nIsso causa o mau-funcionamento do jogo. Por favor, renomeie a pasta do jogo antes de continuar.
