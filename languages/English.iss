@@ -39,7 +39,7 @@ IstallModeTitle      =Select Installation Mode
 IstallModeDesc       =How should Silent Hill 2: Enhanced Edition be installed?
 
 normalInstallBtn     =Install enhancement packages (recommended)
-normalInstallLabel   =Downloads the enhancement packages to a temporary folder for project installation.
+normalInstallLabel   =Downloads the enhancement packages to a temporary Windows AppData folder for project installation.
 
 backupInstallBtn     =Install and backup enhancement packages
 backupInstallLabel   =Downloads the enhancement packages to a specified folder as a backup and installs the project files.%n%nThe backup created will work as an offline installer.
