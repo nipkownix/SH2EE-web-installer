@@ -1,4 +1,4 @@
-﻿#define brazilianPortuguese_lang_name  "Portugês Brasileiro"
+﻿#define brazilianPortuguese_lang_name  "Português Brasileiro"
 
 [Messages]
 pt_br.StatusExtractFiles      =Movendo arquivos...
@@ -105,7 +105,7 @@ pt_br.InvalidWebComponentsListSize   =Erro: Tamanho da lista de componentes inv�
 pt_br.InvalidLocalComponentsListSize =Erro: Tamanho da lista de componentes inválido%n%nO arquivo 'local_sh2ee.dat' pode estar corrompido. Usar o modo de instalação online?
 pt_br.FailedToQueryComponents        =Erro: Arquivos indisponíveis%n%Falha ao consultar um ou mais componentes.%n%nA instalação não pode continuar. Por favor, tente novamente e, se o problema persistir, informe aos desenvolvedores.
 pt_br.FailedToQueryComponents2       =Erro: Arquivos indisponíveis%n%Falha ao consultar um ou mais componentes.%n%nA instalação não pode continuar.
-pt_br.ChecksumMismatchFirstTime      =Erro: Soma de verificação incompatível%n%nO Arquivo '%1' está corrompido.%n%nDeseja pular a instalação deste componente e passar para o próximo?%n%nNOTA: Você pode tentar instalar este componente novamente após a instalação concluída, abrindo a ferramenta de configuração (SH2EEsetup.exe) na pasta do jogo e escolhendo "Instalar ou Reparar Pacotes". É altamente recomendável que você faça isso para experimentar Silent Hill 2: Enhanced Edition.
+pt_br.ChecksumMismatchFirstTime      =Erro: Problema na verificação%n%nO Arquivo '%1' está corrompido.%n%nDeseja pular a instalação deste componente e passar para o próximo?%n%nNOTA: Você pode tentar instalar este componente novamente após a instalação concluída, abrindo a ferramenta de configuração (SH2EEsetup.exe) na pasta do jogo e escolhendo "Instalar ou Reparar Pacotes". É altamente recomendável que você faça isso para experimentar Silent Hill 2: Enhanced Edition.
 pt_br.ChecksumMismatchMaintenance    =Erro: Problema na verificação%n%nO arquivo '%1' está corrompido.%n%nA instalação deste componente será ignorada. Tente novamente e, se o problema persistir, informe aos desenvolvedores.
 pt_br.ExtractionFailed               =Erro: Falha ao iniciar a extração.%n%nA instalação não pode continuar.
 pt_br.NoComponentsSelected           =Erro: Nenhum componente foi selecionado.
