@@ -242,7 +242,7 @@ begin
     AutoSize   := True;
 
     if uninstallOnly then
-      Caption := Caption + #13#10 + '(' + CustomMessage('MaintenanceLabelUnavailable') + ')'; 
+      Caption := CustomMessage('MaintenanceLabelUnavailable'); 
   end;
 
   updateLabel := TLabel.Create(wpMaintenance);
@@ -259,7 +259,7 @@ begin
     AutoSize   := True;
 
     if uninstallOnly then
-      Caption := Caption + #13#10 + '(' + CustomMessage('MaintenanceLabelUnavailable') + ')'; 
+      Caption := CustomMessage('MaintenanceLabelUnavailable'); 
   end;
   
   adjustLabel := TLabel.Create(wpMaintenance);
