@@ -39,7 +39,7 @@ it.IstallModeTitle      =Seleziona modalità di installazione
 it.IstallModeDesc       =Come vuoi installare Silent Hill 2: Enhanced Edition?
 
 it.normalInstallBtn     =Installa pacchetti di miglioramento (consigliato)
-it.normalInstallLabel   =Scarica i pacchetti di miglioramento in una cartella temporanea per l'installazione del progetto.
+it.normalInstallLabel   =Scarica il pacchetto di migliorie in una cartella temporanea in AppData di Windows per l'installazione del progetto.
 
 it.backupInstallBtn     =Installa e crea un backup dei pacchetti di miglioramento
 it.backupInstallLabel   =Scarica una copia dei pacchetti di miglioramento in una cartella specifica come backup e installa i file del progetto.%n%nIl backup creato si potrà usare per l'installazione non in linea.
@@ -77,7 +77,7 @@ it.MaintenanceButtonInstall       =Installa o Ripara Pacchetti
 it.MaintenanceButtonUpdate        =Aggiorna Pacchetti
 it.MaintenanceButtonAdjust        =Regola Impostazioni
 it.MaintenanceButtonUninstall     =Disinstalla
-it.MaintenanceLabelUnavailable    =Feature unavailable. Cannot contact server. Please try again later.
+it.MaintenanceLabelUnavailable    =Opzione non disponibile. Impossibile contattare il server. Si prega di riprovare più tardi.
 it.MaintenanceLabelInstall        =Installa i pacchetti di miglioramento che non sono ancora stati installati, o ripara i pacchetti danneggiati.
 it.MaintenanceLabelUpdate         =Verifica e scarica gli aggiornamenti per i pacchetti di miglioramento installati.
 it.MaintenanceLabelAdjust         =Apri lo Strumento di Configurazione di Silent Hill 2: Enhanced Edition per regolare le impostazioni del progetto.
@@ -109,7 +109,7 @@ it.InvalidWebComponentsListSize   =Errore: Dimensione lista componenti non valid
 it.InvalidLocalComponentsListSize =Errore: Dimensione lista componenti non valida%n%nIl file 'local_sh2ee.dat' potrebbe essere danneggiato. Usare al suo posto la modalità di installazione in linea?
 it.FailedToQueryComponents        =Errore: File non disponibili%n%nLa richiesta di uno o più componenti è fallita.%n%nImpossibile continuare con l'installazione. Vi preghiamo di riprovare e, se il problema persiste, di segnalarlo agli sviluppatori.
 it.FailedToQueryComponents2       =Errore: File non disponibili%n%nLa richiesta di uno o più componenti è fallita.%n%nImpossibile continuare con l'installazione.
-it.ChecksumMismatchFirstTime      =Error: Checksum mismatch%n%nFile '%1' is corrupted.%n%nDo you wish to skip the installation of this component and move to the next one?%n%nNOTE: You can try installing this component again after the installation has been completed by opening the Setup Tool (SH2EEsetup.exe) in the game's folder, and choosing "Install or Repair Packages". It is strongly recommended you do so in order to fully experience Silent Hill 2: Enhanced Edition.
+it.ChecksumMismatchFirstTime      =Errore: Il checksum non corrisponde %n%n Il file '%1' è corrotto. %n%n Vorresti saltare l'installazione di questo modulo e continuare col prossimo? %n%n NOTA: Puoi riprovare ad installare questo modulo di nuovo dopo il completamento dell'installazione riaprendo il Setup Tool (SH2EEsetup.exe) che si trova nella cartella del gioco, e selezionando "Installa o Ripara Pacchetti". E' caldamente consigliato di farlo, per godersi al meglio Silent Hill 2: Enhanced Edition.
 it.ChecksumMismatchMaintenance    =Errore: Il checksum non corrisponde%n%nIl file '%1' è danneggiato.%n%nImpossibile continuare con l'installazione. Vi preghiamo di riprovare e, se il problema persiste, di segnalarlo agli sviluppatori.
 it.ExtractionFailed               =Errore: Avvio dell'estrazione non riuscito.%n%nImpossibile continuare con l'installazione.
 it.NoComponentsSelected           =Errore: Nessun componente selezionato.
