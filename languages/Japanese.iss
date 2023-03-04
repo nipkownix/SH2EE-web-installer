@@ -1,4 +1,4 @@
-﻿; Japanese translation by toraMeeKay
+﻿; Japanese translation by toraMeeKay and lullulabydreams
 #define japanese_lang_name  "Japanese (日本語)"
 
 [Messages]
@@ -38,7 +38,7 @@ jp.IstallModeTitle      =インストール　モードを選択
 jp.IstallModeDesc       =Silent Hill 2: Enhanced Edition をどちらの形式でインストールしますか?
 
 jp.normalInstallBtn     =拡張パッケージをインストールする (推奨)
-jp.normalInstallLabel   =プロジェクト用の一時フォルダに　拡張機能をダウンロード
+jp.normalInstallLabel   プロジェクトのインストール用に、拡張パッケージをWindowsのAppData内のTempフォルダにダウンロードします。
 
 jp.backupInstallBtn     =拡張パッケージのインストールとバックアップ
 jp.backupInstallLabel   =拡張パッケージのバックアップを、指定先のフォルダにダウンロードします。%n%n作成されたバックアップファイルは、オフライン インストーラーとして使用可能です。
@@ -75,7 +75,7 @@ jp.MaintenanceButtonInstall       =パッケージのインストール　また
 jp.MaintenanceButtonUpdate        =パッケージのアップデート
 jp.MaintenanceButtonAdjust        =設定の変更
 jp.MaintenanceButtonUninstall     =アンインストール
-jp.MaintenanceLabelUnavailable    =Feature unavailable. Cannot contact server. Please try again later.
+jp.MaintenanceLabelUnavailable    =サーバーに接続できないため、この機能を使うことができません。しばらく待ってから再度お試しください。
 jp.MaintenanceLabelInstall        =まだ導入されていない拡張パッケージのインストールや、破損したパッケージの修復を行います。
 jp.MaintenanceLabelUpdate         =インストールされている拡張パッケージのアップデートを確認し、更新データをダウンロードします。
 jp.MaintenanceLabelAdjust         =Silent Hill 2: Enhanced Edition の設定ツールを起動し、ゲームのプロジェクト設定を調整します。
@@ -107,8 +107,8 @@ jp.InvalidWebComponentsListSize   =エラー: 整合性エラー%n%n'sh2ee.csv'�
 jp.InvalidLocalComponentsListSize =エラー: 整合性エラー%n%n'local_sh2ee.dat' が破損している可能性があります。オンライン インストールモードに切り替えますか?
 jp.FailedToQueryComponents        =エラー: ファイル利用不可%n%n1つ、または複数のコンポーネントの参照に失敗しました。%n%nインストールを続行できません。もう一度お試し下さい。問題が解決しない場合は、開発者に報告して下さい。
 jp.FailedToQueryComponents2       =エラー: ファイル利用不可%n%n1つ、または複数のコンポーネントの参照に失敗しました。%n%nインストールを続行できません。
-jp.ChecksumMismatchFirstTime      =Error: Checksum mismatch%n%nFile '%1' is corrupted.%n%nDo you wish to skip the installation of this component and move to the next one?%n%nNOTE: You can try installing this component again after the installation has been completed by opening the Setup Tool (SH2EEsetup.exe) in the game's folder, and choosing "Install or Repair Packages". It is strongly recommended you do so in order to fully experience Silent Hill 2: Enhanced Edition.
-jp.ChecksumMismatchMaintenance    =エラー: チェックサム不一致%n%nファイル '%1' が破損しています。%n%n インストールを続行できません。もう一度お試し下さい。問題が解決しない場合は、開発者に報告して下さい。
+jp.ChecksumMismatchFirstTime      =エラー: チェックサムの不一致%n%nファイル '%1' が破損しています。%n%nこのコンポーネントのインストールをスキップして、次のコンポーネントに移動しますか？%n%n注意：インストール完了後、ゲームフォルダ内のセットアップツール（SH2EEsetup.exe）を開けば、「パッケージのインストールまたは修復」を選択すると、あとでこのコンポーネントを再インストールもできます。『サイレントヒル2：エンハンスド・エディション』を十分にお楽しみいただくために、この作業を行うことを強くお勧めします
+jp.ChecksumMismatchMaintenance    =エラー: チェックサムの不一致%n%nファイル '%1' が破損しています。%n%nインストールを続行できません。もう一度お試し下さい。問題が解決しない場合は、開発者に報告して下さい。
 jp.ExtractionFailed               =エラー: ファイル展開エラー%n%nインストールを続行できません。
 jp.NoComponentsSelected           =エラー: コンポーネントが選択されていません。
 jp.SemicolonInPath                =エラー: 無効なフォルダパスを検出%n%n選択したディレクトリにセミコロン等が含まれています。%n%nゲームが正常に動作しなくなるため、ディレクトリ名を変更して下さい。
