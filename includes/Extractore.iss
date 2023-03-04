@@ -213,7 +213,10 @@ begin
       Log('ProcStart failed');
 
       MsgBox(CustomMessage('ExtractionFailed'), mbInformation, MB_OK);
-      doCustomUninstall(); // Try to undo the changes done so far
+
+      if not maintenanceMode then
+        doCustomUninstall(); // Try to undo the changes done so far
+
       ExitCode := -2;
       ExitProcess(1);
     end;
