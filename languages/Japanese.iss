@@ -38,7 +38,7 @@ jp.IstallModeTitle      =インストール　モードを選択
 jp.IstallModeDesc       =Silent Hill 2: Enhanced Edition をどちらの形式でインストールしますか?
 
 jp.normalInstallBtn     =拡張パッケージをインストールする (推奨)
-jp.normalInstallLabel   プロジェクトのインストール用に、拡張パッケージをWindowsのAppData内のTempフォルダにダウンロードします。
+jp.normalInstallLabel   =プロジェクトのインストール用に、拡張パッケージをWindowsのAppData内のTempフォルダにダウンロードします。
 
 jp.backupInstallBtn     =拡張パッケージのインストールとバックアップ
 jp.backupInstallLabel   =拡張パッケージのバックアップを、指定先のフォルダにダウンロードします。%n%n作成されたバックアップファイルは、オフライン インストーラーとして使用可能です。
