@@ -123,6 +123,13 @@ begin
           DeleteFile(WizardDirValue + '\d3d8.dat');
           DeleteFile(WizardDirValue + '\D3DCompiler_43.dll');
           DeleteFile(WizardDirValue + '\D3DX9_43.dll');
+          DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_e.res');
+          DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_f.res');
+          DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_g.res');
+          DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_i.res');
+          DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_j.res');
+          DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_s.res');
+          DelTree(WizardDirValue + '\sh2e\resources', True, True, True);
         end;
       end;
   
