@@ -232,6 +232,8 @@ begin
         SetLength(LogTextAnsi, Res);
         LogText := LeftOver + String(LogTextAnsi);
 
+        Log(LogText);
+
         if logToListBox then 
            StrSplitAppendToList(LogText, boxName, LeftOver);
 

@@ -71,7 +71,7 @@ begin
       begin
         UpdateCurrentComponentName(WebCompsArray[i].name + ' - ' + CustomMessage('ChecksumCheck'), true); // Update label
   
-        curFileChecksum := GetSHA256OfFile(localDataDir(GetURLFilePart(WebCompsArray[i].URL)));
+        curFileChecksum := Uppercase(GetSHA256OfFile(localDataDir(GetURLFilePart(WebCompsArray[i].URL))));
   
         Log('# ' + WebCompsArray[i].name + ' - Checksum (from .csv): ' + WebCompsArray[i].SHA256);
         Log('# ' + WebCompsArray[i].name + ' - Checksum (temp file): ' + curFileChecksum);

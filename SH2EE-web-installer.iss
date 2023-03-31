@@ -934,3 +934,17 @@ begin
     end;
   end;
 end;
+
+procedure DeinitializeSetup();
+var
+  logfilepathname, logfilename, newfilepathname: string;
+begin
+  if not CmdLineParamExists('/LOG') then Exit;
+
+  logfilepathname := ExpandConstant('{log}');
+  logfilename := ExtractFileName(logfilepathname);
+  // Set the new target path as the directory where the installer is being run from
+  newfilepathname := ExpandConstant('{src}\') + logfilename;
+
+  FileCopy(logfilepathname, newfilepathname, false);
+end; 
