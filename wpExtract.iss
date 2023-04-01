@@ -54,6 +54,7 @@ end;
 procedure ExtractWebCSVFiles();
 var
   i : Integer;
+  IniIndex : Integer;
   curFileChecksum : String;
 begin
   if IsWin64 then
@@ -64,8 +65,9 @@ begin
   // Extract selected components
   for i := 0 to GetArrayLength(WebCompsArray) - 1 do
   begin
-    if WizardIsComponentSelected(WebCompsArray[i].id) then
-    begin
+    if not WizardIsComponentSelected(WebCompsArray[i].id) then
+      Log(Format('Component "%s" not selected!', [WebCompsArray[i].id]))
+    else begin
       // Check for corrupted files
       if not (WebCompsArray[i].SHA256 = 'notUsed') then
       begin
@@ -112,25 +114,25 @@ begin
       // Custom actions for sh2emodule before extraction
       if WebCompsArray[i].id = 'sh2emodule' then
       begin
+        // Backup current .ini settings into an array
         if FileExists(WizardDirValue + '\d3d8.ini') then
         begin 
-          // Backup current .ini settings into an array
           CurIniArray := IniToSettingsArray(WizardDirValue + '\d3d8.ini');
           if {#DEBUG} then Log('# Backed up d3d8.ini settings');
-
-          // Try to delete old/unused sh2ee project files
-          DeleteFile(WizardDirValue + '\d3d8.res');
-          DeleteFile(WizardDirValue + '\d3d8.dat');
-          DeleteFile(WizardDirValue + '\D3DCompiler_43.dll');
-          DeleteFile(WizardDirValue + '\D3DX9_43.dll');
-          DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_e.res');
-          DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_f.res');
-          DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_g.res');
-          DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_i.res');
-          DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_j.res');
-          DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_s.res');
-          DelTree(WizardDirValue + '\sh2e\resources', True, True, True);
         end;
+
+        // Try to delete old/unused sh2ee project files
+        DeleteFile(WizardDirValue + '\d3d8.res');
+        DeleteFile(WizardDirValue + '\d3d8.dat');
+        DeleteFile(WizardDirValue + '\D3DCompiler_43.dll');
+        DeleteFile(WizardDirValue + '\D3DX9_43.dll');
+        DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_e.res');
+        DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_f.res');
+        DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_g.res');
+        DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_i.res');
+        DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_j.res');
+        DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_s.res');
+        DelTree(WizardDirValue + '\sh2e\resources', True, True, True);
       end;
   
       // Custom actions for Xidi before extraction
@@ -193,29 +195,21 @@ begin
       if (Length(userPackageDataDir) = 0) then DeleteFile(tmp(GetURLFilePart(WebCompsArray[i].URL)));
   
       // Restore .ini settings if we are in maintenance mode
-      if WebCompsArray[i].id = 'sh2emodule' then
+      if (WebCompsArray[i].id = 'sh2emodule') and maintenanceMode and not (GetArrayLength(CurIniArray) = 0) then
       begin
-        if maintenanceMode and not (GetArrayLength(CurIniArray) = 0) then
+        for IniIndex := 0 to GetArrayLength(CurIniArray) - 1 do
         begin
-          // Write stored .ini settings onto the new .ini file
-          for i := 0 to GetArrayLength(CurIniArray) - 1 do begin
-            with CurIniArray[i] do begin
-              if not (Trim(CurIniArray[i].Key) = '') then
-              begin 
-                // Log(CurIniArray[i].Section + ' - ' + CurIniArray[i].Key + ' = ' + CurIniArray[i].Value);  // <--- Enabling this Log will somewhat break the SetIniString function. No idea why. Inno Setup bug?
-                if IniKeyExists(CurIniArray[i].Section, CurIniArray[i].Key, WizardDirValue + '\d3d8.ini') then
-                begin
-                  SetIniString(CurIniArray[i].Section, CurIniArray[i].Key, CurIniArray[i].Value, WizardDirValue + '\d3d8.ini');
-                  if {#DEBUG} then
-                    Log('# key "' + CurIniArray[i].Key + '" has been restored');
-                end else 
-                if {#DEBUG} then
-                  Log('# key "' + CurIniArray[i].Key + '" doesn''t exist in the new .ini file');
-              end;
-            end;
-          end;
-          if {#DEBUG} then Log('# Restored d3d8.ini settings');
+          if (Trim(CurIniArray[IniIndex].Key) = '') or (Trim(CurIniArray[IniIndex].Value) = '') then
+            continue;
+          
+          if IniKeyExists(CurIniArray[IniIndex].Section, CurIniArray[IniIndex].Key, WizardDirValue + '\d3d8.ini') then
+          begin
+            SetIniString(CurIniArray[IniIndex].Section, CurIniArray[IniIndex].Key, ' ' +  CurIniArray[IniIndex].Value, WizardDirValue + '\d3d8.ini');
+            Log('# Key "' + CurIniArray[IniIndex].Key + '" has been restored');
+          end
+          else Log('# Key "' + CurIniArray[IniIndex].Key + '" doesn''t exist in the new .ini file');
         end;
+        Log('# Restored d3d8.ini settings');
       end;
 
       UpdateTotalProgressBar();

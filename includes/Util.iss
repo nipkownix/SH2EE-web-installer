@@ -320,36 +320,29 @@ end;
 
 // Given a .ini file, return an array of settings corresponding to
 // the data in the ini file.
-function IniToSettingsArray(Filename: String): array of TIniArray;
+function IniToSettingsArray(Filename: string): array of TIniArray;
 var
   Rows: TArrayOfString;
-  RowValues: TStrings;
-  IniSection: String;
+  IniSection: string;
   i: Integer;
 begin
-  // Read the file at Filename and store the lines in Rows
-  if LoadStringsFromFile(Filename, Rows) then begin
-    // Match length of return array to number of rows
-    SetArrayLength(Result, GetArrayLength(Rows) - 1);
-    for i := 1 to GetArrayLength(Rows) - 1 do begin
-      if (Pos('[', Rows[i]) > 0) and not (Pos(';', Rows[i]) > 0) then begin
-        IniSection := Rows[i];
-        Delete(IniSection, 1, 1); 
-        Delete(IniSection, Length(IniSection), 1); 
-      end;
-      if (Pos('=', Rows[i]) > 0) and not (Pos(';', Rows[i]) > 0) then
+  if LoadStringsFromFile(Filename, Rows) then
+  begin
+    SetArrayLength(Result, 0);
+    for i := 0 to GetArrayLength(Rows) - 1 do
+    begin
+      if (Rows[i] <> '') and (Rows[i][1] = '[') then
       begin
-        // Separate values
-        RowValues := SplitString(Rows[i], '=');
-        with Result[i - 1] do begin
-          Section := IniSection;
-          Key := RowValues[0];
-          Value := RowValues[1];
-        end;
+        IniSection := Copy(Rows[i], 2, Length(Rows[i]) - 2);
+      end
+      else if (Pos('=', Rows[i]) > 0) and (IniSection <> '') and (Rows[i][1] <> ';') then
+      begin
+        SetArrayLength(Result, GetArrayLength(Result) + 1);
+        Result[GetArrayLength(Result) - 1].Section := IniSection;
+        Result[GetArrayLength(Result) - 1].Key := Trim(Copy(Rows[i], 1, Pos('=', Rows[i]) - 1));
+        Result[GetArrayLength(Result) - 1].Value := Trim(Copy(Rows[i], Pos('=', Rows[i]) + 1, MaxInt));
       end;
     end;
-  end else begin
-    SetArrayLength(Result, 0);
   end;
 end;
 

@@ -164,11 +164,12 @@ var
 #include "CustomUninstall.iss"
 #include "includes/Extractore.iss"
 #include "wpMaintenance.iss"
-#include "LanguageDialog.iss"
-#include "wpInstallMode.iss"
 #include "CSVparser.iss"
 #include "wpSelectComponents.iss"
 #include "wpExtract.iss"
+#include "LanguageDialog.iss"
+#include "wpInstallMode.iss"
+
 #include "SelfUpdate.iss"
 #include "CustomLabels.iss"
 
