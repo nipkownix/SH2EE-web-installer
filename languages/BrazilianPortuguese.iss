@@ -1,4 +1,4 @@
-#define brazilianPortuguese_lang_name  "Português Brasileiro"
+﻿#define brazilianPortuguese_lang_name  "Português Brasileiro"
 
 [Messages]
 pt_br.StatusExtractFiles      =Movendo arquivos...
