@@ -150,7 +150,6 @@ begin
       if WebCompsArray[i].id = 'fmv_pack' then
       begin
         // Try to delete old Bink FMV files
-        DeleteFile(WizardDirValue + '\sh2e\movie\credits.bik');
         DeleteFile(WizardDirValue + '\sh2e\movie\deai.bik');
         DeleteFile(WizardDirValue + '\sh2e\movie\end.bik');
         DeleteFile(WizardDirValue + '\sh2e\movie\ending.bik');
@@ -174,10 +173,10 @@ begin
         DeleteFile(WizardDirValue + '\sh2e\movie\water.bik');
       end;
 
-      // Custom actions for Xidi before extraction
+      // Custom actions for the Credits FMV Pack before extraction
       if WebCompsArray[i].id = 'credits' then
       begin
-        // Try to delete old Bink FMV files
+        // Try to delete old Credits FMV file
         DeleteFile(WizardDirValue + '\sh2e\movie\credits.bik');
       end;
 
