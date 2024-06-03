@@ -54,6 +54,7 @@ end;
 procedure ExtractWebCSVFiles();
 var
   i : Integer;
+  compIndex : Integer;
   IniIndex : Integer;
   curFileChecksum : String;
 begin
@@ -133,6 +134,18 @@ begin
         DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_j.res');
         DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_s.res');
         DelTree(WizardDirValue + '\sh2e\resources', True, True, True);
+
+        compIndex := GetMaintCompIndexByID('dsoal');
+        if compIndex > -1 then
+        begin
+          if MaintenanceCompsArray[compIndex].isInstalled then
+          begin
+            Log('# Deleting old DSOAL files...');
+            DeleteFile(WizardDirValue + '\dsound.dll');
+            DeleteFile(WizardDirValue + '\dsoal-aldrv.dll');  
+            MaintenanceCompsArray[compIndex].isInstalled := False;
+          end;
+        end;
       end;
   
       // Custom actions for Xidi before extraction

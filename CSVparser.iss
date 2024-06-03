@@ -1,5 +1,50 @@
 [Code]
 
+function GetLocalCompIndexByID(const ID: String): Integer;
+var
+  i: Integer;
+begin
+  Result := -1; // Default result if not found
+  for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
+  begin
+    if LocalCompsArray[i].ID = ID then
+    begin
+      Result := i;
+      Exit;
+    end;
+  end;
+end;
+
+function GetWebCompIndexByID(const ID: String): Integer;
+var
+  i: Integer;
+begin
+  Result := -1; // Default result if not found
+  for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+  begin
+    if WebCompsArray[i].ID = ID then
+    begin
+      Result := i;
+      Exit;
+    end;
+  end;
+end;
+
+function GetMaintCompIndexByID(const ID: String): Integer;
+var
+  i: Integer;
+begin
+  Result := -1; // Default result if not found
+  for i := 0 to GetArrayLength(MaintenanceCompsArray) - 1 do
+  begin
+    if MaintenanceCompsArray[i].ID = ID then
+    begin
+      Result := i;
+      Exit;
+    end;
+  end;
+end;
+
 // Given a .csv file, return an array of information corresponding to
 // the data in the csv file.
 function WebCSVToInfoArray(Filename: String): array of TWebComponentsInfo;
@@ -121,6 +166,7 @@ end;
 procedure UpdateMaintenanceCSV(recoverOnly: Boolean);
 var
   i: Integer;
+  compIndex: Integer;
 begin
   Log('# updating maintenance csv');
 
@@ -178,6 +224,22 @@ begin
           SaveStringToFile(ExpandConstant('{src}\SH2EEsetup.dat')
           ,WebCompsArray[i].ID + ',false,' + '0.0' + #13#10,
           True);
+
+          // Re-save DSOAL's info if it exists, and we just wrote audio_pack
+          if (WebCompsArray[i].id = 'audio_pack') then
+          begin
+            compIndex := GetMaintCompIndexByID('dsoal');
+            if compIndex > -1 then
+            begin
+              if MaintenanceCompsArray[compIndex].isInstalled then
+              begin
+                Log('# User has installed DSOAL in the past, keeping .csv entry');
+                SaveStringToFile(ExpandConstant('{src}\SH2EEsetup.dat')
+                ,MaintenanceCompsArray[compIndex].ID + ',true,' + MaintenanceCompsArray[compIndex].Version + #13#10,
+                True);
+              end;
+            end;
+          end;
         end;
       end;
     end;
@@ -201,33 +263,39 @@ begin
     begin
       if not (WebCompsArray[i].id = 'setup_tool') then
       begin
-        // Rewrite existing local csv info
-        if maintenanceMode then
+        compIndex := GetMaintCompIndexByID(WebCompsArray[i].id);
+        if compIndex > -1 then
         begin
-          try
-            if MaintenanceCompsArray[i].isInstalled then
-              FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), MaintenanceCompsArray[i].ID + ',false,' + '0.0', MaintenanceCompsArray[i].ID + ',true,' + MaintenanceCompsArray[i].Version);
-          except
-            Log('# Entry is missing from local CSV.');
+          // Rewrite existing local csv info
+          if maintenanceMode then
+          begin
+            try
+              begin
+                if MaintenanceCompsArray[compIndex].isInstalled then
+                  FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), MaintenanceCompsArray[compIndex].ID + ',false,' + '0.0', MaintenanceCompsArray[compIndex].ID + ',true,' + MaintenanceCompsArray[compIndex].Version);
+              end;
+            except
+              Log('# Entry is missing from CSV.');
+            end;
           end;
-        end;
-  
-        // If in maintenance mode, check for maintenance page's radio buttons
-        if maintenanceMode and not selfUpdateMode and not recoverOnly then
-        begin
-          // Write info from new selected components using wpSelectComponents' list box
-          if installRadioBtn.Checked or updateRadioBtn.Checked or updateMode then
+    
+          // If in maintenance mode, check for maintenance page's radio buttons
+          if maintenanceMode and not selfUpdateMode and not recoverOnly then
+          begin
+            // Write info from new selected components using wpSelectComponents' list box
+            if installRadioBtn.Checked or updateRadioBtn.Checked or updateMode then
+            begin
+              if WizardForm.ComponentsList.Checked[i - 1] then
+                FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), MaintenanceCompsArray[compIndex].ID + ',' + BoolToStr(MaintenanceCompsArray[compIndex].isInstalled) + ',' + MaintenanceCompsArray[compIndex].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+            end;
+          end;
+    
+          // If not in maintenance mode, use the default method
+          if not maintenanceMode then
           begin
             if WizardForm.ComponentsList.Checked[i - 1] then
-              FileReplaceString(ExpandConstant('{src}\SH2EEsetup.dat'), MaintenanceCompsArray[i].ID + ',' + BoolToStr(MaintenanceCompsArray[i].isInstalled) + ',' + MaintenanceCompsArray[i].Version, WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
+              FileReplaceString(ExpandConstant('{app}\SH2EEsetup.dat'), WebCompsArray[i].ID + ',false,0.0', WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
           end;
-        end;
-  
-        // If not in maintenance mode, use the default method
-        if not maintenanceMode then
-        begin
-          if WizardForm.ComponentsList.Checked[i - 1] then
-            FileReplaceString(ExpandConstant('{app}\SH2EEsetup.dat'), WebCompsArray[i].ID + ',false,0.0', WebCompsArray[i].ID + ',true,' + WebCompsArray[i].Version);
         end;
       end;
     end;

@@ -12,6 +12,7 @@ var
 procedure update_ComponentsList();
   var
   i: integer;
+  compIndex: integer;
 begin
   // Reset component lists
   iTotalCompCount := 0;
@@ -56,14 +57,18 @@ begin
           ItemSubItem[i - 1] := FileSizeArray[i - 1].String
         else
         begin
-          // Show custom text if the component is already installed
-          if MaintenanceCompsArray[i].isInstalled then
-            ItemSubItem[i - 1] := CustomMessage('AlreadyInstalled') + ' - ' + FileSizeArray[i - 1].String
-          else if installRadioBtn.Checked then // "Install/Repair" page 
-            ItemSubItem[i - 1] := FileSizeArray[i - 1].String;
-  
-          if updateRadioBtn.Checked or updateMode then // "Update" page
-            ItemSubItem[i - 1] := wpUVersionLabel(WebCompsArray[i].Version, MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].isInstalled);
+          compIndex := GetMaintCompIndexByID(WebCompsArray[i].id);
+          if compIndex > -1 then
+          begin
+            // Show custom text if the component is already installed
+            if MaintenanceCompsArray[compIndex].isInstalled then
+              ItemSubItem[i - 1] := CustomMessage('AlreadyInstalled') + ' - ' + FileSizeArray[i - 1].String
+            else if installRadioBtn.Checked then // "Install/Repair" page 
+              ItemSubItem[i - 1] := FileSizeArray[i - 1].String;
+      
+            if updateRadioBtn.Checked or updateMode then // "Update" page
+              ItemSubItem[i - 1] := wpUVersionLabel(WebCompsArray[i].Version, MaintenanceCompsArray[compIndex].Version, MaintenanceCompsArray[compIndex].isInstalled);
+          end;
         end;
 
         // Calculate how many components are selected
@@ -267,14 +272,10 @@ begin
          Description := CustomMessage('audio_packDescription');
        end;
     6: begin
-         Title := '{#dsoalName}';
-         Description := CustomMessage('dsoalDescription');
-       end;
-    7: begin
          Title := '{#xidiName}';
          Description := CustomMessage('xidiDescription');
        end;
-    8: begin
+    7: begin
          Title := '{#creditsName}';
          Description := CustomMessage('creditsDescription');
        end;

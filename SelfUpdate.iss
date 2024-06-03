@@ -33,6 +33,7 @@ procedure SelfUpdate_postInstall();
 var
   webInstallerChecksum: String;
   i: Integer;
+  compIndex: Integer;
   intErrorCode: Integer;
   ShouldUpdateComps: Boolean;
 begin
@@ -64,8 +65,12 @@ begin
     for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
       if not (WebCompsArray[i].id = 'setup_tool') then
       begin
-        if isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].isInstalled) then
-          ShouldUpdateComps := True;
+        compIndex := GetMaintCompIndexByID(WebCompsArray[i].id);
+        if compIndex > -1 then
+        begin
+          if isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[compIndex].Version, MaintenanceCompsArray[compIndex].isInstalled) then
+            ShouldUpdateComps := True;
+        end;
       end;
     end;
   end;

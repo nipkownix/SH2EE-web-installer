@@ -28,6 +28,22 @@ begin
   Result:= GetProcAddress(LibHandle, 'wine_get_version')<> 0;
 end;
 
+function Max(A, B: Integer): Integer;
+begin
+  if A > B then
+    Result := A
+  else
+    Result := B;
+end;
+
+function Min(A, B: Integer): Integer;
+begin
+  if A < B then
+    Result := A
+  else
+    Result := B;
+end;
+
 procedure GetComponentSizes();
 var
   i: integer;

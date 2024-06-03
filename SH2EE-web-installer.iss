@@ -1,6 +1,6 @@
 ; -- SH2EE Web Installer --
 
-#define INSTALLER_VER  "1.1.2"
+#define INSTALLER_VER  "1.1.4"
 #define DEBUG          "true"
 #define SH2EE_CSV_URL  "https://raw.githubusercontent.com/elishacloud/Silent-Hill-2-Enhancements/master/Resources/webcsv.url"
 
@@ -14,7 +14,7 @@
 #define img_packName      "Image Enhancement Pack"
 #define fmv_packName      "FMV Enhancement Pack"
 #define audio_pack        "Audio Enhancement Pack"
-#define dsoalName         "DSOAL"
+;#define dsoalName         "DSOAL"
 #define xidiName          "Xidi"
 #define CreditsName       "Credits"
 
@@ -72,7 +72,7 @@ Name: ee_essentials; Description: {#ee_essentialsName}; Types: full
 Name: img_pack;      Description: {#img_packName};      Types: full
 Name: fmv_pack;      Description: {#fmv_packName};      Types: full
 Name: audio_pack;    Description: {#audio_pack};        Types: full
-Name: dsoal;         Description: {#dsoalName};         Types: full
+;Name: dsoal;         Description: {#dsoalName};         Types: full
 Name: xidi;          Description: {#xidiName};          Types: full
 Name: credits;       Description: {#creditsName};       Types: full custom
 
@@ -167,11 +167,10 @@ var
 #include "CSVparser.iss"
 #include "wpSelectComponents.iss"
 #include "wpExtract.iss"
-#include "LanguageDialog.iss"
-#include "wpInstallMode.iss"
-
 #include "SelfUpdate.iss"
 #include "CustomLabels.iss"
+#include "LanguageDialog.iss"
+#include "wpInstallMode.iss"
 
 // Runs before anything else
 function InitializeSetup(): Boolean;
@@ -528,10 +527,10 @@ begin
   begin
     WizardForm.ComponentsList.Checked[0] := true;
     WizardForm.ComponentsList.Checked[1] := true;
-    WizardForm.ComponentsList.Checked[8] := true;
+    WizardForm.ComponentsList.Checked[7] := true;
     WizardForm.ComponentsList.ItemEnabled[0] := false;
     WizardForm.ComponentsList.ItemEnabled[1] := false;
-    WizardForm.ComponentsList.ItemEnabled[8] := false;
+    WizardForm.ComponentsList.ItemEnabled[7] := false;
   end;
 
   // Items names and descriptions on wpSelectComponents
@@ -794,6 +793,7 @@ procedure CurPageChanged(CurPage: Integer);
 var
   sh2pcFilesExist : Boolean;
   i : Integer;
+  compIndex : Integer;
 begin
   // Only enable the lang button if we're in the main maintenance page
   if maintenanceMode and not selfUpdateMode then
@@ -845,16 +845,20 @@ begin
       for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
         if not (WebCompsArray[i].id = 'setup_tool') then
         begin
-          with Wizardform.ComponentsList do
+          compIndex := GetMaintCompIndexByID(WebCompsArray[i].id);
+          if compIndex > -1 then
           begin
-            // Unchecked and enabled by default
-            Checked[i - 1] := false;
-            ItemEnabled[i - 1] := true;
-
-            if updateRadioBtn.Checked or updateMode then // "Update" page
+            with Wizardform.ComponentsList do
             begin
-              Checked[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].isInstalled);
-              ItemEnabled[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[i].Version, MaintenanceCompsArray[i].isInstalled);
+              // Unchecked and enabled by default
+              Checked[i - 1] := false;
+              ItemEnabled[i - 1] := true;
+
+              if updateRadioBtn.Checked or updateMode then // "Update" page
+              begin
+                Checked[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[compIndex].Version, MaintenanceCompsArray[compIndex].isInstalled);
+                ItemEnabled[i - 1] := isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[compIndex].Version, MaintenanceCompsArray[compIndex].isInstalled);
+              end;
             end;
           end;
         end;
