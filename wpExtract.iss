@@ -148,6 +148,21 @@ begin
         end;
       end;
   
+      // Custom actions for wine_stub before extraction
+      if WebCompsArray[i].id = 'sh2emodule\wine_stub' then
+      begin
+        // Display Wine dll message
+        if not (RegValueExists(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8')) then
+        begin
+          RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8', 'native,builtin');
+          RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'Dinput', 'native,builtin');
+          RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'Dinput8', 'native,builtin');
+          RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'dsound', 'native,builtin');
+          RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'XInput1_3', 'native,builtin');
+          MsgBox(CustomMessage('WineOverrides'), mbInformation, MB_OK);
+        end;
+      end;
+
       // Custom actions for Xidi before extraction
       if WebCompsArray[i].id = 'xidi' then
       begin

@@ -50,6 +50,7 @@ BackupLocationBrowse =Please specify the directory where the backup should be st
 
 DescriptionTip                 =Move your mouse over a component to see its description.
 eeModuleDescription            =The SH2 Enhancements module provides programming-based fixes and enhancements. This is the "brains" of the project and is required to be installed.
+wine_stubDescription           =Placeholder
 eeExeDescription               =This executable provides compatibility with newer Windows operating systems and is required to be installed.
 ; For translators: if your language is French, German, Italian or Spanish, here you can replace "language/textual improvements" with "translation improvements".
 eeEssentialsDescription        =The Enhanced Edition Essential Files provides geometry fixes, camera clipping adjustments, high resolution text, and language/textual improvements for the game.
@@ -83,7 +84,7 @@ MaintenanceLabelUpdate         =Check and download updates for installed enhance
 MaintenanceLabelAdjust         =Open the Silent Hill 2: Enhanced Edition Configuration Tool to adjust project settings for the game.
 MaintenanceLabelUninstall      =Remove all installed enhancement packages. This only removes the Silent Hill 2: Enhanced Edition project files and does not remove Silent Hill 2 PC files.
 ; For translators: you can find Wine's official translations here: https://gitlab.winehq.org/wine/wine/-/tree/master/po
-WineDetected                   =Wine/Proton detected%n%nThis installation is running in Wine/Proton.%n%nThe Silent Hill 2: Enhanced Edition DLLs have automatically been set to "native, builtin" in the Wine configuration options.%n%nFor Steam Deck/OS users: This setting is only active for the currently used profile.%nIf you added this installer as a non-Steam game, simply change its target from SH2EEsetup.exe to sh2pc.exe and use that to start the game.
+WineOverrides                  =Wine/Proton%n%nThe Silent Hill 2: Enhanced Edition DLLs have automatically been set to "native, builtin" in the Wine configuration options.
 GameFilesNotFound              =The selected folder may not be where Silent Hill 2 PC is located.%n%nProceed anyway?
 installPageDescriptionLabel    =Please select which enhancement packages you would like to install or repair.
 installSelectComponentsLabel   =Silent Hill 2: Enhanced Edition is comprised of several enhancement packages. Select which enhancement packages you wish to install. For the full, intended experience, install all enhancement packages.

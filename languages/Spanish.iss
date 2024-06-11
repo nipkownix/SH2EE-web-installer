@@ -49,6 +49,7 @@ es.BackupLocationBrowse =Especifica el directorio en el que se guardará la copi
 
 es.DescriptionTip                 =Pasa el ratón sobre un componente para ver su descripción.
 es.eeModuleDescription            =El módulo de mejoras de SH2 ofrece correcciones y mejoras de programación. Es el «cerebro» del proyecto y su instalación es obligatoria.
+es.wine_stubDescription           =Placeholder
 es.eeExeDescription               =Este ejecutable da una mejor compatibilidad con los sistemas operativos Windows modernos y su instalación es obligatoria.
 es.eeEssentialsDescription        =Los archivos esenciales de la Enhanced Edition ofrecen correcciones de la geometría, ajustes para que la cámara no se salga de las habitaciones, textos en alta resolución y mejoras en las traducciones del juego.
 es.img_packDescription            =El paquete de mejora de imágenes ofrece imágenes a pantalla completa redimensionadas, remasterizadas y recreadas.
@@ -80,7 +81,7 @@ es.MaintenanceLabelInstall        =Instala los paquetes de mejora que no hayan s
 es.MaintenanceLabelUpdate         =Busca y descarga actualizaciones para los paquetes de mejora instalados.
 es.MaintenanceLabelAdjust         =Abre la herramienta de configuración de Silent Hill 2: Enhanced Edition para cambiar los ajustes del proyecto.
 es.MaintenanceLabelUninstall      =Elimina todos los paquetes de mejora instalado. Solo se desinstalarán los archivos del proyecto Silent Hill 2: Enhanced Edition y no se borrarán los archivos de la versión para PC de Silent Hill 2.
-es.WineDetected                   =Wine/Proton detectado%n%nEsta instalación se está ejecutando dentro de Wine o Proton.%n%nLas DLL de Silent Hill 2: Enhanced Edition han sido asignadas automáticamente como «nativa, interna» dentro de las opciones de configuración de Wine.%n%nAviso a usuarios de Steam Deck/OS: esta configuración solo se aplica al perfil que se esté utilizando en estos momentos.%nSi has añadido este instalador como un juego que no es de Steam, solo tienes que cambiar su ejecutable de destino de SH2EEsetup.exe a sh2pc.exe y utilizarlo para ejecutar el juego.
+es.WineOverrides                   =Wine/Proton%n%nLas DLL de Silent Hill 2: Enhanced Edition han sido asignadas automáticamente como «nativa, interna» dentro de las opciones de configuración de Wine.
 es.GameFilesNotFound              =Es posible que en la carpeta seleccionada no se encuentre la versión para PC de Silent Hill 2.%n%n¿Deseas continuar de todos modos?
 es.installPageDescriptionLabel    =Selecciona qué paquetes de mejora deseas instalar o reparar.
 es.installSelectComponentsLabel   =Silent Hill 2: Enhanced Edition está compuesta por varios paquetes de mejora. Selecciona qué paquetes deseas instalar. Si quieres la experiencia completa, instala todos los paquetes de mejora.

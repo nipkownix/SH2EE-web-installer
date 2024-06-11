@@ -251,31 +251,35 @@ begin
          Title := '{#eeModuleName}';
          Description := CustomMessage('eeModuleDescription');
        end;
-    1: begin
+    1: begin 
+         Title := '{#wine_stubName}';
+         Description := CustomMessage('wine_stubDescription');
+       end;
+    2: begin
          Title := '{#ee_exeName}';
          Description := CustomMessage('eeExeDescription');
        end;
-    2: begin
+    3: begin
          Title := '{#ee_essentialsName}';
          Description := CustomMessage('eeEssentialsDescription');
        end;
-    3: begin
+    4: begin
          Title := '{#img_packName}';
          Description := CustomMessage('img_packDescription');
        end;
-    4: begin
+    5: begin
          Title := '{#fmv_packName}';
          Description := CustomMessage('fmv_packDescription');
        end;
-    5: begin
+    6: begin
          Title := '{#audio_pack}';
          Description := CustomMessage('audio_packDescription');
        end;
-    6: begin
+    7: begin
          Title := '{#xidiName}';
          Description := CustomMessage('xidiDescription');
        end;
-    7: begin
+    8: begin
          Title := '{#creditsName}';
          Description := CustomMessage('creditsDescription');
        end;

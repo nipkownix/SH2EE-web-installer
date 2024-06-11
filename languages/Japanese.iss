@@ -48,6 +48,7 @@ jp.BackupLocationBrowse =バックアップを保存するフォルダを指定�
 
 jp.DescriptionTip                 =コンポーネント上にカーソルを合わせると、説明文が表示されます。
 jp.eeModuleDescription            =SH2 Enhancements module は、PC版のゲーム本体が抱える既知の不具合の修正や、独自の強化機能を提供します。 こちらはプロジェクトの基本にして核であるため、必ずインストールする必要があります。
+jp.wine_stubDescription           =Placeholder
 jp.eeExeDescription               =新しい Windows OS との互換性を提供する実行ファイルです。必ずインストールして下さい。
 jp.eeEssentialsDescription        =Enhanced Edition Essential Filesでは、ジオメトリ処理の修正、カメラのコントロール調整、テキストの高解像度化、ゲーム内の言語/テキストの改善などが行われています。
 jp.img_packDescription            =Image Enhancement Packはアップスケーリングおよびリマスター処理、高解像度に合わせ再作成したファイルを提供します。
@@ -81,7 +82,7 @@ jp.MaintenanceLabelUpdate         =インストールされている拡張パッ
 jp.MaintenanceLabelAdjust         =Silent Hill 2: Enhanced Edition の設定ツールを起動し、ゲームのプロジェクト設定を調整します。
 jp.MaintenanceLabelUninstall      =インストールされている全ての拡張パッケージを削除します。サイレントヒル2 PC版の本体データを残したまま、Silent Hill 2: Enhanced Edition のプロジェクトファイルのみを削除します。
 
-jp.WineDetected                   =Wine/Proton検出%n%nこのインストールプログラムは、Wine/Protonで動作しています。%n%nSilent Hill 2: Enhanced Edition の DLL は、Wine の設定オプションにて自動的に "native, builtin" に設定されました。%n%nSteam Deck/OSユーザー向け。この設定は、現在使用されているプロファイルに対してのみ有効です。%nこのインストーラーを非Steamゲームとして追加する場合は、登録する実行ファイルを SH2EEsetup.exe から sh2pc.exe に変更した上で、ゲームを起動して下さい。
+jp.WineOverrides                   =Wine/Proto%n%nSilent Hill 2: Enhanced Edition の DLL は、Wine の設定オプションにて自動的に "native, builtin" に設定されました。
 jp.GameFilesNotFound              =指定先のフォルダにサイレントヒル2 PC版の本体データが見当たりません。%n%nこのまま実行しますか？
 jp.installPageDescriptionLabel    =インストール、または修復する拡張パッケージを選択して下さい。
 jp.installSelectComponentsLabel   =Silent Hill 2: Enhanced Edition はいくつかのパッケージに分けて構成されています。修正、あるいは強化された全ての機能を体験するには、全パッケージをインストールする必要があります。

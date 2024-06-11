@@ -9,6 +9,7 @@
 #define HELP_URL         "https://github.com/elishacloud/Silent-Hill-2-Enhancements/issues"
 
 #define eeModuleName      "SH2 Enhancements Module"
+#define wine_stubName     "Wine/Linux Support"
 #define ee_exeName        "Enhanced Executable"
 #define ee_essentialsName "Enhanced Edition Essential Files"
 #define img_packName      "Image Enhancement Pack"
@@ -66,15 +67,16 @@ Name: custom; Description: {cm:installTypeCustom}; Flags: iscustom
 
 [Components]
 ; *** component name MUST match the component "id" in _sh2ee.csv! ***
-Name: sh2emodule;    Description: {#eeModuleName};      Types: full custom
-Name: ee_exe;        Description: {#ee_exeName};        Types: full custom
-Name: ee_essentials; Description: {#ee_essentialsName}; Types: full
-Name: img_pack;      Description: {#img_packName};      Types: full
-Name: fmv_pack;      Description: {#fmv_packName};      Types: full
-Name: audio_pack;    Description: {#audio_pack};        Types: full
-;Name: dsoal;         Description: {#dsoalName};         Types: full
-Name: xidi;          Description: {#xidiName};          Types: full
-Name: credits;       Description: {#creditsName};       Types: full custom
+Name: sh2emodule;           Description: {#eeModuleName};      Types: full custom; Flags: checkablealone
+Name: sh2emodule\wine_stub; Description: {#wine_stubName};     Types: custom;      Flags: dontinheritcheck
+Name: ee_exe;               Description: {#ee_exeName};        Types: full custom
+Name: ee_essentials;        Description: {#ee_essentialsName}; Types: full
+Name: img_pack;             Description: {#img_packName};      Types: full
+Name: fmv_pack;             Description: {#fmv_packName};      Types: full
+Name: audio_pack;           Description: {#audio_pack};        Types: full
+;Name: dsoal;                Description: {#dsoalName};         Types: full
+Name: xidi;                 Description: {#xidiName};          Types: full
+Name: credits;              Description: {#creditsName};       Types: full custom
 
 [Files]
 ; Tools below
@@ -525,13 +527,17 @@ begin
   // Force installation of the SH2E module, EE exe and credits if not in maintenance mode
   if not maintenanceMode then
   begin
-    WizardForm.ComponentsList.Checked[0] := true;
-    WizardForm.ComponentsList.Checked[1] := true;
-    WizardForm.ComponentsList.Checked[7] := true;
-    WizardForm.ComponentsList.ItemEnabled[0] := false;
-    WizardForm.ComponentsList.ItemEnabled[1] := false;
-    WizardForm.ComponentsList.ItemEnabled[7] := false;
+    WizardForm.ComponentsList.Checked[GetWebCompIndexByID('sh2emodule') - 1] := true;
+    WizardForm.ComponentsList.Checked[GetWebCompIndexByID('ee_exe') - 1] := true;
+    WizardForm.ComponentsList.Checked[GetWebCompIndexByID('credits') - 1] := true;
+    WizardForm.ComponentsList.ItemEnabled[GetWebCompIndexByID('sh2emodule') - 1] := false;
+    WizardForm.ComponentsList.ItemEnabled[GetWebCompIndexByID('ee_exe') - 1] := false;
+    WizardForm.ComponentsList.ItemEnabled[GetWebCompIndexByID('credits') - 1] := false;
   end;
+
+  // Automatically check the wine_stub component if wine is detected
+  if not maintenanceMode then
+    WizardForm.ComponentsList.Checked[GetWebCompIndexByID('sh2emodule\wine_stub') - 1] := IsWine();
 
   // Items names and descriptions on wpSelectComponents
   create_CompNameDesc();
@@ -766,21 +772,6 @@ begin
   // Copy SH2EEsetup.exe to the game's directory if we're not currently running from it
   if not (DirExists(ExpandConstant('{src}\') + 'data') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat')) then
     FileCopy(ExpandConstant('{tmp}\SH2EEsetup.exe'), ExpandConstant('{app}\SH2EEsetup.exe'), false);
-
-  // Display Wine message when not uninstalling
-  if maintenanceMode and not selfUpdateMode then
-    if uninstallRadioBtn.Checked then
-    Uninstalling := True;
-
-  if (IsWine) and not (Uninstalling) and not (RegValueExists(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8')) then
-  begin
-    RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8', 'native,builtin');
-    RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'Dinput', 'native,builtin');
-    RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'Dinput8', 'native,builtin');
-    RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'dsound', 'native,builtin');
-    RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'XInput1_3', 'native,builtin');
-    MsgBox(CustomMessage('WineDetected'), mbInformation, MB_OK);
-  end;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);

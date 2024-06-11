@@ -50,6 +50,7 @@ it.BackupLocationBrowse =Per favore, specifica il percorso dove archiviare il ba
 
 it.DescriptionTip                 =Posiziona il mouse sopra un componente per vedere la sua descrizione.
 it.eeModuleDescription            =Il modulo Miglioramenti per SH2 offre correzioni e miglioramenti a livello di programmazione. Questo è il "cervello" del progetto ed è necessario installarlo.
+it.wine_stubDescription           =Placeholder
 it.eeExeDescription               =Questo eseguibile offre compatiblità con i più recenti sistemi operativi Windows ed è necessario installarlo.
 ; For translators: if your language is French, German, Italian or Spanish, here you can replace "language/textual improvements" with "translation improvements".
 it.eeEssentialsDescription        =I File Essenziali della Enhanced Edition offrono correzioni alla geometria, aggiustamenti alle inquadrature della telecamera, testo ad alta risoluzione, e miglioramenti della traduzione.
@@ -83,7 +84,7 @@ it.MaintenanceLabelUpdate         =Verifica e scarica gli aggiornamenti per i pa
 it.MaintenanceLabelAdjust         =Apri lo Strumento di Configurazione di Silent Hill 2: Enhanced Edition per regolare le impostazioni del progetto.
 it.MaintenanceLabelUninstall      =Rinuovi tutti i pacchetti di miglioramento installati. Questo rimuove solamente i file del progetto Silent Hill 2: Enhanced Edition e non i file di Silent Hill 2 per PC.
 ; For translators: you can find Wine's official translations here: https://gitlab.winehq.org/wine/wine/-/tree/master/po
-it.WineDetected                   =Rilevato Wine/Proton%n%nQuesta installazione è in esecuzione tramite Wine/Proton.%n%n Le DLL di Silent Hill 2: Enhanced Edition sono state impostate automaticamente su "nativa, integrata" nelle opzioni di configurazione di Wine.%n%nPer gli utenti Steam Deck/OS: Questa impostazione è attiva solo per il profilo attualmente in uso.%nSe hai aggiunto questo strumento come gioco non di Steam, basta modificare la destinazione da SH2EEsetup.exe a sh2pc.exe per avviare direttamente il gioco.
+it.WineOverrides                  =Wine/Proton%n%n Le DLL di Silent Hill 2: Enhanced Edition sono state impostate automaticamente su "nativa, integrata" nelle opzioni di configurazione di Wine.
 it.GameFilesNotFound              =La cartella selezionata non sembra contenere i file di gioco di Silent Hill 2 per PC.%n%nProcedere comunque?
 it.installPageDescriptionLabel    =Per favore, seleziona quali pacchetti di miglioramento vorresti installare o riparare.
 it.installSelectComponentsLabel   =Silent Hill 2: Enhanced Edition comprende numerosi pacchetti di miglioramento. Seleziona quali pacchetti di miglioramento vorresti installare. Per l'esperienza completa, installa tutti i pacchetti di miglioramento.
