@@ -48,7 +48,7 @@ pt_br.BackupLocationBrowse =Por favor, escolha a pasta onde o Backup deve ser sa
 
 pt_br.DescriptionTip                 =Mova o mouse sobre um componente para ler a sua descrição.
 pt_br.eeModuleDescription            =O SH2 Enhancements Module fornece correções e aprimoramentos baseados em programação. Este é o "cérebro" do projeto e deve ser instalado.
-pt_br.wine_stubDescription           =Placeholder
+pt_br.wine_stubDescription           =Coloca um stub d3dx.dll na pasta do jogo, para que o jogo possa carregar o arquivo d3d8.dll local do projeto para usuários de Linux/Wine/Proton. Deve ser usado em conjunto com o "Enhanced Executable" do projeto para funcionar.
 pt_br.eeExeDescription               =Este executável fornece compatibilidade com sistemas operacionais Windows mais recentes e deve ser instalado.
 pt_br.eeEssentialsDescription        =O Enhanced Edition Essential Files fornece correções de geometria, ajustes de câmera, texto de alta resolução e melhorias no idioma/texto do jogo.
 pt_br.img_packDescription            =O Image Enhancement Pack fornece imagens em tela cheia redimensionadas, remasterizadas e refeitas.

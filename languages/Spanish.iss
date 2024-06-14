@@ -49,7 +49,7 @@ es.BackupLocationBrowse =Especifica el directorio en el que se guardará la copi
 
 es.DescriptionTip                 =Pasa el ratón sobre un componente para ver su descripción.
 es.eeModuleDescription            =El módulo de mejoras de SH2 ofrece correcciones y mejoras de programación. Es el «cerebro» del proyecto y su instalación es obligatoria.
-es.wine_stubDescription           =Placeholder
+es.wine_stubDescription           =Sitúa un archivo «stub» d3dx.dll en la carpeta del juego para que este pueda cargar el archivo  d3d8.dll local del proyecto. Para usuarios de Linux/Wine/Proton. Es necesario para que el paquete «Enhanced Executable (ejecutable mejorado)» pueda funcionar.
 es.eeExeDescription               =Este ejecutable da una mejor compatibilidad con los sistemas operativos Windows modernos y su instalación es obligatoria.
 es.eeEssentialsDescription        =Los archivos esenciales de la Enhanced Edition ofrecen correcciones de la geometría, ajustes para que la cámara no se salga de las habitaciones, textos en alta resolución y mejoras en las traducciones del juego.
 es.img_packDescription            =El paquete de mejora de imágenes ofrece imágenes a pantalla completa redimensionadas, remasterizadas y recreadas.

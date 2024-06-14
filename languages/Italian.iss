@@ -50,7 +50,7 @@ it.BackupLocationBrowse =Per favore, specifica il percorso dove archiviare il ba
 
 it.DescriptionTip                 =Posiziona il mouse sopra un componente per vedere la sua descrizione.
 it.eeModuleDescription            =Il modulo Miglioramenti per SH2 offre correzioni e miglioramenti a livello di programmazione. Questo è il "cervello" del progetto ed è necessario installarlo.
-it.wine_stubDescription           =Placeholder
+it.wine_stubDescription           =Posiziona un file di collegamento chiamato d3dx.dll nella cartella del gioco così che carichi il file d3d8.dll nella stessa cartella per utenti di Linux/Wine/Proton. Deve essere usato in concomitanza al pacchetto "Enhanced Executable (Eseguibile Migliorato)".
 it.eeExeDescription               =Questo eseguibile offre compatiblità con i più recenti sistemi operativi Windows ed è necessario installarlo.
 ; For translators: if your language is French, German, Italian or Spanish, here you can replace "language/textual improvements" with "translation improvements".
 it.eeEssentialsDescription        =I File Essenziali della Enhanced Edition offrono correzioni alla geometria, aggiustamenti alle inquadrature della telecamera, testo ad alta risoluzione, e miglioramenti della traduzione.

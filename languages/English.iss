@@ -50,7 +50,7 @@ BackupLocationBrowse =Please specify the directory where the backup should be st
 
 DescriptionTip                 =Move your mouse over a component to see its description.
 eeModuleDescription            =The SH2 Enhancements module provides programming-based fixes and enhancements. This is the "brains" of the project and is required to be installed.
-wine_stubDescription           =Placeholder
+wine_stubDescription           =Places a d3dx.dll stub in the game's folder so that the game will load the project's local d3d8.dll file for Linux/Wine/Proton users. Must be used with the project's "Enhanced Executable" package to work.
 eeExeDescription               =This executable provides compatibility with newer Windows operating systems and is required to be installed.
 ; For translators: if your language is French, German, Italian or Spanish, here you can replace "language/textual improvements" with "translation improvements".
 eeEssentialsDescription        =The Enhanced Edition Essential Files provides geometry fixes, camera clipping adjustments, high resolution text, and language/textual improvements for the game.
