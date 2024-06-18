@@ -48,7 +48,7 @@ jp.BackupLocationBrowse =バックアップを保存するフォルダを指定�
 
 jp.DescriptionTip                 =コンポーネント上にカーソルを合わせると、説明文が表示されます。
 jp.eeModuleDescription            =SH2 Enhancements module は、PC版のゲーム本体が抱える既知の不具合の修正や、独自の強化機能を提供します。 こちらはプロジェクトの基本にして核であるため、必ずインストールする必要があります。
-jp.wine_stubDescription           =Placeholder
+jp.wine_stubDescription           =Linux/Wine/Protonユーザーのために、ゲームがプロジェクトのローカルd3d8.dllファイルをロードするように、ゲームのフォルダにd3dx.dllスタブが配置されます。プロジェクトの "Enhanced Executable "パッケージと一緒に使用する必要があります。
 jp.eeExeDescription               =新しい Windows OS との互換性を提供する実行ファイルです。必ずインストールして下さい。
 jp.eeEssentialsDescription        =Enhanced Edition Essential Filesでは、ジオメトリ処理の修正、カメラのコントロール調整、テキストの高解像度化、ゲーム内の言語/テキストの改善などが行われています。
 jp.img_packDescription            =Image Enhancement Packはアップスケーリングおよびリマスター処理、高解像度に合わせ再作成したファイルを提供します。
