@@ -527,17 +527,17 @@ begin
   // Force installation of the SH2E module, EE exe and credits if not in maintenance mode
   if not maintenanceMode then
   begin
-    WizardForm.ComponentsList.Checked[GetWebCompIndexByID('sh2emodule') - 1] := true;
-    WizardForm.ComponentsList.Checked[GetWebCompIndexByID('ee_exe') - 1] := true;
-    WizardForm.ComponentsList.Checked[GetWebCompIndexByID('credits') - 1] := true;
-    WizardForm.ComponentsList.ItemEnabled[GetWebCompIndexByID('sh2emodule') - 1] := false;
-    WizardForm.ComponentsList.ItemEnabled[GetWebCompIndexByID('ee_exe') - 1] := false;
-    WizardForm.ComponentsList.ItemEnabled[GetWebCompIndexByID('credits') - 1] := false;
+    WizardForm.ComponentsList.Checked[GetCompIndexByID('sh2emodule') - 1] := true;
+    WizardForm.ComponentsList.Checked[GetCompIndexByID('ee_exe') - 1] := true;
+    WizardForm.ComponentsList.Checked[GetCompIndexByID('credits') - 1] := true;
+    WizardForm.ComponentsList.ItemEnabled[GetCompIndexByID('sh2emodule') - 1] := false;
+    WizardForm.ComponentsList.ItemEnabled[GetCompIndexByID('ee_exe') - 1] := false;
+    WizardForm.ComponentsList.ItemEnabled[GetCompIndexByID('credits') - 1] := false;
   end;
 
   // Automatically check the wine_stub component if wine is detected
   if not maintenanceMode then
-    WizardForm.ComponentsList.Checked[GetWebCompIndexByID('sh2emodule\wine_stub') - 1] := IsWine();
+    WizardForm.ComponentsList.Checked[GetCompIndexByID('sh2emodule\wine_stub') - 1] := IsWine();
 
   // Items names and descriptions on wpSelectComponents
   create_CompNameDesc();
@@ -836,7 +836,7 @@ begin
       for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
         if not (WebCompsArray[i].id = 'setup_tool') then
         begin
-          compIndex := GetMaintCompIndexByID(WebCompsArray[i].id);
+          compIndex := GetCompIndexByID(WebCompsArray[i].id);
           if compIndex > -1 then
           begin
             with Wizardform.ComponentsList do

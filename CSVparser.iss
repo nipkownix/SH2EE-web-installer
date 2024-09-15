@@ -1,46 +1,41 @@
 [Code]
 
-function GetLocalCompIndexByID(const ID: String): Integer;
+function GetCompIndexByID(const ID: String): Integer;
 var
   i: Integer;
 begin
   Result := -1; // Default result if not found
-  for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
-  begin
-    if LocalCompsArray[i].ID = ID then
-    begin
-      Result := i;
-      Exit;
-    end;
-  end;
-end;
 
-function GetWebCompIndexByID(const ID: String): Integer;
-var
-  i: Integer;
-begin
-  Result := -1; // Default result if not found
-  for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+  if localInstallMode and not maintenanceMode then
   begin
-    if WebCompsArray[i].ID = ID then
+    for i := 0 to GetArrayLength(LocalCompsArray) - 1 do
     begin
-      Result := i;
-      Exit;
+      if LocalCompsArray[i].ID = ID then
+      begin
+        Result := i;
+        Exit;
+      end;
     end;
-  end;
-end;
-
-function GetMaintCompIndexByID(const ID: String): Integer;
-var
-  i: Integer;
-begin
-  Result := -1; // Default result if not found
-  for i := 0 to GetArrayLength(MaintenanceCompsArray) - 1 do
+  end
+  else if not localInstallMode and maintenanceMode then
   begin
-    if MaintenanceCompsArray[i].ID = ID then
+    for i := 0 to GetArrayLength(MaintenanceCompsArray) - 1 do
     begin
-      Result := i;
-      Exit;
+      if MaintenanceCompsArray[i].ID = ID then
+      begin
+        Result := i;
+        Exit;
+      end;
+    end;
+  end else
+  begin
+    for i := 0 to GetArrayLength(WebCompsArray) - 1 do
+    begin
+      if WebCompsArray[i].ID = ID then
+      begin
+        Result := i;
+        Exit;
+      end;
     end;
   end;
 end;
@@ -228,7 +223,7 @@ begin
           // Re-save DSOAL's info if it exists, and we just wrote audio_pack
           if (WebCompsArray[i].id = 'audio_pack') then
           begin
-            compIndex := GetMaintCompIndexByID('dsoal');
+            compIndex := GetCompIndexByID('dsoal');
             if compIndex > -1 then
             begin
               if MaintenanceCompsArray[compIndex].isInstalled then
@@ -263,7 +258,7 @@ begin
     begin
       if not (WebCompsArray[i].id = 'setup_tool') then
       begin
-        compIndex := GetMaintCompIndexByID(WebCompsArray[i].id);
+        compIndex := GetCompIndexByID(WebCompsArray[i].id);
         if compIndex > -1 then
         begin
           // Rewrite existing local csv info

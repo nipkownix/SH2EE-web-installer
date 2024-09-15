@@ -65,7 +65,7 @@ begin
     for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
       if not (WebCompsArray[i].id = 'setup_tool') then
       begin
-        compIndex := GetMaintCompIndexByID(WebCompsArray[i].id);
+        compIndex := GetCompIndexByID(WebCompsArray[i].id);
         if compIndex > -1 then
         begin
           if isUpdateAvailable(WebCompsArray[i].Version, MaintenanceCompsArray[compIndex].Version, MaintenanceCompsArray[compIndex].isInstalled) then

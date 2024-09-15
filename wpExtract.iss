@@ -135,7 +135,7 @@ begin
         DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_s.res');
         DelTree(WizardDirValue + '\sh2e\resources', True, True, True);
 
-        compIndex := GetMaintCompIndexByID('dsoal');
+        compIndex := GetCompIndexByID('dsoal');
         if compIndex > -1 then
         begin
           if MaintenanceCompsArray[compIndex].isInstalled then

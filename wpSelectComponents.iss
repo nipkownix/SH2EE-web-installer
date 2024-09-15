@@ -57,7 +57,7 @@ begin
           ItemSubItem[i - 1] := FileSizeArray[i - 1].String
         else
         begin
-          compIndex := GetMaintCompIndexByID(WebCompsArray[i].id);
+          compIndex := GetCompIndexByID(WebCompsArray[i].id);
           if compIndex > -1 then
           begin
             // Show custom text if the component is already installed
