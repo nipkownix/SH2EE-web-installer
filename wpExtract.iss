@@ -127,6 +127,8 @@ begin
         DeleteFile(WizardDirValue + '\d3d8.dat');
         DeleteFile(WizardDirValue + '\D3DCompiler_43.dll');
         DeleteFile(WizardDirValue + '\D3DX9_43.dll');
+        DeleteFile(WizardDirValue + '\dsound.dll');
+        DeleteFile(WizardDirValue + '\dsoal-aldrv.dll');  
         DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_e.res');
         DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_f.res');
         DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_g.res');
@@ -134,18 +136,6 @@ begin
         DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_j.res');
         DeleteFile(WizardDirValue + '\sh2e\etc\resource\r_menu_s.res');
         DelTree(WizardDirValue + '\sh2e\resources', True, True, True);
-
-        compIndex := GetCompIndexByID('dsoal');
-        if compIndex > -1 then
-        begin
-          if MaintenanceCompsArray[compIndex].isInstalled then
-          begin
-            Log('# Deleting old DSOAL files...');
-            DeleteFile(WizardDirValue + '\dsound.dll');
-            DeleteFile(WizardDirValue + '\dsoal-aldrv.dll');  
-            MaintenanceCompsArray[compIndex].isInstalled := False;
-          end;
-        end;
       end;
   
       // Custom actions for wine_stub before extraction
