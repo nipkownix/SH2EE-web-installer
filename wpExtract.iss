@@ -255,6 +255,21 @@ begin
     begin
       // Update label
       UpdateCurrentComponentName(LocalCompsArray[i].name, false);
+
+      // Custom actions for wine_stub before extraction
+      if LocalCompsArray[i].id = 'sh2emodule\wine_stub' then
+      begin
+        // Display Wine dll message
+        if not (RegValueExists(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8')) then
+        begin
+          RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'd3d8', 'native,builtin');
+          RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'Dinput', 'native,builtin');
+          RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'Dinput8', 'native,builtin');
+          RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'dsound', 'native,builtin');
+          RegWriteStringValue(HKEY_CURRENT_USER, 'Software\Wine\DllOverrides', 'XInput1_3', 'native,builtin');
+          MsgBox(CustomMessage('WineOverrides'), mbInformation, MB_OK);
+        end;
+      end;
   
       // Backup the original .exe before extracting the new one, if a backup doesn't already exist
       if LocalCompsArray[i].id = 'ee_exe' then
