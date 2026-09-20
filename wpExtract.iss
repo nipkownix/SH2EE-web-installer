@@ -156,9 +156,13 @@ begin
       // Custom actions for Xidi before extraction
       if WebCompsArray[i].id = 'xidi' then
       begin
-        // Try to delete old XInput Plus files
+        // Try to delete old XInput Plus and Xidi files
         DeleteFile(WizardDirValue + '\Dinput.dll');
         DeleteFile(WizardDirValue + '\Dinput8.dll');
+        DeleteFile(WizardDirValue + '\SDL3.dll');
+        DeleteFile(WizardDirValue + '\SDL.XidiPlugin.32.dll');
+        DeleteFile(WizardDirValue + '\Xidi.32.dll');
+        DeleteFile(WizardDirValue + '\Xidi.ini');
         DeleteFile(WizardDirValue + '\XInput1_3.dll');
         DeleteFile(WizardDirValue + '\XInput1_4.dll');
         DeleteFile(WizardDirValue + '\XInputPlus.ini');
