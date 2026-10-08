@@ -1,6 +1,6 @@
 ; -- SH2EE Web Installer --
 
-#define INSTALLER_VER  "1.1.5"
+#define INSTALLER_VER  "1.1.7"
 #define DEBUG          "true"
 #define SH2EE_CSV_URL  "https://raw.githubusercontent.com/elishacloud/Silent-Hill-2-Enhancements/master/Resources/webcsv.url"
 
@@ -417,7 +417,7 @@ begin
             begin
               // Make sure the local .csv has the current Setup Tool's version, as there is
               // a chance the user might have manually updated the setup tool.
-              UpdateMaintenanceCSV_SetupToolOnly();
+              UpdateMaintenanceCSV_SetupToolOnly(ExpandConstant('{#INSTALLER_VER}'));
             end;
           end;
         end;

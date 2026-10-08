@@ -59,7 +59,7 @@ begin
   // Do stuff if we're selfUpdating from an existing install
   if DirExists(ExpandConstant('{src}\') + 'data') and FileExists(ExpandConstant('{src}\') + 'SH2EEsetup.dat') then
   begin
-    UpdateMaintenanceCSV_SetupToolOnly();
+    UpdateMaintenanceCSV_SetupToolOnly(WebCompsArray[0].Version);
   
     // Check if there's an update available for any component
     for i := 0 to GetArrayLength(WebCompsArray) - 1 do begin
