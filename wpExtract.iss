@@ -153,14 +153,16 @@ begin
         end;
       end;
 
-      // Custom actions for Xidi before extraction
+      // Custom actions for Xidi before extraction - this is a total of all the different files used for the project's controller support over the years
       if WebCompsArray[i].id = 'xidi' then
       begin
         // Try to delete old XInput Plus and Xidi files
         DeleteFile(WizardDirValue + '\Dinput.dll');
         DeleteFile(WizardDirValue + '\Dinput8.dll');
+        DeleteFile(WizardDirValue + '\gamecontrollerdb.txt');
         DeleteFile(WizardDirValue + '\SDL3.dll');
         DeleteFile(WizardDirValue + '\SDL.XidiPlugin.32.dll');
+        DeleteFile(WizardDirValue + '\sh2input.ini');
         DeleteFile(WizardDirValue + '\Xidi.32.dll');
         DeleteFile(WizardDirValue + '\Xidi.ini');
         DeleteFile(WizardDirValue + '\XInput1_3.dll');
