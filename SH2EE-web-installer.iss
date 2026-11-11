@@ -16,7 +16,7 @@
 #define fmv_packName      "FMV Enhancement Pack"
 #define audio_pack        "Audio Enhancement Pack"
 ;#define dsoalName         "DSOAL"
-#define xidiName          "Xidi"
+#define xidiName          "Controller Support"
 #define CreditsName       "Credits"
 
 #include "languages/English.iss"
