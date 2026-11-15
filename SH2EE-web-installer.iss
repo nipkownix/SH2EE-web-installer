@@ -1,6 +1,6 @@
 ; -- SH2EE Web Installer --
 
-#define INSTALLER_VER  "1.1.7"
+#define INSTALLER_VER  "1.1.8"
 #define DEBUG          "true"
 #define SH2EE_CSV_URL  "https://raw.githubusercontent.com/elishacloud/Silent-Hill-2-Enhancements/master/Resources/webcsv.url"
 
