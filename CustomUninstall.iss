@@ -26,11 +26,13 @@ begin
   DeleteFile(path + '\Dinput8.dll');
   DeleteFile(path + '\dsoal-aldrv.dll');
   DeleteFile(path + '\dsound.dll');
+  DeleteFile(path + '\gamecontrollerdb.txt‎');
   DeleteFile(path + '\SDL3.dll');
   DeleteFile(path + '\SDL.XidiPlugin.32.dll');
   DeleteFile(path + '\SH2EEsetup.dat');
   DeleteFile(path + '\SH2EEconfig.exe');
   DeleteFile(path + '\SH2EEconfig.xml');
+  DeleteFile(path + '\sh2input.ini');
   DeleteFile(path + '\sh2pc.exe');
   DeleteFile(path + '\XInput1_3.dll');
   DeleteFile(path + '\XInputPlus.ini');
